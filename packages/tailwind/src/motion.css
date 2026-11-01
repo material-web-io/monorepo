@@ -1,0 +1,77 @@
+/* Material 3 motion tokens: ease-standard, ease-emphasized-decelerate, ...,
+ * duration-short-3, duration-medium-2, ...; springs are in theme-default.css. With
+ * prefers-reduced-motion every duration collapses to 0.01ms, so all is instant. */
+:root {
+  --md-sys-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --md-sys-motion-easing-standard-accelerate: cubic-bezier(0.3, 0, 1, 1);
+  --md-sys-motion-easing-standard-decelerate: cubic-bezier(0, 0, 0, 1);
+  --md-sys-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --md-sys-motion-easing-emphasized-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
+  --md-sys-motion-easing-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --md-sys-motion-easing-linear: cubic-bezier(0, 0, 1, 1);
+
+  --md-sys-motion-duration-short1: 50ms;
+  --md-sys-motion-duration-short2: 100ms;
+  --md-sys-motion-duration-short3: 150ms;
+  --md-sys-motion-duration-short4: 200ms;
+  --md-sys-motion-duration-medium1: 250ms;
+  --md-sys-motion-duration-medium2: 300ms;
+  --md-sys-motion-duration-medium3: 350ms;
+  --md-sys-motion-duration-medium4: 400ms;
+  --md-sys-motion-duration-long1: 450ms;
+  --md-sys-motion-duration-long2: 500ms;
+  --md-sys-motion-duration-long3: 550ms;
+  --md-sys-motion-duration-long4: 600ms;
+  --md-sys-motion-duration-extra-long1: 700ms;
+  --md-sys-motion-duration-extra-long2: 800ms;
+  --md-sys-motion-duration-extra-long3: 900ms;
+  --md-sys-motion-duration-extra-long4: 1000ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --md-sys-motion-duration-short1: 0.01ms;
+    --md-sys-motion-duration-short2: 0.01ms;
+    --md-sys-motion-duration-short3: 0.01ms;
+    --md-sys-motion-duration-short4: 0.01ms;
+    --md-sys-motion-duration-medium1: 0.01ms;
+    --md-sys-motion-duration-medium2: 0.01ms;
+    --md-sys-motion-duration-medium3: 0.01ms;
+    --md-sys-motion-duration-medium4: 0.01ms;
+    --md-sys-motion-duration-long1: 0.01ms;
+    --md-sys-motion-duration-long2: 0.01ms;
+    --md-sys-motion-duration-long3: 0.01ms;
+    --md-sys-motion-duration-long4: 0.01ms;
+    --md-sys-motion-duration-extra-long1: 0.01ms;
+    --md-sys-motion-duration-extra-long2: 0.01ms;
+    --md-sys-motion-duration-extra-long3: 0.01ms;
+    --md-sys-motion-duration-extra-long4: 0.01ms;
+  }
+}
+
+@theme inline {
+  --ease-linear: var(--md-sys-motion-easing-linear);
+  --ease-standard: var(--md-sys-motion-easing-standard);
+  --ease-standard-accelerate: var(--md-sys-motion-easing-standard-accelerate);
+  --ease-standard-decelerate: var(--md-sys-motion-easing-standard-decelerate);
+  --ease-emphasized: var(--md-sys-motion-easing-emphasized);
+  --ease-emphasized-accelerate: var(--md-sys-motion-easing-emphasized-accelerate);
+  --ease-emphasized-decelerate: var(--md-sys-motion-easing-emphasized-decelerate);
+
+  --transition-duration-short-1: var(--md-sys-motion-duration-short1);
+  --transition-duration-short-2: var(--md-sys-motion-duration-short2);
+  --transition-duration-short-3: var(--md-sys-motion-duration-short3);
+  --transition-duration-short-4: var(--md-sys-motion-duration-short4);
+  --transition-duration-medium-1: var(--md-sys-motion-duration-medium1);
+  --transition-duration-medium-2: var(--md-sys-motion-duration-medium2);
+  --transition-duration-medium-3: var(--md-sys-motion-duration-medium3);
+  --transition-duration-medium-4: var(--md-sys-motion-duration-medium4);
+  --transition-duration-long-1: var(--md-sys-motion-duration-long1);
+  --transition-duration-long-2: var(--md-sys-motion-duration-long2);
+  --transition-duration-long-3: var(--md-sys-motion-duration-long3);
+  --transition-duration-long-4: var(--md-sys-motion-duration-long4);
+  --transition-duration-extra-long-1: var(--md-sys-motion-duration-extra-long1);
+  --transition-duration-extra-long-2: var(--md-sys-motion-duration-extra-long2);
+  --transition-duration-extra-long-3: var(--md-sys-motion-duration-extra-long3);
+  --transition-duration-extra-long-4: var(--md-sys-motion-duration-extra-long4);
+}

@@ -1,0 +1,356 @@
+import calendarApi from 'virtual:api/Calendar'
+import { CalendarSlots } from '../../slot-pictures/calendar.tsx'
+import calendarCellApi from 'virtual:api/CalendarCell'
+import calendarGridApi from 'virtual:api/CalendarGrid'
+import calendarGridBodyApi from 'virtual:api/CalendarGridBody'
+import calendarGridHeaderApi from 'virtual:api/CalendarGridHeader'
+import calendarHeaderCellApi from 'virtual:api/CalendarHeaderCell'
+import calendarHeadingApi from 'virtual:api/CalendarHeading'
+import calendarMenuButtonApi from 'virtual:api/CalendarMenuButton'
+import calendarMonthPickerApi from 'virtual:api/CalendarMonthPicker'
+import calendarMonthsApi from 'virtual:api/CalendarMonths'
+import calendarPageApi from 'virtual:api/CalendarPage'
+import calendarWeekdaysApi from 'virtual:api/CalendarWeekdays'
+import calendarYearPickerApi from 'virtual:api/CalendarYearPicker'
+import rangeCalendarApi from 'virtual:api/RangeCalendar'
+import * as anatomy from '../../examples/calendar/anatomy.tsx?example'
+import * as basic from '../../examples/calendar/basic.tsx?example'
+import * as controlled from '../../examples/calendar/controlled.tsx?example'
+import * as customDay from '../../examples/calendar/custom-day.tsx?example'
+import * as focused from '../../examples/calendar/focused.tsx?example'
+import * as formProps from '../../examples/calendar/form-props.tsx?example'
+import * as invalid from '../../examples/calendar/invalid.tsx?example'
+import * as menus from '../../examples/calendar/menus.tsx?example'
+import * as months from '../../examples/calendar/months.tsx?example'
+import * as range from '../../examples/calendar/range.tsx?example'
+import * as scrolling from '../../examples/calendar/scrolling.tsx?example'
+import * as unavailable from '../../examples/calendar/unavailable.tsx?example'
+
+Calendars let people select a date, or a range of dates, on a grid of days, without an input or a dialog around it. Compose your own calendar from the parts on this page, in a `Calendar` or a `RangeCalendar`. For a complete picker, with a header and a date input, use a [date picker](/components/date-picker).
+
+```tsx
+import {
+  Calendar,
+  CalendarCell,
+  CalendarGrid,
+  CalendarGridBody,
+  CalendarGridHeader,
+  CalendarHeaderCell,
+  CalendarHeading,
+  CalendarMenuButton,
+  CalendarMonthPicker,
+  CalendarMonths,
+  CalendarPage,
+  CalendarWeekdays,
+  CalendarYearPicker,
+  RangeCalendar,
+} from '@material-web/react'
+import { parseDate } from '@internationalized/date'
+```
+
+## Basic calendar
+
+A `Calendar` selects one date. Write its parts as its children, and name it with an `aria-label`. This one has the layout of a date picker's calendar: see [Layout](#layout).
+
+<Example {...basic} />
+
+### Range calendar
+
+Use a `RangeCalendar` to select a range of dates, such as the dates of a flight or of a hotel stay: the first day pressed starts the range, and the second ends it. Its grids highlight the range between its ends.
+
+<Example {...range} />
+
+## Composition
+
+A `Calendar` and a `RangeCalendar` hold the other parts as their children, and take the same parts.
+
+### React Aria parts
+
+These parts take the same props as the parts of the same name in React Aria's [Calendar](https://react-aria.adobe.com/Calendar#api) and [RangeCalendar](https://react-aria.adobe.com/RangeCalendar#api), and are composed the same way:
+
+| Part              | In                               | Use                                                                                                                                                                                                                                        |
+| ----------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `CalendarGrid`    | The calendar or a `CalendarPage` | Shows a month, with its seven columns spread evenly across its width. Pass it a function that returns a `CalendarCell` for a date, and it shows a `CalendarGridHeader` of `CalendarHeaderCell`s above a `CalendarGridBody` of those cells. |
+| `CalendarCell`    | `CalendarGrid`                   | Shows a day. Return it from the function of a `CalendarGrid` or a `CalendarGridBody`. Its children are the day's number by default.                                                                                                        |
+| `CalendarHeading` | The calendar or a `CalendarPage` | The heading of a month, as above each month of a range                                                                                                                                                                                     |
+
+This example uses these parts alone: a `CalendarHeading` between the previous and next buttons, above a `CalendarGrid` with a function as its children. The days of the adjacent months are dimmed.
+
+<Example {...anatomy} />
+
+### M3 parts
+
+These parts are specific to this library:
+
+| Part                  | In           | Use                                                                                                                                                    |
+| --------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `CalendarWeekdays`    | The calendar | Shows the days of the week once above a calendar's grids, so that they stay in place while the days page or scroll                                     |
+| `CalendarPage`        | The calendar | Holds what the previous and next buttons page through. It is as tall as six weeks, or as its content when that is taller.                              |
+| `CalendarMonths`      | The calendar | Shows the months of the calendar's `visibleDuration` in a scrolling column, under a `CalendarWeekdays`. See [Months in a column](#months-in-a-column). |
+| `CalendarMenuButton`  | The calendar | Opens a picker over the days: the years (the default), or the months with `picker="month"`                                                             |
+| `CalendarYearPicker`  | The calendar | A grid of years. See [Month and year pickers](#month-and-year-pickers).                                                                                |
+| `CalendarMonthPicker` | The calendar | A menu of months. See [Month and year pickers](#month-and-year-pickers).                                                                               |
+
+### Layout
+
+Lay the parts out with the calendar's classes. This is the layout of the date picker's calendar:
+
+```tsx
+<Calendar aria-label="Event date">
+  <div className="calendar-nav">
+    <CalendarMenuButton />
+    <div className="calendar-nav-arrows">
+      <span className="calendar-arrow-slot">
+        <IconButton slot="previous" aria-label="Previous month">
+          <Icon name="chevron_left" />
+        </IconButton>
+      </span>
+      <span className="calendar-arrow-slot">
+        <IconButton slot="next" aria-label="Next month">
+          <Icon name="chevron_right" />
+        </IconButton>
+      </span>
+    </div>
+  </div>
+  <div className="calendar-body">
+    <div className="calendar-days">
+      <CalendarWeekdays>{(day) => <CalendarHeaderCell>{day}</CalendarHeaderCell>}</CalendarWeekdays>
+      <CalendarPage>
+        <CalendarGrid>
+          <CalendarGridBody>{(date) => <CalendarCell date={date} />}</CalendarGridBody>
+        </CalendarGrid>
+      </CalendarPage>
+    </div>
+    <CalendarYearPicker />
+  </div>
+</Calendar>
+```
+
+| Class                 | Use                                                                                                                                                    |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `calendar-nav`        | The navigation row, with the menu button at its start.                                                                                                 |
+| `calendar-nav-arrows` | Holds the previous and next buttons at the end of the row, and hides them in place while a picker is open.                                             |
+| `calendar-arrow-slot` | Holds one of these buttons, in its middle.                                                                                                             |
+| `calendar-body`       | The area under the navigation row. It is as tall as the days of the week and six weeks of days, whatever the month, and a picker covers it while open. |
+| `calendar-days`       | Holds the days of the week and the page, and hides the days of the adjacent months.                                                                    |
+
+A calendar is as wide as the element that holds it. Give it a width with a class, such as `w-90` for 360dp.
+
+## Slots
+
+<CalendarSlots showLegend />
+
+| Slot           | Child                                                         | Use                                                             |
+| -------------- | ------------------------------------------------------------- | --------------------------------------------------------------- |
+| `previous`     | Any button, such as an [icon button](/components/icon-button) | The previous button, which pages back                           |
+| `next`         | Any button                                                    | The next button, which pages forward                            |
+| `errorMessage` | A `Text`                                                      | The error message. See [Invalid selection](#invalid-selection). |
+
+> **Note:** Inside a calendar, a button without a `slot` throws an error. Give any other button `slot={null}`.
+
+## Month and year pickers
+
+A `CalendarMenuButton` opens a picker over the days: the years (the default), or the months with `picker="month"`. Its label is the month and year shown, unless you give it children. `CalendarYearPicker` is a grid of years, and `CalendarMonthPicker` is a menu of months. Each opens from its menu button and closes when a year or a month is chosen, which the calendar then shows.
+
+A picker covers the element that holds it. Put it next to the days, in your own element with `position: relative`, such as one with the `calendar-body` class.
+
+Shift+M moves the focus to the months' menu button, and Shift+Y to the years'. With one menu button, both move the focus to it. On a keyboard layout without Latin letters, use the keys in the places of M and Y on a US keyboard. Escape in a picker closes the picker alone, not what is around the calendar.
+
+This example has a menu button for each picker. Their labels are written from the state that the `Calendar` passes to a function as its children:
+
+<Example {...menus} />
+
+## Controlled
+
+Pass dates as [`CalendarDate`](https://react-aria.adobe.com/internationalized/date/CalendarDate) objects from [`@internationalized/date`](https://react-aria.adobe.com/internationalized/date/), as `parseDate` returns for a string such as `2025-08-17`. Set the initial date with `defaultValue`, or control it with `value` and `onChange`, which is called with the date when a day is selected.
+
+<Example {...controlled} />
+
+A `RangeCalendar` takes the same props. Its value is a `{ start, end }` pair of `CalendarDate` objects, and its `onChange` is called once the second day ends the range. The [range calendar](#range-calendar) above is controlled.
+
+## Initial month
+
+A calendar opens at the month of its value, or at the current month when it has none. To open at another month, set `defaultFocusedValue` to a date in that month.
+
+To move the calendar from your own code, control the focused date with `focusedValue` and `onFocusChange`: the calendar shows the month of that date. See React Aria's [Controlling the focused date](https://react-aria.adobe.com/Calendar#controlling-the-focused-date).
+
+This calendar opens at April 2022 with no date selected, and its Today button moves it to the current month.
+
+<Example {...focused} />
+
+## Form props
+
+Set `isDisabled` to disable a calendar: its days and its buttons are dimmed, they cannot be pressed or focused, and the selected date is not marked. Set `isReadOnly` to keep the value as it is: the days can be focused and the months paged, but a press on a day selects nothing.
+
+<Example {...formProps} />
+
+## Validation
+
+Set `minValue` and `maxValue` to limit the dates that can be selected. Pass `isDateUnavailable` to mark days as unavailable: they are struck out, and can be focused with the keyboard but not selected.
+
+Set `allowsNonContiguousRanges` on a `RangeCalendar` to let a range run over unavailable days. These days are left out of the selection, and of the highlight of the range.
+
+<Example {...unavailable} />
+
+### Invalid selection
+
+A calendar is invalid when you set `isInvalid`, or when its value is outside the bounds or on an unavailable day. It then shows its selected day or its range in the error colors. For an error message under the days, put a `Text` from `react-aria-components` in the `errorMessage` slot, and render it while the calendar is invalid.
+
+<Example {...invalid} />
+
+## Localization
+
+A calendar formats its dates for the locale, which also sets the calendar system, the first day of the week, the names and digits of the days, months and years, and the direction the arrow keys move. To set a locale, wrap the calendar in an [`I18nProvider`](https://react-aria.adobe.com/I18nProvider) from `react-aria-components`. See [Internationalization](/get-started/react-aria#internationalization).
+
+- **First day of the week:** Set `firstDayOfWeek` on the calendar to start the week on another day than the locale's, as in `firstDayOfWeek="mon"`.
+- **Days of the week:** Set `weekdayStyle` on a `CalendarGrid` or a `CalendarWeekdays` to `narrow` (the default), `short` or `long`, for names such as S, Sun or Sunday.
+- **Direction:** A calendar follows the page's `dir`. Make it agree with the locale, so that the days run in the direction the arrow keys move.
+- **Calendar systems:** See React Aria's [International calendars](https://react-aria.adobe.com/Calendar#international-calendars) and [Custom calendar systems](https://react-aria.adobe.com/Calendar#custom-calendar-systems).
+
+For more on the locale and the direction, see [Text and locale](/components/date-picker#text-and-locale) on the date picker page.
+
+## Customization
+
+Pass classes in `className` to restyle a part: each part takes its own. See [Styling](/get-started/styling) for the classes, the states and the theme.
+
+- **States:** A `CalendarCell` reports the states of its day. Style one with its variant, such as `selected:`, `unavailable:` or `outside-month:`. See [States](/get-started/styling#states).
+- **Functions:** `className`, `style` and the children of a `Calendar`, a `RangeCalendar` and a `CalendarCell` can be functions of its state. See [Children as a function](/get-started/composition#children-as-a-function).
+
+### Months side by side
+
+To show several months side by side, set `visibleDuration` on the calendar, and put a `CalendarHeading` and a `CalendarGrid` for each month in one `CalendarPage`, each with an `offset` from the first month. The previous and next buttons page through all the months at once, or by one month with `pageBehavior="single"`.
+
+<Example {...months} />
+
+`selectionAlignment` sets where the month of the value is among them when the calendar opens: `start`, `center` (the default) or `end`.
+
+### Months in a column
+
+`CalendarMonths` shows the months of the calendar's `visibleDuration` in a scrolling column, each under its `CalendarHeading`. It starts scrolled to the focused month. Put it under a `CalendarWeekdays` in a `RangeCalendar`, as in this example:
+
+<Example {...scrolling} />
+
+### Custom day rendering
+
+To draw a day yourself, pass a function as the children of its `CalendarCell`. It is called with the state of the day, such as `formattedDate`, the number of the day in the locale, `isSelected` and `isToday`. This example marks the days that have an event with a dot:
+
+<Example {...customDay} />
+
+## Accessibility
+
+### Interaction and style
+
+- **States:** The days, a menu button, the years and the months show a state layer on hover and a ripple on a press. Keyboard focus shows a [focus ring](/theme/accessibility#focus-ring), and a press with a mouse or touch does not. Today is ringed, the selected day is filled, and an unavailable day is struck out.
+- **Touch target:** Each day, each year and a menu button have a 48dp [touch target](/theme/accessibility#touch-targets), and so does an [icon button](/components/icon-button) as the previous or next button. Each month in the months' menu is a 48dp row.
+- **Color contrast:** Material [advises](https://m3.material.io/components/date-pickers/accessibility#2f3e0c27-b914-44e7-9d56-ec38ca1fda68) 4.5:1 contrast between the dates and the background. With the default color roles, the days and the selected day keep it on the date picker's container in every scheme, and so do the days of an invalid range. On a background of your own, keep that contrast.
+- **Density:** The days, a menu button, the years and the months keep their size in every [density](/get-started/styling#density).
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), the pages change and the pickers open and close at once.
+- **Forced colors:** In [forced colors](/theme/accessibility#forced-colors), the selected day, the band of a range, the chosen year and the chosen month are filled with the system's highlight color, and the days outside the month or the bounds and the unavailable days are grayed out.
+- **Right to left:** In a right-to-left locale, Left arrow and Right arrow move the other way along the days. In a right-to-left `dir`, the next page slides in from the left. Make the two agree, as [Localization](#localization) explains.
+
+### Focus
+
+- The days are a single tab stop: the focus lands on the selected day, or on today when none is selected, and the arrow keys move it from there. Set `autoFocus` to focus that day when the calendar is shown.
+- An unavailable day can be focused with the keyboard, but not selected.
+- While a picker is open, the page under it cannot be reached, and the picker takes the focus on its chosen year or month. When the picker closes, the focus returns to its menu button.
+- When the previous or next button is disabled at a bound while it has the focus, the focus moves to the days.
+- The days and the buttons of a disabled calendar cannot be focused. The days of a read-only calendar can.
+
+### Keyboard navigation
+
+| Keys                             | Actions                                                                              |
+| -------------------------------- | ------------------------------------------------------------------------------------ |
+| Tab                              | Move the focus to the next control, with the days as one stop                        |
+| Left or Right arrow              | Move the focus to the previous or next day                                           |
+| Up or Down arrow                 | Move the focus to the same day of the previous or next week                          |
+| Page Up or Page Down             | Move the focus to the same day of the previous or next month                         |
+| Shift+Page Up or Shift+Page Down | Move the focus to the same day of the previous or next year                          |
+| Home or End                      | Move the focus to the first or last day of the month                                 |
+| Space or Enter                   | Select the focused day, or start or end a range, or choose the focused year or month |
+| Arrow keys                       | Move the focus among the years or the months, while a picker is open                 |
+| Shift+M                          | Move the focus to the months' menu button                                            |
+| Shift+Y                          | Move the focus to the years' menu button                                             |
+| Escape                           | Close the open picker, or cancel a range whose end is not selected yet               |
+
+- With one menu button, Shift+M and Shift+Y both move the focus to it. See [Month and year pickers](#month-and-year-pickers).
+
+### Labeling elements
+
+- Name the calendar with an `aria-label` or `aria-labelledby`. The month shown is added to the name, as in Event date, August 2025, and each grid of days is named the same way, with its own month.
+- Name the previous and next buttons with an `aria-label`.
+- Each day is named with its full date, such as Sunday, August 17, 2025, as Material [advises](https://m3.material.io/components/date-pickers/accessibility#0a993e94-c073-459f-9eaf-da28a628c926), so the days of the week are hidden from assistive technology. The name also says whether the day is today or selected, and whether it is the first or the last date allowed.
+- A day outside the bounds or unavailable is reported as disabled. While the calendar is invalid, its selected days are reported as invalid, and described by the `Text` in the `errorMessage` slot.
+- A menu button is named by its label, the month and year shown unless you give it children, and reports whether its picker is open. The years and the months are list boxes named in the locale, the chosen one selected.
+- When a day is selected, screen readers announce the selection. When the previous or next button changes the page, they announce the month shown.
+
+## Props
+
+`Calendar`, `RangeCalendar`, `CalendarGrid`, `CalendarGridHeader`, `CalendarGridBody`, `CalendarHeaderCell`, `CalendarCell` and `CalendarHeading` take the props of the React Aria Components part of the same name, and a `ref`.
+
+### Calendar
+
+<PropsTable {...calendarApi} />
+
+### RangeCalendar
+
+<PropsTable {...rangeCalendarApi} />
+
+### CalendarGrid
+
+<PropsTable {...calendarGridApi} />
+
+### CalendarGridHeader
+
+<PropsTable {...calendarGridHeaderApi} />
+
+### CalendarGridBody
+
+<PropsTable {...calendarGridBodyApi} />
+
+### CalendarHeaderCell
+
+<PropsTable {...calendarHeaderCellApi} />
+
+### CalendarCell
+
+<PropsTable {...calendarCellApi} />
+
+### CalendarHeading
+
+<PropsTable {...calendarHeadingApi} />
+
+### CalendarWeekdays
+
+Pass a function as its children: it is called with the name of each day of the week, and returns its label, such as a `CalendarHeaderCell`. `weekdayStyle` sets the format of the names, as on a `CalendarGrid`.
+
+<PropsTable {...calendarWeekdaysApi} />
+
+### CalendarPage
+
+Takes `className`, `style`, `ref` and children.
+
+<PropsTable {...calendarPageApi} />
+
+### CalendarMonths
+
+Takes `className`, `style` and `ref`.
+
+<PropsTable {...calendarMonthsApi} />
+
+### CalendarMenuButton
+
+Takes the props of a button, except `slot`. Its children are its label.
+
+<PropsTable {...calendarMenuButtonApi} />
+
+### CalendarYearPicker
+
+Takes the props of React Aria's `CalendarYearPicker`, except children, and the `className` and `style` of the element it opens in.
+
+<PropsTable {...calendarYearPickerApi} />
+
+### CalendarMonthPicker
+
+Takes the props of React Aria's `CalendarMonthPicker`, except children, and the `className` and `style` of the element it opens in. `format` is `long` by default.
+
+<PropsTable {...calendarMonthPickerApi} />

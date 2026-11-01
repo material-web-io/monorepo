@@ -1,0 +1,50 @@
+/* M3 window size classes as min-width breakpoints, in px as media queries can't read variables:
+ * medium-screen: 600dp, expanded-screen: 840dp, large-screen: 1200dp, extra-large-screen: 1600dp,
+ * plus max-medium-screen: etc.; compact is unprefixed. No clash with React Aria's expanded:. */
+@theme {
+  --breakpoint-medium-screen: 600px;
+  --breakpoint-expanded-screen: 840px;
+  --breakpoint-large-screen: 1200px;
+  --breakpoint-extra-large-screen: 1600px;
+}
+
+/* Hides the native scrollbar without disabling scrolling, for internal overflow
+ * (FabMenu's item stack) that should read as clipped content. Needs both the
+ * standard property and the WebKit pseudo-element; no browser has just one. */
+@utility scrollbar-hidden {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* The M3 scrollbar, on every scroll container and the page itself: a 4dp outline thumb with
+ * round ends and no track, 2dp short of each end. In the base layer, under scrollbar-hidden
+ * and a component's own (menu-panel); as scrollbar parts it stays on screen and takes its 4dp. */
+@layer base {
+  ::-webkit-scrollbar {
+    width: var(--spacing-space-50);
+    height: var(--spacing-space-50);
+  }
+  ::-webkit-scrollbar-track:vertical {
+    margin-block: var(--spacing-space-25);
+  }
+  ::-webkit-scrollbar-track:horizontal {
+    margin-inline: var(--spacing-space-25);
+  }
+  ::-webkit-scrollbar-thumb {
+    border-radius: var(--md-sys-shape-corner-full);
+    background-color: var(--md-sys-color-outline);
+    /* Forced colors would paint it the canvas color it lies on. */
+    @media (forced-colors: active) {
+      background-color: ButtonText;
+    }
+  }
+  /* Firefox has no scrollbar parts: its own thin scrollbar takes the color, on no track. */
+  @supports not selector(::-webkit-scrollbar) {
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: var(--md-sys-color-outline) transparent;
+    }
+  }
+}

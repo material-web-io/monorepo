@@ -1,0 +1,105 @@
+import * as density from '../../examples/theme/density.tsx?example'
+import * as ruler from '../../examples/theme/spacing-ruler.tsx?example'
+import * as scale from '../../examples/theme/spacing-scale.tsx?example'
+
+Use a step of the Material 3 [spacing scale](https://m3.material.io/styles/spacing/tokens), Space 0 to Space 900, with any of Tailwind's [spacing and sizing utilities](https://tailwindcss.com/docs/theme#theme-variable-namespaces), as in `p-space-200` or `gap-space-100`. Every step has a second form that follows the density of the element, for a component that people can make more compact.
+
+## Spacing scale
+
+The theme's spaces follow Material's [spacing system](https://m3.material.io/styles/spacing/overview): a scale of 8dp units, where Space 100 is 8dp and the number of a step is its multiple of that unit. The steps are 2dp apart up to Space 200, and 4dp or 8dp apart from there.
+
+<Example {...ruler} showCode={false} />
+
+Use a step as `space-<n>` after any of Tailwind's [spacing and sizing utilities](https://tailwindcss.com/docs/theme#theme-variable-namespaces): `p-space-100`, `gap-space-300`, `size-space-500`, `-mt-space-50`.
+
+<Example {...scale} showCode={false} />
+
+| Name        | Theme variable        | Density form                   | Size |
+| ----------- | --------------------- | ------------------------------ | ---- |
+| `space-0`   | `--spacing-space-0`   | `--spacing-space-0-variable`   | 0    |
+| `space-25`  | `--spacing-space-25`  | `--spacing-space-25-variable`  | 2dp  |
+| `space-50`  | `--spacing-space-50`  | `--spacing-space-50-variable`  | 4dp  |
+| `space-75`  | `--spacing-space-75`  | `--spacing-space-75-variable`  | 6dp  |
+| `space-100` | `--spacing-space-100` | `--spacing-space-100-variable` | 8dp  |
+| `space-125` | `--spacing-space-125` | `--spacing-space-125-variable` | 10dp |
+| `space-150` | `--spacing-space-150` | `--spacing-space-150-variable` | 12dp |
+| `space-175` | `--spacing-space-175` | `--spacing-space-175-variable` | 14dp |
+| `space-200` | `--spacing-space-200` | `--spacing-space-200-variable` | 16dp |
+| `space-250` | `--spacing-space-250` | `--spacing-space-250-variable` | 20dp |
+| `space-300` | `--spacing-space-300` | `--spacing-space-300-variable` | 24dp |
+| `space-400` | `--spacing-space-400` | `--spacing-space-400-variable` | 32dp |
+| `space-450` | `--spacing-space-450` | `--spacing-space-450-variable` | 36dp |
+| `space-500` | `--spacing-space-500` | `--spacing-space-500-variable` | 40dp |
+| `space-600` | `--spacing-space-600` | `--spacing-space-600-variable` | 48dp |
+| `space-700` | `--spacing-space-700` | `--spacing-space-700-variable` | 56dp |
+| `space-800` | `--spacing-space-800` | `--spacing-space-800-variable` | 64dp |
+| `space-900` | `--spacing-space-900` | `--spacing-space-900-variable` | 72dp |
+
+One dp is one px: `p-space-100` is 8dp. The spaces are in `px`, so they keep their size when the reader's font size changes. A step's density form is the theme variable of its `space-<n>-variable` name: see [Density](/theme/spacing#density).
+
+A space is a value of Tailwind's spacing scale, and is used like any other:
+
+- **Utilities:** Use a space with every utility that takes a spacing value: padding, margin, gap, width, height and `size-*`, inset, translate and scroll margin.
+- **Negative values:** Put a dash before the utility, as in `-mt-space-50`, where Tailwind takes a [negative value](https://tailwindcss.com/docs/margin#using-negative-values).
+- **Tailwind's scale:** A bare number is Tailwind's own scale: `p-4` is 1rem. Use the two side by side. For a size past Space 900, use Tailwind's scale, such as `h-72`.
+- **Window size:** Add a [breakpoint variant](/theme/layout#breakpoints) for another space in a larger window, as in `p-space-200 expanded-screen:p-space-300`.
+- **Padding and gaps:** Material [recommends](https://m3.material.io/styles/spacing/overview) padding and gaps on a parent over margins on its children.
+- **Your own CSS:** Apply a space with Tailwind's [`@apply`](https://tailwindcss.com/docs/functions-and-directives#apply-directive), as in `@apply p-space-200`, or use its [theme variable](https://tailwindcss.com/docs/theme#with-custom-css) in a stylesheet that Tailwind compiles, as in `var(--spacing-space-200)`.
+- **Merged classes:** [tailwind-merge](https://github.com/dcastil/tailwind-merge) does not know the scale, and keeps both of two classes of one utility, such as `p-space-100 p-space-200`. To merge them, use the [`tv` or the `twMerge`](/get-started/styling#custom-components) that `@material-web/react` exports, where the later class replaces the earlier one.
+
+## Density
+
+Density makes a component shorter by taking from its top and bottom padding, 4dp of height a step, as Material's [density scale](https://m3.material.io/foundations/layout/grids-spacing/density) does. To make a box follow the density, pad it with `space-<n>-variable`, which is Space `<n>` less half a density step. Use it with any spacing utility, as in `py-space-125-variable` or `mt-space-300-variable`.
+
+Set the step with `density-1`, `density-2` or `density-3`, on the element or on any element around it. Without one, a `-variable` space equals the plain one. A density class sets the `--density` custom property, which every `-variable` space reads.
+
+<Example {...density} />
+
+| Class       | `--density` | Material's density | Height taken |
+| ----------- | ----------- | ------------------ | ------------ |
+| `density-0` | `0`         | 0, the default     | None         |
+| `density-1` | `-0.25rem`  | -1                 | 4dp          |
+| `density-2` | `-0.5rem`   | -2                 | 8dp          |
+| `density-3` | `-0.75rem`  | -3                 | 12dp         |
+
+A step is 0.25rem, Tailwind's [spacing unit](https://tailwindcss.com/docs/padding#customizing-your-theme): 4dp at the browser's default font size of 16px.
+
+- **Scope:** A density reaches everything inside the element it is set on. Use `density-0` to return a part of a denser area to the default.
+- **Your own CSS:** Apply a density space with Tailwind's [`@apply`](https://tailwindcss.com/docs/functions-and-directives#apply-directive), as in `@apply py-space-125-variable`. Read as a variable, as in `var(--spacing-space-125-variable)`, it has the root's density, not the element's.
+- **Padding only:** A density changes the padding alone. The text keeps its size, and a padding stops at 0, so a box is never shorter than its content.
+- **Round corners:** Use `rounded-space-<n>-variable` for the round corner of a box padded with it, at any density. See [Shape](/theme/shape#fully-round-corners).
+- **Components:** The components whose height comes from their padding, such as a `Button` or a `ListItem`, follow the density: `density-2` on a toolbar makes every button in it 8dp shorter. See [Styling](/get-started/styling#density).
+- **Targets:** A denser control is a smaller target. Material [advises against](https://m3.material.io/foundations/layout/grids-spacing/density#c6412110-5c22-428a-a04c-3ee2bb591427) applying density by default where it brings a target under 48 by 48dp: let people choose a denser layout instead. To keep the target of a smaller control at 48dp, add [`touch-target`](/theme/accessibility#touch-targets).
+
+## Custom spacing
+
+Every step of the scale is one of Tailwind's [theme variables](https://tailwindcss.com/docs/theme), named `--spacing-space-<n>`: the [scale's table](/theme/spacing#spacing-scale) lists each with its size. Set a variable in `@theme`, after the import, to add a step of your own. Material [names a new step](https://m3.material.io/styles/spacing/applying-spacing#6c3782db-7124-4602-a502-223b0dc69e32) by its multiple of 8dp, so 18dp is Space 225:
+
+```css
+@import 'tailwindcss';
+@import '@material-web/tailwind';
+
+@theme {
+  --spacing-space-225: 18px;
+}
+```
+
+The step then works with every spacing utility, as in `p-space-225` or `-mt-space-225`.
+
+A step of your own has no `-variable` form. To add one, define it in [`@theme inline`](https://tailwindcss.com/docs/theme#referencing-other-variables), with the step's size in place of `18px`:
+
+```css
+@theme inline {
+  --spacing-space-225-variable: calc(18px + var(--density, 0px) / 2);
+}
+```
+
+The density has two custom properties of its own:
+
+| Custom property | Default                       | Sets                                                                                                                                                                    |
+| --------------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--density`     | Not set, which reads as `0px` | The height a density takes from a padded box, as a negative length. A `density-<n>` class sets it to `<n>` steps                                                        |
+| `--spacing`     | `0.25rem`                     | Tailwind's own [spacing unit](https://tailwindcss.com/docs/padding#customizing-your-theme): one density step, and the base of Tailwind's numeric classes, such as `p-4` |
+
+- **Steps of the scale:** To change a step of the scale, set its variable in `@theme` as well, as in `--spacing-space-100: 10px`. The change reaches every class of that step, and the components that use it. The step's `-variable` form and its round corner keep the default size.
+- **One component:** To change the spacing of one component instead, pass a spacing class in its [`className`](/get-started/styling#classes), as in `<Button className="px-space-400">`.

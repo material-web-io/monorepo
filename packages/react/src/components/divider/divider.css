@@ -1,0 +1,6 @@
+/* React Aria's <hr> with its native margin and inset border reset, redrawn by the orientation
+ * as a 1dp solid border on one side: forced colors drop backgrounds but keep borders, so the
+ * line stays visible there with no extra rule. */
+@utility divider {
+  @apply m-0 shrink-0 self-stretch border-0 border-outline-variant;
+}

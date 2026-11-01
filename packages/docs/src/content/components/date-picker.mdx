@@ -1,0 +1,333 @@
+import datePickerApi from 'virtual:api/DatePicker'
+import { DatePickerDialogSlots, DatePickerHeaderSlots } from '../../slot-pictures/date-picker.tsx'
+import datePickerContentApi from 'virtual:api/DatePickerContent'
+import datePickerDialogApi from 'virtual:api/DatePickerDialog'
+import datePickerHeaderApi from 'virtual:api/DatePickerHeader'
+import datePickerHeadlineApi from 'virtual:api/DatePickerHeadline'
+import datePickerInputApi from 'virtual:api/DatePickerInput'
+import datePickerModeToggleApi from 'virtual:api/DatePickerModeToggle'
+import dateRangePickerApi from 'virtual:api/DateRangePicker'
+import dateRangePickerHeadlineApi from 'virtual:api/DateRangePickerHeadline'
+import dateRangePickerInputApi from 'virtual:api/DateRangePickerInput'
+import * as basic from '../../examples/date-picker/basic.tsx?example'
+import * as bounds from '../../examples/date-picker/bounds.tsx?example'
+import * as controlled from '../../examples/date-picker/controlled.tsx?example'
+import * as formProps from '../../examples/date-picker/form-props.tsx?example'
+import * as fullScreen from '../../examples/date-picker/full-screen.tsx?example'
+import * as input from '../../examples/date-picker/input.tsx?example'
+import * as locale from '../../examples/date-picker/locale.tsx?example'
+import * as modal from '../../examples/date-picker/modal.tsx?example'
+import * as parts from '../../examples/date-picker/parts.tsx?example'
+import * as range from '../../examples/date-picker/range.tsx?example'
+import * as rangeModal from '../../examples/date-picker/range-modal.tsx?example'
+
+Date pickers let people select a date, or a range of dates, on a calendar or by typing it. Compose a `DatePicker` from its parts, and use a `DateRangePicker` to select a range of dates. The pickers have no built-in text: write the text of each part yourself, in your language.
+
+To let people type a date without a calendar, use a [date field](/components/date-field).
+
+```tsx
+import {
+  DatePicker,
+  DatePickerCalendar,
+  DatePickerContent,
+  DatePickerDialog,
+  DatePickerHeader,
+  DatePickerHeadline,
+  DatePickerInput,
+  DatePickerModeToggle,
+  DateRangePicker,
+  DateRangePickerCalendar,
+  DateRangePickerHeadline,
+  DateRangePickerInput,
+  DialogTrigger,
+} from '@material-web/react'
+import { parseDate } from '@internationalized/date'
+import { Heading } from 'react-aria-components'
+```
+
+## Basic date picker
+
+Write the parts of a `DatePicker` as its children, with their text. A picker is shown where it is written, and does not open on its own: to show it in a dialog, see [Modal date picker](#modal-date-picker).
+
+<Example {...basic} />
+
+A `DatePicker` selects one date, and a `DateRangePicker` a range of dates. Show either one in the page, as in the example above, or in a dialog:
+
+| To show                                    | Use                                                                       |
+| ------------------------------------------ | ------------------------------------------------------------------------- |
+| [A picker in a dialog](#modal-date-picker) | A `DatePickerDialog` around the picker, with its buttons                  |
+| [A range picker](#date-range-picker)       | A `DateRangePicker`, in the page or in a `DatePickerDialog`               |
+| [A full-screen range picker](#full-screen) | A `DateRangePicker` in a [dialog](/components/dialog) with `isFullScreen` |
+
+## Composition
+
+A `DatePicker` is composed of these parts. It holds a `DatePickerHeader` and, under it, a `DatePickerContent`, which hold the others:
+
+| Part                          | In                  | Use                                                                |
+| ----------------------------- | ------------------- | ------------------------------------------------------------------ |
+| `DatePickerHeader`            | `DatePicker`        | The header                                                         |
+| `Heading` with `slot="title"` | `DatePickerHeader`  | The title                                                          |
+| `DatePickerHeadline`          | `DatePickerHeader`  | Shows the selected date, or its children while no date is selected |
+| `DatePickerModeToggle`        | `DatePickerHeader`  | The button that switches between the calendar and the date input   |
+| `DatePickerContent`           | `DatePicker`        | The content, under the header                                      |
+| `DatePickerCalendar`          | `DatePickerContent` | The calendar                                                       |
+| `DatePickerInput`             | `DatePickerContent` | The date input. Set its `label` to label its field.                |
+
+Leave out the mode toggle, the calendar or the input to do without it. This picker has the calendar alone:
+
+<Example {...parts} />
+
+The `DatePickerCalendar` is a [calendar](/components/calendar), and the `DatePickerInput` is a [date field](/components/date-field). Set their props on the picker. The props of React Aria's [Calendar](https://react-aria.adobe.com/Calendar#api), or of its [RangeCalendar](https://react-aria.adobe.com/RangeCalendar#api) on a `DateRangePicker`, apply to the calendar, and the value, the bounds and the disabled, read-only and invalid states apply to the input too. A `DatePicker` does not take `visibleDuration`.
+
+## Date range picker
+
+Use a `DateRangePicker` to select a range of dates, such as the dates of a flight or of a hotel stay. Compose it the same way, with these parts in place of the headline, the calendar and the input:
+
+| Part                      | Use                                                                                       |
+| ------------------------- | ----------------------------------------------------------------------------------------- |
+| `DateRangePickerHeadline` | Shows the selected range, or one end of it, or its children while neither end is selected |
+| `DateRangePickerCalendar` | Shows the months in a scrolling column                                                    |
+| `DateRangePickerInput`    | Holds the start and end inputs. Set `startLabel` and `endLabel` to label their fields.    |
+
+The picker fills the height it is given: in this example, the height of the box it is in. Press two days to select a range.
+
+<Example {...range} />
+
+In a `DatePickerDialog`, the months fill the dialog's height above the buttons. In this example, the confirm button is disabled until a range is selected.
+
+<Example {...rangeModal} />
+
+## Modal date picker
+
+To show a picker in a dialog, put it in a `DatePickerDialog`. Pass the dialog's buttons as `confirmButton` and `dismissButton`, and add a `clearButton` if you want one. Open the dialog from your own button with a `DialogTrigger`, or with the dialog's `isOpen`.
+
+The picker reports every selection through `onChange`. To keep the date unchanged until it is confirmed, hold the picked date in your own state and save it in the confirm button's `onPress`.
+
+A button with `slot="close"` closes the dialog after its own `onPress`. Escape and a press outside the dialog close it too. Set `isDismissable={false}` to keep a press outside from closing it, and `isKeyboardDismissDisabled` to keep Escape from closing it.
+
+<Example {...modal} />
+
+- The dialog places the dismiss button and then the confirm button at the end, under the picker, and the clear button at the start.
+- The `Heading` in the `title` slot of the picker's `DatePickerHeader` names the dialog.
+- Set `autoFocus` on the picker to focus a day of the calendar, or the first segment of the input, when the dialog opens.
+- The dialog opens and closes with the same props as a [dialog](/components/dialog).
+
+## Slots
+
+### Header
+
+<DatePickerHeaderSlots showLegend />
+
+| Slot    | Child       | Use                                                               |
+| ------- | ----------- | ----------------------------------------------------------------- |
+| `title` | A `Heading` | The picker's title. In a `DatePickerDialog`, it names the dialog. |
+
+### Dialog
+
+<DatePickerDialogSlots showLegend />
+
+| Slot    | Child                                               | Use                                                                         |
+| ------- | --------------------------------------------------- | --------------------------------------------------------------------------- |
+| `close` | Any button, such as the confirm and dismiss buttons | Closes the [`DatePickerDialog`](#modal-date-picker) after its own `onPress` |
+
+## Controlled
+
+Pass dates as [`CalendarDate`](https://react-aria.adobe.com/internationalized/date/CalendarDate) objects from [`@internationalized/date`](https://react-aria.adobe.com/internationalized/date/), in `value`, `defaultValue`, `minValue` and `maxValue`. Set the initial date with `defaultValue`, or control it with `value` and `onChange`. `onChange` is called with the date when a day is selected or a date is typed, and with `null` while the input holds no date that can be selected.
+
+<Example {...controlled} />
+
+The value of a `DateRangePicker` is a `{ start, end }` pair of dates. Its `onChange` is called with the range once both ends are selected or typed, and with `null` while the inputs hold one end or none.
+
+## Display mode
+
+The display mode is `picker` (the default), which shows the calendar, or `input`, which shows the date input. Set the initial mode with `defaultDisplayMode`, or control it with `displayMode` and `onDisplayModeChange`, which is called when the mode toggle switches the mode.
+
+Pass a function as the picker's children to write text that follows the display mode, such as the mode toggle's `aria-label`. It is called with `{ displayMode }`.
+
+Each time the input is shown, it holds the selected date, or the ends of the range, or nothing: a date that was partly typed, or that could not be selected, is cleared. Each time the calendar is shown, it opens at the month of the selected date, or of the start of the range. With no date selected, it stays on the month it showed before.
+
+Show the input first for a date in the distant past or future, such as a date of birth. In this example, `defaultFocusedValue` sets the [month](/components/calendar#initial-month) the calendar opens at while no date is selected.
+
+<Example {...input} />
+
+## Month and year pickers
+
+In the calendar, the month and year button opens a grid of years over the month, scrolled to the year shown. Shift+M and Shift+Y move the focus to the button. Escape in the years closes the years alone, not what is around the picker.
+
+## Clearing the value
+
+Set the value to `null` to clear it: no day is selected, the input is empty, and the headline shows its children. A picker has no clear button of its own. In a `DatePickerDialog`, pass one as `clearButton`, as in the [modal date picker](#modal-date-picker).
+
+## Form props
+
+Set `isDisabled` to disable a picker: its days, its month and year button and its input are dimmed and cannot be pressed or focused, and the selected day is not marked in the calendar. Set `isReadOnly` to keep the date as it is: the days and the input can be focused, but a press or a key changes nothing. The headline and the mode toggle stay as they are.
+
+<Example {...formProps} />
+
+> **Note:** A picker takes no `name`. To include a date in a form, use a [date field](/components/date-field#forms).
+
+## Validation
+
+Set `minValue` and `maxValue` to limit the dates that can be selected. Days outside them are dimmed, and the previous and next buttons and the years stop at them. Pass `isDateUnavailable` to mark days as unavailable: they are struck out, and can be focused with the keyboard but not selected.
+
+A typed date that is outside the bounds or unavailable stays in the input, marked as invalid, and makes the value `null` until a valid date replaces it.
+
+<Example {...bounds} />
+
+### Typed ranges
+
+- A typed date that is outside the bounds, unavailable, or on the wrong side of the other end is not accepted. It stays in its input, marked as invalid, and the range is `null` until a valid date replaces it.
+- When the two dates are out of order, the one typed last is marked as invalid, with no error text.
+- For the end date, `isDateUnavailable` is called with the start date as its anchor. Unless you set `allowsNonContiguousRanges`, an end date after the next unavailable day is not accepted.
+- The inputs accept only dates within the months of the calendar: its `visibleDuration`, which is 24 months by default, around the range or today. The months move when the keyboard focus goes past either end.
+
+## Full-screen
+
+For a full-screen range picker, as on a phone, put the `DateRangePicker` in a [dialog](/components/dialog) with `isFullScreen`, under your own bar that holds a close button and a Save button. A picker is 360dp wide: give it `className="w-full"` to fill the dialog. The days of each week then spread evenly across its width, and the months scroll to the bottom edge of the window.
+
+<Example {...fullScreen} />
+
+## Text and locale
+
+The pickers have no built-in text. Write it in the parts: the title, the headline shown while no date is selected, the mode toggle's `aria-label`, the inputs' labels, and the text of the dialog's buttons. A part with no text shows none, but the mode toggle requires an `aria-label`.
+
+The pickers format the dates for the locale: the headline's date or range, the month and year, the days of the week, and the input's segments and format. The previous and next buttons are named in the locale too (Previous and Next in English). To set a locale, wrap the picker in an [`I18nProvider`](https://react-aria.adobe.com/I18nProvider) from `react-aria-components`.
+
+The locale also sets the calendar system (`th-TH` is Buddhist, `ja-JP-u-ca-japanese` has eras), the first day of the week, the names and digits of the days, months and years, and the direction the arrow keys move. The input's own error texts, such as `Value must be 09/01/2025 or later.`, are in the browser's language, not the locale's. See [Date field](/components/date-field#error-text-language).
+
+<Example {...locale} />
+
+- A `DatePickerDialog` is laid out in the locale's direction, unless you set its `dir`.
+- A picker or a calendar outside a dialog follows the page's `dir`. Make it agree with the locale, so that the days run in the direction the arrow keys move.
+- To change the calendar system, choose it in the locale (`th-TH-u-ca-gregory`). `createCalendar` changes the calendar but not the input.
+
+## Customization
+
+Pass classes in `className` to restyle a picker: they apply to its outermost element, as `style` and `ref` do. A `DatePickerHeader`, a `DatePickerContent` and a `DatePickerModeToggle` take `className` too. See [Styling](/get-started/styling) for the classes, the states and the theme.
+
+- **Width:** A picker is 360dp wide. Give it `className="w-full"` to fill the element that holds it.
+- **Height:** A `DateRangePicker` fills the height it is given, and its months scroll in it.
+- **Months:** A `DateRangePicker` holds 24 months. Set `visibleDuration` for more or fewer, as in `visibleDuration={{ months: 12 }}`.
+- **Calendar:** To compose your own calendar, use the parts of the [calendar](/components/calendar). Its [Layout](/components/calendar#layout) section shows how `DatePickerCalendar` composes them.
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/date-pickers/accessibility#2304b04a-3986-4afd-b3c3-d94a7b04719d) what people should be able to do with assistive technology:
+
+- Use multiple input methods, making it accessible to those using assistive technology
+
+### Interaction and style
+
+- **States:** The days, the month and year button and the years show a state layer on hover and a ripple on a press. Keyboard focus shows a [focus ring](/theme/accessibility#focus-ring), and a press with a mouse or touch does not. Today is ringed, the selected day is filled, and an unavailable day is struck out.
+- **Touch target:** Each day, each year, the month and year button, the previous and next buttons and the mode toggle have a 48dp [touch target](/theme/accessibility#touch-targets), as Material [advises](https://m3.material.io/components/date-pickers/accessibility#33c29a44-204f-482e-a82a-d19a1b90fa58).
+- **Color contrast:** With the default color roles, the days keep 4.5:1 contrast with the dialog's container in every scheme, the selected day too, as Material [advises](https://m3.material.io/components/date-pickers/accessibility#2f3e0c27-b914-44e7-9d56-ec38ca1fda68) for dates.
+- **Density:** The days, the years and the month and year button keep their size in every [density](/get-started/styling#density).
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), the dialog opens and the months change at once, without sliding.
+- **Forced colors:** In [forced colors](/theme/accessibility#forced-colors), the selected day and the band of a range are filled with the system's highlight color, the days past the bounds are grayed out, and the dialog keeps an edge.
+- **Right to left:** In a right-to-left locale, the dialog is laid out right to left, and the arrow keys move along the days in that direction. See [Text and locale](#text-and-locale).
+- **Date input:** Material [advises](https://m3.material.io/components/date-pickers/accessibility#2304b04a-3986-4afd-b3c3-d94a7b04719d) offering the date input in a modal date picker, behind the edit icon. Add a `DatePickerModeToggle` and a `DatePickerInput`: over the calendar, the toggle shows the edit icon and switches to the input.
+- **Clear button:** A `DatePickerDialog` has a clear button only when you pass `clearButton`. Material [advises](https://m3.material.io/components/date-pickers/accessibility#5f015ede-4e77-4cfc-843b-0a0cd025bf4b) leaving it out where it is not needed, so that keyboard users have fewer tab stops.
+
+### Focus
+
+- The dialog keeps the focus inside it while it is open, and gives it back to the button that opened it when it closes.
+- Set `autoFocus` on the picker to focus a day of the calendar, or the first segment of the input, when the dialog opens.
+- The days are a single tab stop. The arrow keys move the focus among them.
+- Pressing the mode toggle moves the focus into the calendar or the input it switches to. The other one cannot be reached until it is shown.
+- When the years close, the focus returns to the month and year button.
+- The days, the month and year button and the input of a disabled picker cannot be focused. Those of a read-only picker can.
+
+### Keyboard navigation
+
+| Keys                             | Actions                                                       |
+| -------------------------------- | ------------------------------------------------------------- |
+| Tab                              | Move the focus to the next control, with the days as one stop |
+| Left or Right arrow              | Move the focus to the previous or next day                    |
+| Up or Down arrow                 | Move the focus to the same day of the previous or next week   |
+| Page Up or Page Down             | Move the focus to the same day of the previous or next month  |
+| Shift+Page Up or Shift+Page Down | Move the focus to the same day of the previous or next year   |
+| Home or End                      | Move the focus to the first or last day of the month          |
+| Space or Enter                   | Select the focused day, or the focused year                   |
+| Arrow keys                       | Move the focus among the years, while they are open           |
+| Shift+M or Shift+Y               | Move the focus to the month and year button                   |
+| Escape                           | Close the years, or the dialog while the years are closed     |
+
+- Enter on a day selects it. It does not confirm the date or close the dialog.
+- Set `isKeyboardDismissDisabled` on the `DatePickerDialog` to keep Escape from closing it.
+- In the date input, the keys are those of a [date field](/components/date-field#keyboard-navigation).
+
+### Labeling elements
+
+- The picker's title names the dialog. To name it otherwise, set an `aria-label` on the `DatePickerDialog`.
+- The inputs are named by their labels: `label`, or `startLabel` and `endLabel`.
+- Give the mode toggle an `aria-label`, which can follow the display mode, as in [Display mode](#display-mode).
+- The previous and next buttons are named in the locale, Previous and Next in English. The month and year button is named by the month and year shown, such as August 2025, and reports whether the years are open. The years are a list box, the chosen year selected.
+- Each day is named with its full date, as Material [advises](https://m3.material.io/components/date-pickers/accessibility#0a993e94-c073-459f-9eaf-da28a628c926). See [Calendar](/components/calendar#labeling-elements).
+
+## Props
+
+Set a picker's props on the `DatePicker` or the `DateRangePicker`. Calendar props, such as `focusedValue`, `firstDayOfWeek` and `pageBehavior`, apply to its calendar, and the value and the bounds apply to its input too. `className`, `style` and `ref` apply to the picker's outermost element.
+
+### DatePicker
+
+<PropsTable {...datePickerApi} />
+
+### DateRangePicker
+
+<PropsTable {...dateRangePickerApi} />
+
+### DatePickerDialog
+
+<PropsTable {...datePickerDialogApi} />
+
+### DatePickerHeader
+
+Takes `className`, `style` and children.
+
+<PropsTable {...datePickerHeaderApi} />
+
+### DatePickerHeadline
+
+Its children are shown while no date is selected.
+
+<PropsTable {...datePickerHeadlineApi} />
+
+### DateRangePickerHeadline
+
+Its children are shown while neither end of the range is selected.
+
+<PropsTable {...dateRangePickerHeadlineApi} />
+
+### DatePickerModeToggle
+
+Takes the props of an [icon button](/components/icon-button), except `children` and `onPress`.
+
+<PropsTable {...datePickerModeToggleApi} />
+
+### DatePickerContent
+
+Takes `className`, `style` and children.
+
+<PropsTable {...datePickerContentApi} />
+
+### DatePickerCalendar
+
+Takes no props. Set the [calendar](/components/calendar)'s props on the `DatePicker`.
+
+### DatePickerInput
+
+Shows a [date field](/components/date-field) with no supporting text.
+
+<PropsTable {...datePickerInputApi} />
+
+### DateRangePickerCalendar
+
+Takes no props. Set the calendar's props on the `DateRangePicker`.
+
+### DateRangePickerInput
+
+Shows a [date field](/components/date-field) for each end of the range, with no supporting text.
+
+<PropsTable {...dateRangePickerInputApi} />

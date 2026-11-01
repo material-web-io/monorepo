@@ -1,0 +1,185 @@
+/* M3 type scale: text-display-lg, text-title-md, ..., and -emphasized, each
+ * setting size, line-height, tracking and weight; font-regular/medium/bold.
+ * No font is bundled: load Roboto and Material Symbols (font-icon, --font-icon). */
+:root {
+  --md-ref-typeface-brand: Roboto, ui-sans-serif, system-ui, sans-serif;
+  --md-ref-typeface-plain: Roboto, ui-sans-serif, system-ui, sans-serif;
+  --md-ref-typeface-weight-regular: 400;
+  --md-ref-typeface-weight-medium: 500;
+  --md-ref-typeface-weight-bold: 700;
+}
+
+@theme inline {
+  --font-brand: var(--md-ref-typeface-brand);
+  --font-plain: var(--md-ref-typeface-plain);
+
+  --font-weight-regular: var(--md-ref-typeface-weight-regular);
+  --font-weight-medium: var(--md-ref-typeface-weight-medium);
+  --font-weight-bold: var(--md-ref-typeface-weight-bold);
+}
+
+@theme {
+  --text-display-lg: 3.5625rem;
+  --text-display-lg--line-height: 4rem;
+  --text-display-lg--letter-spacing: -0.25px;
+  --text-display-lg--font-weight: var(--md-ref-typeface-weight-regular);
+  --text-display-md: 2.8125rem;
+  --text-display-md--line-height: 3.25rem;
+  --text-display-md--letter-spacing: 0;
+  --text-display-md--font-weight: var(--md-ref-typeface-weight-regular);
+  --text-display-sm: 2.25rem;
+  --text-display-sm--line-height: 2.75rem;
+  --text-display-sm--letter-spacing: 0;
+  --text-display-sm--font-weight: var(--md-ref-typeface-weight-regular);
+
+  --text-headline-lg: 2rem;
+  --text-headline-lg--line-height: 2.5rem;
+  --text-headline-lg--letter-spacing: 0;
+  --text-headline-lg--font-weight: var(--md-ref-typeface-weight-regular);
+  --text-headline-md: 1.75rem;
+  --text-headline-md--line-height: 2.25rem;
+  --text-headline-md--letter-spacing: 0;
+  --text-headline-md--font-weight: var(--md-ref-typeface-weight-regular);
+  --text-headline-sm: 1.5rem;
+  --text-headline-sm--line-height: 2rem;
+  --text-headline-sm--letter-spacing: 0;
+  --text-headline-sm--font-weight: var(--md-ref-typeface-weight-regular);
+
+  --text-title-lg: 1.375rem;
+  --text-title-lg--line-height: 1.75rem;
+  --text-title-lg--letter-spacing: 0;
+  --text-title-lg--font-weight: var(--md-ref-typeface-weight-regular);
+  --text-title-md: 1rem;
+  --text-title-md--line-height: 1.5rem;
+  --text-title-md--letter-spacing: 0.15px;
+  --text-title-md--font-weight: var(--md-ref-typeface-weight-medium);
+  --text-title-sm: 0.875rem;
+  --text-title-sm--line-height: 1.25rem;
+  --text-title-sm--letter-spacing: 0.1px;
+  --text-title-sm--font-weight: var(--md-ref-typeface-weight-medium);
+
+  --text-body-lg: 1rem;
+  --text-body-lg--line-height: 1.5rem;
+  --text-body-lg--letter-spacing: 0.5px;
+  --text-body-lg--font-weight: var(--md-ref-typeface-weight-regular);
+  --text-body-md: 0.875rem;
+  --text-body-md--line-height: 1.25rem;
+  --text-body-md--letter-spacing: 0.25px;
+  --text-body-md--font-weight: var(--md-ref-typeface-weight-regular);
+  --text-body-sm: 0.75rem;
+  --text-body-sm--line-height: 1rem;
+  --text-body-sm--letter-spacing: 0.4px;
+  --text-body-sm--font-weight: var(--md-ref-typeface-weight-regular);
+
+  --text-label-lg: 0.875rem;
+  --text-label-lg--line-height: 1.25rem;
+  --text-label-lg--letter-spacing: 0.1px;
+  --text-label-lg--font-weight: var(--md-ref-typeface-weight-medium);
+  --text-label-md: 0.75rem;
+  --text-label-md--line-height: 1rem;
+  --text-label-md--letter-spacing: 0.5px;
+  --text-label-md--font-weight: var(--md-ref-typeface-weight-medium);
+  --text-label-sm: 0.6875rem;
+  --text-label-sm--line-height: 1rem;
+  --text-label-sm--letter-spacing: 0.5px;
+  --text-label-sm--font-weight: var(--md-ref-typeface-weight-medium);
+
+  /* Emphasized: same size, line height and tracking, heavier weight. */
+  --text-display-lg-emphasized: 3.5625rem;
+  --text-display-lg-emphasized--line-height: 4rem;
+  --text-display-lg-emphasized--letter-spacing: -0.25px;
+  --text-display-lg-emphasized--font-weight: var(--md-ref-typeface-weight-medium);
+  --text-display-md-emphasized: 2.8125rem;
+  --text-display-md-emphasized--line-height: 3.25rem;
+  --text-display-md-emphasized--letter-spacing: 0;
+  --text-display-md-emphasized--font-weight: var(--md-ref-typeface-weight-medium);
+  --text-display-sm-emphasized: 2.25rem;
+  --text-display-sm-emphasized--line-height: 2.75rem;
+  --text-display-sm-emphasized--letter-spacing: 0;
+  --text-display-sm-emphasized--font-weight: var(--md-ref-typeface-weight-medium);
+
+  --text-headline-lg-emphasized: 2rem;
+  --text-headline-lg-emphasized--line-height: 2.5rem;
+  --text-headline-lg-emphasized--letter-spacing: 0;
+  --text-headline-lg-emphasized--font-weight: var(--md-ref-typeface-weight-medium);
+  --text-headline-md-emphasized: 1.75rem;
+  --text-headline-md-emphasized--line-height: 2.25rem;
+  --text-headline-md-emphasized--letter-spacing: 0;
+  --text-headline-md-emphasized--font-weight: var(--md-ref-typeface-weight-medium);
+  --text-headline-sm-emphasized: 1.5rem;
+  --text-headline-sm-emphasized--line-height: 2rem;
+  --text-headline-sm-emphasized--letter-spacing: 0;
+  --text-headline-sm-emphasized--font-weight: var(--md-ref-typeface-weight-medium);
+
+  --text-title-lg-emphasized: 1.375rem;
+  --text-title-lg-emphasized--line-height: 1.75rem;
+  --text-title-lg-emphasized--letter-spacing: 0;
+  --text-title-lg-emphasized--font-weight: var(--md-ref-typeface-weight-medium);
+  --text-title-md-emphasized: 1rem;
+  --text-title-md-emphasized--line-height: 1.5rem;
+  --text-title-md-emphasized--letter-spacing: 0.15px;
+  --text-title-md-emphasized--font-weight: var(--md-ref-typeface-weight-bold);
+  --text-title-sm-emphasized: 0.875rem;
+  --text-title-sm-emphasized--line-height: 1.25rem;
+  --text-title-sm-emphasized--letter-spacing: 0.1px;
+  --text-title-sm-emphasized--font-weight: var(--md-ref-typeface-weight-bold);
+
+  --text-body-lg-emphasized: 1rem;
+  --text-body-lg-emphasized--line-height: 1.5rem;
+  --text-body-lg-emphasized--letter-spacing: 0.5px;
+  --text-body-lg-emphasized--font-weight: var(--md-ref-typeface-weight-medium);
+  --text-body-md-emphasized: 0.875rem;
+  --text-body-md-emphasized--line-height: 1.25rem;
+  --text-body-md-emphasized--letter-spacing: 0.25px;
+  --text-body-md-emphasized--font-weight: var(--md-ref-typeface-weight-medium);
+  --text-body-sm-emphasized: 0.75rem;
+  --text-body-sm-emphasized--line-height: 1rem;
+  --text-body-sm-emphasized--letter-spacing: 0.4px;
+  --text-body-sm-emphasized--font-weight: var(--md-ref-typeface-weight-medium);
+
+  --text-label-lg-emphasized: 0.875rem;
+  --text-label-lg-emphasized--line-height: 1.25rem;
+  --text-label-lg-emphasized--letter-spacing: 0.1px;
+  --text-label-lg-emphasized--font-weight: var(--md-ref-typeface-weight-bold);
+  --text-label-md-emphasized: 0.75rem;
+  --text-label-md-emphasized--line-height: 1rem;
+  --text-label-md-emphasized--letter-spacing: 0.5px;
+  --text-label-md-emphasized--font-weight: var(--md-ref-typeface-weight-bold);
+  --text-label-sm-emphasized: 0.6875rem;
+  --text-label-sm-emphasized--line-height: 1rem;
+  --text-label-sm-emphasized--letter-spacing: 0.5px;
+  --text-label-sm-emphasized--font-weight: var(--md-ref-typeface-weight-bold);
+}
+
+/* Not inline, so an app can override --font-icon to use another symbol font. */
+@theme {
+  --font-icon: 'Material Symbols Outlined Variable', 'Material Symbols Outlined';
+  /* Ligature icons need exactly 0, not the `normal` default: some engines add
+   * tracking to ligature text, which mis-shapes or clips the glyph. */
+  --tracking-0: 0px;
+
+  /* Icon font sizes, matched 1:1 to the size-* box each renders in. */
+  --text-icon-18: 1.125rem;
+  --text-icon-18--line-height: 1;
+  --text-icon-20: 1.25rem;
+  --text-icon-20--line-height: 1;
+  --text-icon-24: 1.5rem;
+  --text-icon-24--line-height: 1;
+  --text-icon-28: 1.75rem;
+  --text-icon-28--line-height: 1;
+  --text-icon-32: 2rem;
+  --text-icon-32--line-height: 1;
+  --text-icon-36: 2.25rem;
+  --text-icon-36--line-height: 1;
+  --text-icon-40: 2.5rem;
+  --text-icon-40--line-height: 1;
+  --text-icon-48: 3rem;
+  --text-icon-48--line-height: 1;
+}
+
+/* Ligature text only shapes into its glyph in a left-to-right run; in an
+ * rtl layout the icon would show its clipped last letter instead. The box
+ * still flows in the layout's direction, and rtl: variants still apply. */
+@utility direction-ltr {
+  direction: ltr;
+}

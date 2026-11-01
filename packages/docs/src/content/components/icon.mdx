@@ -1,0 +1,138 @@
+import api from 'virtual:api/Icon'
+import * as basic from '../../examples/icon/basic.tsx?example'
+import * as color from '../../examples/icon/color.tsx?example'
+import * as fill from '../../examples/icon/fill.tsx?example'
+import * as grade from '../../examples/icon/grade.tsx?example'
+import * as inComponents from '../../examples/icon/in-components.tsx?example'
+import * as inherited from '../../examples/icon/inherited.tsx?example'
+import * as labelled from '../../examples/icon/labelled.tsx?example'
+import * as mirrored from '../../examples/icon/mirrored.tsx?example'
+import * as otherLibrary from '../../examples/icon/other-library.tsx?example'
+import * as sizes from '../../examples/icon/sizes.tsx?example'
+import * as weight from '../../examples/icon/weight.tsx?example'
+
+Icons are small symbols for actions, objects and ideas. Use them beside a label to make it easier to scan, or alone in a control that has an accessible name, such as an [icon button](/components/icon-button).
+
+The library supports icons in two ways:
+
+1. With the `Icon` component, which shows a [Material Symbols](#basic-icon) icon by its name.
+2. With [any other icon](#other-libraries), such as one from an SVG icon library, written in place of an `Icon`.
+
+```tsx
+import { Icon } from '@material-web/react'
+```
+
+## Basic icon
+
+`Icon` shows an icon from the Material Symbols font. It takes the color of the text around it, and its size, fill, weight and grade from classes.
+
+<Example {...basic} />
+
+The icon font is not bundled. Load Material Symbols as [Installation](/get-started/installation#load-the-styles-and-fonts) shows.
+
+Set `name` to the ligature name of a Material Symbols icon, such as `home` or `arrow_back`. Look up the names in the [Material Symbols library](https://fonts.google.com/icons). `name` is the only prop specific to `Icon`: style the icon with the classes below.
+
+To show an icon in an element of your own, give that element the `font-icon` class and write the name as its text.
+
+```tsx
+<span className="font-icon icon-24" aria-hidden>
+  home
+</span>
+```
+
+## Color
+
+An icon takes the text color of the element it is in. To give it another [color role](/theme/color#color-roles), pass a text color class in `className`, or set the class on an element around it.
+
+<Example {...color} />
+
+## Sizes
+
+Set an icon's size with `icon-` and a number of dp, such as `icon-18` to `icon-48`, the Material 3 icon sizes, or with a length, such as `icon-[1.5rem]`. The icon takes a square box of that size.
+
+<Example {...sizes} />
+
+Put the class on the icon or on any element around it. Like a font size, it is inherited: an icon uses its own class first, then the nearest one around it. The class does not change the size of the text. Without one, the icon is as large as the font size it inherits, 16dp in body-large text.
+
+<Example {...inherited} />
+
+## Fill
+
+Use `icon-filled` to fill an icon and `icon-outlined` to keep it outlined. The fill is inherited in the same way as the size: `icon-filled` on a parent fills every icon in it, except one with `icon-outlined`.
+
+<Example {...fill} />
+
+## Weight
+
+Set an icon's stroke weight with a font weight class, such as `font-medium`. The default weight is 400.
+
+<Example {...weight} />
+
+## Grade
+
+Use `-icon-grade-25` for low emphasis and `icon-grade-200` for high emphasis. The default grade is 0. The grade is inherited in the same way as the fill.
+
+<Example {...grade} />
+
+## Right to left
+
+Use `rtl:icon-mirrored` to flip an icon in a right-to-left layout. Apply it to an icon that implies a direction, such as `arrow_back`, and not to a symbol that keeps its meaning there, such as `check`.
+
+<Example {...mirrored} />
+
+## In components
+
+A component sizes the icons in it, so an icon in a `Button`, a `Chip`, a `ListItem` or a `MenuItem` needs no size class. A selected navigation, list or menu item fills the icons in it. Add `icon-outlined` to an icon to keep it outlined there.
+
+<Example {...inComponents} />
+
+In a component with icon slots, such as a `ListItem`, a `MenuItem` or a `Chip`, set the icon's `slot` to one of them. Any other `slot` throws an `Invalid slot` error. See [Slots](/get-started/composition#slots).
+
+## Other libraries
+
+Any icon works in place of `Icon`. `Button`, `IconButton`, `Fab` and `SplitButtonLeading` take an icon as a child, and `Chip` takes one as a child in its `leading` or `trailing` slot, so those components need no other change.
+
+To use an icon from an SVG icon library, or your own component, write it in place of the `Icon` and size it to fill the slot. A component sizes only the `Icon` it holds. See [Icons](/get-started/composition#icons).
+
+<Example {...otherLibrary} />
+
+## Customization
+
+Pass classes in `className` to restyle one icon, or set them on an element around it: the size, fill and grade classes are inherited. A class of yours replaces the icon's own class for the same property. See [Styling](/get-started/styling) for the classes and the theme.
+
+- **Size:** Pass an `icon-` class, as in [Sizes](#sizes).
+- **Color:** Pass a text color class, as in [Color](#color).
+- **Functions:** An icon reports no state, so `className` and `style` take a value and cannot be a function.
+- **Every icon:** To show every icon in another font, see [Custom font](#custom-font).
+
+### Custom font
+
+`Icon` shows Material Symbols by default. To use another ligature font with `Icon`, override `--font-icon`, and load that font. See [Custom fonts](/theme/typography#custom-fonts).
+
+```css
+:root {
+  --font-icon: 'Material Symbols Rounded';
+}
+```
+
+## Accessibility
+
+An icon is not a tab stop. It is either decorative or semantic.
+
+### Decorative icons
+
+An icon is decorative by default and hidden from assistive technology. The element that holds it is named by its own label.
+
+Material [advises](https://m3.material.io/styles/icons/applying-icons#8982c6eb-e207-4e48-ae14-7c79b05c57da) a text label beside an icon whose meaning is abstract, and a label on every navigation item. Write the label next to the `Icon`, in the same element, so that it names the element.
+
+### Semantic icons
+
+Set an `aria-label` to expose the icon as an image with that name.
+
+<Example {...labelled} />
+
+For an icon that people press, use an [icon button](/components/icon-button), and give the button the `aria-label`.
+
+## Props
+
+<PropsTable {...api} />

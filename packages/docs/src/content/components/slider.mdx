@@ -1,0 +1,195 @@
+import api from 'virtual:api/Slider'
+import * as basic from '../../examples/slider/basic.tsx?example'
+import * as centered from '../../examples/slider/centered.tsx?example'
+import * as controlled from '../../examples/slider/controlled.tsx?example'
+import * as custom from '../../examples/slider/custom.tsx?example'
+import * as form from '../../examples/slider/form.tsx?example'
+import * as icon from '../../examples/slider/icon.tsx?example'
+import * as output from '../../examples/slider/output.tsx?example'
+import * as range from '../../examples/slider/range.tsx?example'
+import * as rightToLeft from '../../examples/slider/right-to-left.tsx?example'
+import * as sizes from '../../examples/slider/sizes.tsx?example'
+import * as standard from '../../examples/slider/standard.tsx?example'
+import * as stops from '../../examples/slider/stops.tsx?example'
+import * as valueIndicator from '../../examples/slider/value-indicator.tsx?example'
+import * as variants from '../../examples/slider/variants.tsx?example'
+import * as vertical from '../../examples/slider/vertical.tsx?example'
+
+Sliders let people make selections from a range of values. They are ideal for adjusting settings such as volume and brightness, or the intensity of an image filter. A change made with a slider should take effect immediately, so that people see its effect as they move the handle.
+
+To enter an exact value, use a [text field](/components/text-field) instead.
+
+```tsx
+import { Slider } from '@material-web/react'
+import { Label, SliderOutput } from 'react-aria-components'
+```
+
+## Basic slider
+
+A slider selects a value along a track, from 0 to 100. Set the initial value with `defaultValue`, and another range with `minValue` and `maxValue`.
+
+<Example {...basic} />
+
+Use one `Slider` for every variant: it has a handle for each value you pass. The value selects the variant. Pass a number for a standard slider, a number with `isCentered` for a centered slider, or an array of two numbers for a range slider.
+
+<Example {...variants} />
+
+Configure any variant with [`size`](#sizes), [`showStops`](#discrete-sliders), [`showValueIndicator`](#value-indicator) and an inset [`icon`](#inset-icon). Each variant is shown below enabled, and disabled with `isDisabled`. A disabled slider cannot be moved or focused.
+
+### Standard slider
+
+A standard slider selects one value from a range of values. Its active track runs from the start to the value. Use it when the slider should start from zero or the beginning of a sequence.
+
+<Example {...standard} />
+
+### Centered slider
+
+A centered slider selects a value from a positive and negative value range. Its active track runs from the middle to the value, on whichever side that is. Use it when zero, or the default value, is in the middle of the range. `isCentered` applies to a single value only: a range slider ignores it.
+
+<Example {...centered} />
+
+### Range slider
+
+A range slider selects two values on one slider to create a range. Its active track runs between its two values. Use it to define a minimum and a maximum value. The handles do not pass each other: each one stops at the other's value.
+
+<Example {...range} />
+
+## Label and output
+
+Write a `Label` as a child of the slider to name it, and a `SliderOutput` to show its value, as in the [first example](#basic-slider) of this page. Import both from `react-aria-components`, as for React Aria's [Slider](https://react-aria.adobe.com/Slider). The children are shown before the track, so arrange them with the slider's `className`.
+
+Without a `Label`, set an `aria-label` on the slider.
+
+`formatOptions` formats the value, including the text of the output and of the value indicator. It takes the options of [`Intl.NumberFormat`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat/NumberFormat#options). A `SliderOutput`'s children can be a function of the slider's state, as in this example, which writes the two values of a range in its own words.
+
+<Example {...output} />
+
+## Inset icon
+
+Set `icon` to show an icon in the track, one that illustrates what the slider controls. It is shown on a standard slider only, and an `Icon` in it is sized to the slider. Use an inset icon on an `m`, `l` or `xl` slider, and not on an `xs` or `s` one.
+
+The icon is on the active track while there is room for it there, and on the inactive track otherwise. In this example, the first slider also swaps its icon at zero, from a volume icon to a mute icon.
+
+<Example {...icon} />
+
+## Value indicator
+
+Set `showValueIndicator` to show the value above a handle while it is held or dragged, or has keyboard focus. Only that handle shows its value, so a range slider shows one value at a time. Format the text with `formatOptions`. Where the value is shown elsewhere, the slider needs no indicator.
+
+<Example {...valueIndicator} />
+
+## Controlled
+
+Control the value with `value` and `onChange`, in place of `defaultValue`. Each takes a number, or an array of two numbers for a range slider. `onChange` is called as the value moves, and `onChangeEnd` once the handle is released.
+
+<Example {...controlled} />
+
+## Forms
+
+Set a `name` to include a slider in a form. Its value is submitted with the form, and a form reset restores `defaultValue`. A range slider submits both values under its `name`, the start first: read them with `getAll` on the form's `FormData`. A disabled slider submits nothing.
+
+Set `form` to the `id` of a form to include a slider that is outside it.
+
+<Example {...form} />
+
+## Discrete sliders
+
+Set `step` to the interval between values, which is 1 by default. Set `showStops` to show a stop at every `step` from `minValue`. The handle snaps to the nearest stop as it is dragged. Avoid too many stops on one slider: they crowd the track and make the value hard to adjust.
+
+The end stops are shown with or without `showStops`: every slider has a stop at the end of its track, and a centered or range slider has one at the start too.
+
+<Example {...stops} />
+
+## Sizes
+
+Set `size` to `xs` (the default), `s`, `m`, `l` or `xl`. A larger size has a thicker track, a larger target and more visual emphasis. Reserve `xl` for hero moments, where the slider is the most important element on the page.
+
+| Size | Track thickness |
+| ---- | --------------- |
+| `xs` | 16dp            |
+| `s`  | 24dp            |
+| `m`  | 40dp            |
+| `l`  | 56dp            |
+| `xl` | 96dp            |
+
+<Example {...sizes} />
+
+## Orientation
+
+Set `orientation="vertical"` for a slider whose value runs from the bottom. Give it a height with `className` or `style`: the track is as long as the slider is tall. The value indicator then appears at the handle's inline start. Avoid a vertical range slider: it adds cognitive load, and people expect most sliders to be horizontal.
+
+<Example {...vertical} />
+
+## Right to left
+
+A slider's direction follows the locale, not the `dir` attribute. To run the value from the right, wrap the slider in an `I18nProvider` with a right-to-left locale, and set `dir` for the rest of the layout. See [Internationalization](/get-started/react-aria#internationalization).
+
+<Example {...rightToLeft} />
+
+## Customization
+
+Pass classes in `className` to size the slider and to arrange its children. They go on its outermost element, as do `style` and `ref`. See [Styling](/get-started/styling) for the classes, the states and the theme.
+
+<Example {...custom} />
+
+- **Color:** `className` does not reach the track and the handles. To change their colors, set the color roles they use. See [Theme](/get-started/styling#theme).
+- **States:** A handle has the `data-dragging` attribute while it is held. To style the slider while one of its handles is held, use the `has-dragging:` variant, as in this example. A disabled slider matches `disabled:`. See [States](/get-started/styling#variants).
+- **Functions:** `className`, `style` and `children` can be functions of the slider's state: `orientation`, `isDisabled` and `state`. The state's type is exported as `SliderRenderProps`. See [Children as a function](/get-started/composition#children-as-a-function).
+- **Every slider:** To restyle all the sliders at once, change the [theme](/get-started/styling#theme).
+
+## Limitations
+
+### Handle props
+
+A handle takes no props of its own: you cannot set an `aria-label` or `inputRef` on a single handle. The slider's `name` and `form` apply to every handle, so the two handles of a range slider cannot be submitted under different names.
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/sliders/accessibility#a24cbac1-eda0-4edd-924a-d2c96b0f3ba8) what people should be able to do with assistive technology:
+
+- Navigate to a slider
+- Select a range by controlling a handle along a track
+- Get appropriate feedback based on input type
+
+### Interaction and style
+
+- **States:** While a handle is held or dragged, or has keyboard focus, it narrows from 4dp to 2dp, and with a [value indicator](#value-indicator) its value shows: the cues Material [describes](https://m3.material.io/components/sliders/accessibility#d04ab405-f376-49bf-b6aa-3c12e53c3641). The pointer is a hand over the track. Keyboard focus shows a [focus ring](/theme/accessibility#focus-ring) around the handle, and a press with a mouse or touch does not.
+- **Touch target:** A press anywhere along the track moves the nearer handle there. The track's [touch target](/theme/accessibility#touch-targets) is 48dp thick, and thicker on an `m`, `l` or `xl` [slider](#sizes).
+- **Color contrast:** Every slider has a stop at the end of its inactive track, the visual anchor Material [advises](https://m3.material.io/components/sliders/accessibility#87734caf-bc34-4bb7-b063-505cb935be0d) so that the end has 3:1 contrast with the background. In the light and dark schemes, at every contrast level, that end keeps 3:1 contrast with the surface. On another background, keep that contrast, or mark the ends with icons that have it.
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), the value indicator appears and disappears instantly.
+- **Forced colors:** In [forced colors](/theme/accessibility#forced-colors), the active track is drawn in the system's highlight color, and the inactive track and the handle in the system's text color. A disabled slider is grayed out.
+- **Right to left:** In a right-to-left locale, the slider runs from the right. Its direction follows the locale, not the `dir` attribute: see [Right to left](#right-to-left).
+
+### Focus
+
+- Tab moves the focus to each handle, as Material [advises](https://m3.material.io/components/sliders/accessibility#f614609c-43c9-468c-a517-4d17628201d8): the focused handle then takes the arrow keys.
+- A disabled slider cannot be focused.
+
+### Keyboard navigation
+
+| Keys                 | Actions                                                |
+| -------------------- | ------------------------------------------------------ |
+| Tab                  | Move the focus to a handle                             |
+| Arrow keys           | Increase or decrease the value by one step             |
+| Page Up or Page Down | Increase or decrease the value by a tenth of the range |
+| Shift+Arrow keys     | Increase or decrease the value by a tenth of the range |
+| Space+Arrow keys     | Increase or decrease the value by a tenth of the range |
+| Home                 | Move the value to the minimum                          |
+| End                  | Move the value to the maximum                          |
+
+- Up arrow, and the arrow that points in the reading direction, increase the value. In a right-to-left locale, Left arrow increases it.
+- A tenth of the range is rounded to whole steps, and is at least one step.
+- In a range slider, a handle stops at the other handle's value, Home and End included.
+
+### Labeling elements
+
+- Each handle has the slider role. A `Label` or an `aria-label` names the slider. Both handles of a range slider take the slider's name: a handle takes no name of its own. See [Handle props](#handle-props).
+- A handle's value is announced as `formatOptions` formats it. The value indicator is hidden from assistive technology.
+- A vertical slider reports its orientation to assistive technology.
+- For buttons beside the slider, such as ones that step the value, use an [icon button](/components/icon-button#labeling-elements), which has the button role, as Material [advises](https://m3.material.io/components/sliders/accessibility#bd0b6c2a-3b7e-4d52-b4a3-9fea0cdfb570). Give it an `aria-label`.
+
+## Props
+
+<PropsTable {...api} />

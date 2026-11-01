@@ -1,0 +1,173 @@
+import api from 'virtual:api/DateField'
+import * as basic from '../../examples/date-field/basic.tsx?example'
+import * as customInput from '../../examples/date-field/custom-input.tsx?example'
+import * as description from '../../examples/date-field/description.tsx?example'
+import * as form from '../../examples/date-field/form.tsx?example'
+import * as format from '../../examples/date-field/format.tsx?example'
+import * as label from '../../examples/date-field/label.tsx?example'
+import * as locale from '../../examples/date-field/locale.tsx?example'
+import * as readOnly from '../../examples/date-field/read-only.tsx?example'
+import * as validation from '../../examples/date-field/validation.tsx?example'
+import * as value from '../../examples/date-field/value.tsx?example'
+import * as withDatePicker from '../../examples/date-field/with-date-picker.tsx?example'
+
+Date fields let people type a date with the keyboard. Use a `DateField` for an outlined text field in which a date is typed, as in the input mode of the [date pickers](/components/date-picker).
+
+To let people pick the date on a calendar, use a [date picker](/components/date-picker).
+
+```tsx
+import { DateField } from '@material-web/react'
+import { parseDate } from '@internationalized/date'
+```
+
+## Basic date field
+
+Set the label text with `label` and the date with `defaultValue`. The date is typed in segments, and each segment shows a placeholder until it is typed. A `DateField` takes no children.
+
+<Example {...basic} />
+
+## Label and supporting text
+
+Set `label` to the label text, which names the field. The label rests on the date's line while the field is empty and not focused, and moves to the outline otherwise. With `isRequired`, it ends in an asterisk. Without a `label`, set an `aria-label`: the segments then show the date's format while the field is empty.
+
+<Example {...label} />
+
+### Supporting text
+
+Set `description` to the text under the field. Without it, the text is the date's format, such as `MM/DD/YYYY`. Pass `null` to show no text. While the field is invalid, the error text follows it.
+
+<Example {...description} />
+
+## Trailing icon
+
+Set `trailing` to show an icon or an icon button at the end of the field, such as a calendar button that opens a date picker. In this example, the button is in a `DialogTrigger` with a `DatePickerDialog`, whose confirm button sets the field's `value`.
+
+<Example {...withDatePicker} />
+
+- An [icon button](/components/icon-button) is a tab stop after the segments. Give it an `aria-label` that says what it does. A button in `trailing` is disabled with the field, unless it sets `isDisabled={false}` itself.
+- `trailing` can also be a function of the field's state: `isInvalid`, `isDisabled`, `isReadOnly` and `isRequired`.
+
+## Controlled
+
+Pass the date as a [`CalendarDate`](https://react-aria.adobe.com/internationalized/date/CalendarDate) from `@internationalized/date`. Set the initial date with `defaultValue`, and the field keeps the date itself. To keep the date in your own state, control the field with `value` and `onChange`, which is called as a date is typed, and with `null` once every segment is cleared.
+
+<Example {...value} />
+
+## Form props
+
+Set `isReadOnly` to keep the date from being changed, and `isDisabled` to disable the field.
+
+<Example {...readOnly} />
+
+## Validation
+
+Set `isInvalid` to show the field and its supporting text in the error color.
+
+The field can also check the date itself, as React Aria's [`DateField`](https://react-aria.adobe.com/DateField#forms) does:
+
+- **Bounds:** Set `minValue` and `maxValue` to the first and the last date allowed.
+- **Unavailable dates:** Pass a function to `isDateUnavailable` that returns `true` for a date that is not allowed.
+- **Your own rule:** Pass a function to `validate` that returns an error message for a date, or `null`.
+
+A date that fails a check puts the field in the error state once the focus leaves the field, and the error text is shown under the supporting text. In this example, type a date outside September 2025 into the second field, then leave the field.
+
+<Example {...validation} />
+
+## Forms
+
+Set a `name` to include the field in a form. The date is submitted as `YYYY-MM-DD`, and a form reset restores the initial date. Set `isRequired` to block the form from being submitted while the field is empty. The browser's own message is then shown as the error text.
+
+A date that fails a check under [Validation](#validation), or a field that is `isInvalid`, blocks the form too, unless `validationBehavior` is `aria`. See React Aria's [Forms](https://react-aria.adobe.com/forms#validation) guide.
+
+<Example {...form} />
+
+## Localization
+
+The field formats the date for the locale: the order of the segments, their separators and placeholders, and the format in the supporting text. The locale is the browser's by default. To set another, wrap the field in an [`I18nProvider`](https://react-aria.adobe.com/I18nProvider) from `react-aria-components`. See [Internationalization](/get-started/react-aria#internationalization).
+
+<Example {...locale} />
+
+### Date format
+
+The format is the locale's, and no prop sets another. The segments are written with leading zeros: `shouldForceLeadingZeros` is `true` by default. Set it to `false` to write the digits as the locale does, such as `8/7/2025` in US English.
+
+<Example {...format} />
+
+## Customization
+
+Pass classes in `className` to size and place one field. See [Styling](/get-started/styling) for the classes, the states and the theme.
+
+- **Element:** A date field is an inline flex box, aligned to the top of its line. `className`, `style` and `ref` apply to its outermost element.
+- **Width:** Set the field's width in `className`, such as `w-80`, or `w-full` to make the field as wide as the element it is in. Without a width, the field is as wide as its date.
+- **States:** On the field, style the disabled, invalid, read-only and required states with their variants, such as `invalid:`. Hover and focus are reported inside the field: use the `has-*` form for them, as in `has-hover:bg-surface-container`. See [Variants](/get-started/styling#variants).
+- **Functions:** `className` and `style` can be functions of `isDisabled`, `isInvalid`, `isReadOnly` and `isRequired`, as `trailing` can. For hover and focus, pass a function as [`input`](#custom-input).
+- **Every field:** To restyle all the date fields at once, change the [theme](/get-started/styling#theme).
+
+### Custom input
+
+Pass a function to `input` to render a `<div>` of your own around the date, in place of the field's. It is called with the props to spread on your element, including the segments and `ref`, and with the input's state, such as `isFocusWithin` and `isInvalid`. In this example, the element has a `title`, which the browser shows over the date.
+
+<Example {...customInput} />
+
+## Limitations
+
+### Variant and density
+
+A date field is always outlined and 56dp tall. It has no `variant`, and the density classes do not change its height.
+
+### Floating label
+
+The label on the outline extends above the field's top edge. If a scrolling box starts with a date field, give the box `pt-space-100` so that the label is not cut off. A label wider than the field is cut off with an ellipsis, so keep it short.
+
+### Error text language
+
+The error texts that the field writes itself, such as `Value must be 09/01/2025 or later.`, are in the browser's language, not in the locale of an `I18nProvider`. For an error text in a language you choose, return it from `validate`.
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/date-pickers/accessibility#2304b04a-3986-4afd-b3c3-d94a7b04719d) what people should be able to do with assistive technology:
+
+- Enter dates manually by inputting text, without using the picker
+
+### Interaction and style
+
+- **States:** Hovering the field darkens its outline. While the focus is in the field, the outline is 2dp thick in the primary color, and the focused segment is filled with it. An invalid field is drawn in the error color.
+- **Touch target:** An [icon button](/components/icon-button) in `trailing` keeps its 48dp [touch target](/theme/accessibility#touch-targets), inside the field.
+- **Density:** A date field stays 56dp tall in every density. See [Variant and density](#variant-and-density).
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), the label moves and the colors change at once.
+- **Forced colors:** In [forced colors](/theme/accessibility#forced-colors), the focused segment is filled with the system's highlight color, a focused field draws its outline in it, and a disabled field is grayed out.
+- **Date entry methods:** Material [advises](https://m3.material.io/components/date-pickers/accessibility#7fa4994b-9e49-4dd9-889b-366886d83d9a) two ways to enter a date: typing it in the field, and a date picker that opens only from a calendar button, so that people using a keyboard or a screen reader can type the date and skip the picker. Put that button in `trailing`, as in [Trailing icon](#trailing-icon).
+
+### Focus
+
+- A press anywhere on the date's line focuses a segment, and a press on the label focuses the date.
+- A disabled field cannot be focused, and neither can a button in `trailing`. A read-only field can be focused.
+
+### Keyboard navigation
+
+| Keys                 | Actions                                                                                                  |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| Tab                  | Move the focus to the next segment, each a separate tab stop, and then to an icon button in the field    |
+| Shift+Tab            | Move the focus to the previous segment                                                                   |
+| Left or Right arrow  | Move the focus to the previous or next segment                                                           |
+| Up or Down arrow     | Step the focused segment up or down                                                                      |
+| Page Up or Page Down | Step the focused segment by 7 days, 2 months or 5 years                                                  |
+| Home or End          | Set the focused segment to its first or last value                                                       |
+| Digits               | Type the focused segment, and move the focus to the next segment once it is full                         |
+| Backspace or Delete  | Clear the focused segment a digit at a time, or move the focus to the previous segment from an empty one |
+
+- In a right-to-left locale, Left arrow and Right arrow move the focus to the segment on that side.
+
+### Labeling elements
+
+- The `label` names the field and each of its segments. Each segment is a spin button, named by its part of the date, such as month, and by the label. Without a `label`, set an `aria-label`.
+- Use the label to state the purpose of the input, such as an event date, and the supporting text to give the date's format, as Material [advises](https://m3.material.io/components/date-pickers/accessibility#34be85b9-4fe7-4940-8018-5edc6421a783). The supporting text is the format in the locale by default, such as MM/DD/YYYY.
+- The `description` and the error text describe the field: its first segment, and every segment while the field is invalid.
+- The separators between the segments are hidden from assistive technology. A month is read with its name as well as its number.
+- Give an icon button in `trailing` an `aria-label` that says what it does. See [Icon button](/components/icon-button#labeling-elements).
+
+## Props
+
+<PropsTable {...api} />

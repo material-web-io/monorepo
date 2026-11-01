@@ -1,0 +1,293 @@
+import previewTriggerApi from 'virtual:api/PreviewTrigger'
+import tooltipApi from 'virtual:api/Tooltip'
+import tooltipPopoverApi from 'virtual:api/TooltipPopover'
+import tooltipTriggerApi from 'virtual:api/TooltipTrigger'
+import * as appBar from '../../examples/tooltip/app-bar.tsx?example'
+import * as basic from '../../examples/tooltip/basic.tsx?example'
+import * as controlled from '../../examples/tooltip/controlled.tsx?example'
+import * as custom from '../../examples/tooltip/custom.tsx?example'
+import * as delay from '../../examples/tooltip/delay.tsx?example'
+import * as disabled from '../../examples/tooltip/disabled.tsx?example'
+import * as elements from '../../examples/tooltip/elements.tsx?example'
+import * as multiLine from '../../examples/tooltip/multi-line.tsx?example'
+import * as offset from '../../examples/tooltip/offset.tsx?example'
+import * as persistent from '../../examples/tooltip/persistent.tsx?example'
+import * as placement from '../../examples/tooltip/placement.tsx?example'
+import * as rich from '../../examples/tooltip/rich.tsx?example'
+import * as richActions from '../../examples/tooltip/rich-actions.tsx?example'
+import * as triggers from '../../examples/tooltip/triggers.tsx?example'
+import * as width from '../../examples/tooltip/width.tsx?example'
+
+Tooltips display brief labels or messages. Use them to add context to a button or another element while it is hovered or focused. A tooltip should not hold information that people cannot do without.
+
+For information that people need, show it on the page, or in a [dialog](/components/dialog) when it needs a response.
+
+A tooltip is written with these parts:
+
+| Part             | Use                                                                                                                                             |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `TooltipTrigger` | Wraps the element to describe and a `Tooltip`, with the element first. It opens the tooltip on a hover or keyboard focus.                       |
+| `Tooltip`        | A plain tooltip (the default) or, with `variant="rich"`, a rich tooltip                                                                         |
+| `PreviewTrigger` | Wraps an element and a `TooltipPopover`, for a [rich tooltip with actions](#rich-tooltips-with-actions)                                         |
+| `TooltipPopover` | A rich tooltip with buttons or links, in a `PreviewTrigger`, or in a `DialogTrigger` for a [persistent rich tooltip](#persistent-rich-tooltips) |
+
+```tsx
+import { PreviewTrigger, Tooltip, TooltipPopover, TooltipTrigger } from '@material-web/react'
+import { Dialog, DialogTrigger, Focusable, Heading, Text } from 'react-aria-components'
+```
+
+## Basic tooltip
+
+Wrap the element to describe and a `Tooltip` in a `TooltipTrigger`, the element first. Hover a button below, or move the focus to it with Tab.
+
+<Example {...basic} />
+
+The `Tooltip` comes in two variants: `plain` (the default) and `rich`. Set `variant` to choose one.
+
+### Plain tooltip
+
+A plain tooltip briefly describes an element. Use it to label an element with no text, such as an icon button. Write a plain tooltip's text as its children. Text wider than 200dp wraps onto more lines.
+
+<Example {...multiLine} />
+
+### Rich tooltip
+
+A rich tooltip gives more context about an element. Use it for longer text, such as a definition or an explanation.
+
+Set `variant="rich"` for a tooltip with a subhead and supporting text. Write the subhead as a `Heading`, and the supporting text after it. A rich tooltip is up to 320dp wide, and is placed below its element, centered and 4dp away. Set `placement` to move it.
+
+<Example {...rich} />
+
+Use a `Tooltip` for a rich tooltip with no buttons or links. The keyboard cannot reach what is inside a `Tooltip`: for one with buttons or links, see [Rich tooltips with actions](#rich-tooltips-with-actions).
+
+## Rich tooltips with actions
+
+For a rich tooltip with buttons or links, put a `TooltipPopover` in a [`PreviewTrigger`](https://react-aria.adobe.com/PreviewTrigger), after the element. Write the subhead as a `Heading`, then the supporting text, then the buttons as `Button`s with `variant="text"`. The buttons are placed side by side below the text: use up to two, with short labels.
+
+> **Note:** Put the supporting text in a `Text` when the tooltip has buttons or the text holds a link. Text written without one shares the buttons' row.
+
+In a `PreviewTrigger`, the `TooltipPopover` opens 0.6s into a hover or keyboard focus, or on a long press on a touch screen. Set `delay` to change the 0.6s.
+
+- The pointer can move onto the popover and stay over it.
+- Tab from the element moves the focus into the popover, through its links and buttons from top to bottom, and then on to the element after the trigger.
+- The popover closes 1.5s after the pointer has left both it and its element and the focus has gone.
+- Escape closes it at once from its element, and after the close delay from inside the popover. Set a shorter `closeDelay` to shorten both.
+
+<Example {...richActions} />
+
+## Persistent rich tooltips
+
+For a rich tooltip that opens on a press and not on a hover, put a `TooltipPopover` in a [`DialogTrigger`](https://react-aria.adobe.com/Popover), after the element. Avoid a persistent rich tooltip on an icon button.
+
+Set `isNonModal` on the `TooltipPopover` and put a `Dialog` from `react-aria-components` in it. Name the dialog with a `Heading` with `slot="title"`. The tooltip then behaves as follows:
+
+- It stays open when the pointer leaves.
+- It closes on a press of another element, which also receives the press.
+- It closes on Escape, and the focus returns to its element.
+- A `Button` with `slot="close"` inside it closes it too.
+- Tab stays inside it while it is open.
+
+Without `isNonModal`, the popover is modal: the page behind it is hidden from assistive technology, the focus stays in the popover, and a press outside only closes it.
+
+<Example {...persistent} />
+
+To show a tooltip as the page loads, render a `TooltipPopover` with `isOpen` and a `triggerRef`, without a trigger. It is placed by the element of the ref, as with React Aria's [custom anchor](https://react-aria.adobe.com/Popover#custom-anchor). Close it in `onOpenChange`, which is called on Escape and on a press of another element. A button inside it closes it in its `onPress`.
+
+```tsx
+function NewSettings() {
+  const settings = useRef<HTMLButtonElement>(null)
+  const [isOpen, setOpen] = useState(true)
+  return (
+    <>
+      <IconButton ref={settings} aria-label="Settings">
+        <Icon name="settings" />
+      </IconButton>
+      <TooltipPopover triggerRef={settings} isOpen={isOpen} onOpenChange={setOpen} isNonModal>
+        <Dialog>
+          <Heading slot="title">New settings available</Heading>
+          <Text>Now you can adjust the uploaded image quality.</Text>
+          <Button variant="text" onPress={() => setOpen(false)}>
+            Got it
+          </Button>
+        </Dialog>
+      </TooltipPopover>
+    </>
+  )
+}
+```
+
+## Labels and descriptions
+
+A tooltip describes its element and does not name it. While the tooltip is open, the element refers to it with `aria-describedby`. An element with no visible text, such as an `IconButton`, still needs an `aria-label`, even when the tooltip shows the same text.
+
+```tsx
+<TooltipTrigger>
+  <IconButton aria-label="Delete">
+    <Icon name="delete" />
+  </IconButton>
+  <Tooltip>Delete</Tooltip>
+</TooltipTrigger>
+```
+
+## Triggers
+
+A trigger decides what opens its tooltip:
+
+| Trigger          | Holds              | Opens on                                                     |
+| ---------------- | ------------------ | ------------------------------------------------------------ |
+| `TooltipTrigger` | A `Tooltip`        | A hover or keyboard focus                                    |
+| `PreviewTrigger` | A `TooltipPopover` | A hover or keyboard focus, or a long press on a touch screen |
+| `DialogTrigger`  | A `TooltipPopover` | A press                                                      |
+
+Set `trigger="focus"` on a `TooltipTrigger` to open its tooltip on focus only.
+
+<Example {...triggers} />
+
+For a `TooltipPopover` in a `PreviewTrigger`, see [Rich tooltips with actions](#rich-tooltips-with-actions). For one in a `DialogTrigger`, see [Persistent rich tooltips](#persistent-rich-tooltips).
+
+### Custom trigger element
+
+The element of a `TooltipTrigger` can be a `Button`, an `IconButton`, a `Fab` or any other focusable React Aria component.
+
+To describe another element, such as an element of your own or a third-party component, wrap it in React Aria's [`Focusable`](https://react-aria.adobe.com/Tooltip#custom-trigger). The element must be able to take the focus, so give one that is not a native control a `tabIndex` and a role.
+
+<Example {...elements} />
+
+## Controlled
+
+Control the open state with `isOpen` and `onOpenChange` on the `TooltipTrigger`, or set the initial state with `defaultOpen`. `onOpenChange` is called when the tooltip would open or close.
+
+<Example {...controlled} />
+
+A `PreviewTrigger` and a `DialogTrigger` take the same three props.
+
+## Opening and closing
+
+A tooltip closes 1.5s after the pointer leaves. Set `closeDelay` on the `TooltipTrigger` or the `PreviewTrigger` to change this. Both delays are in milliseconds.
+
+In a `TooltipTrigger`:
+
+- A hover opens the tooltip after 0.5s, and keyboard focus opens it at once. Set `delay` to change the 0.5s.
+- The tooltip closes at once when the focus leaves, on Escape, and on a press of its element, which `shouldCloseOnPress` controls.
+- The tooltip stays open while the pointer is on it.
+- One tooltip shows at a time. Once one has opened, hovering another element opens its tooltip at once and closes the first.
+
+> **Note:** A touch opens no tooltip, and a disabled element has none. The pointer's first move in a page opens none either, if it lands on a trigger.
+
+<Example {...delay} />
+
+## Disabled
+
+A disabled element shows no tooltip: it cannot be focused and reports no hover.
+
+To turn a tooltip off while its element stays enabled, set `isDisabled` on the `TooltipTrigger`.
+
+<Example {...disabled} />
+
+## Widths
+
+A tooltip wraps text wider than its maximum width: 200dp for a plain tooltip, and 320dp for a rich one. To change it, set a `max-w-*` class on the `Tooltip`.
+
+<Example {...width} />
+
+## Placement
+
+A plain tooltip is placed above its element, centered and 4dp away. Set `placement` on the `Tooltip` to the side of the element the tooltip is on, one of React Aria's [placements](https://react-aria.adobe.com/Tooltip#api). A second word aligns the tooltip with an edge of the element, as in `top start` or `bottom end`.
+
+The tooltip flips to the other side where the window has no room.
+
+<Example {...placement} />
+
+In an app bar, set `placement="bottom"` to place the tooltip below its element.
+
+<Example {...appBar} isFlush />
+
+### Distance from element
+
+Set `offset` on the `Tooltip` to the distance from the element: 4dp by default. Use `offset={8}` for an element with no visual boundary, such as text.
+
+<Example {...offset} />
+
+- `crossOffset` moves the tooltip along the side of the element it is on.
+- `containerPadding` is the distance the tooltip keeps from the window's edges: 8dp (the default).
+
+## Customization
+
+Pass classes in `className` to restyle one tooltip. A class of yours replaces the tooltip's own class for the same property. See [Styling](/get-started/styling) for the classes, the states and the theme.
+
+<Example {...custom} />
+
+- **Color:** To use other [color roles](/theme/color#color-roles), pass a container color and the on-color of that container, as in `bg-error text-on-error`.
+- **Functions:** `className`, `style` and the children can be functions of the tooltip's state. See [Children as a function](/get-started/composition#children-as-a-function).
+- **Ancestors:** A tooltip is rendered at the end of the page, not inside the element it is written in. A class or a `data-theme` on an element around its trigger does not reach it. Set it on the `Tooltip` or the `TooltipPopover` itself, or on the root element.
+- **Every tooltip:** To restyle all the tooltips at once, change the [theme](/get-started/styling#theme).
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/tooltips/accessibility#bfcf792f-0886-4804-9453-cd71153f8c4b) what people should be able to do with assistive technology:
+
+- Receive a tooltip message
+- Activate a tooltip with a keyboard or switch input
+
+### Interaction and style
+
+- **Color contrast:** Every text in a plain or a rich tooltip, the labels of its buttons included, has 4.5:1 contrast or more with its container, in light and dark schemes at every [contrast level](/theme/color#contrast). Keep that contrast when you change its [colors](#customization).
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), a tooltip opens and closes at once.
+- **Forced colors:** A plain and a rich tooltip keep an edge in [forced colors](/theme/accessibility#forced-colors).
+- **Hover and focus:** A hover opens a `Tooltip` after 0.5s, and keyboard focus opens it at once. It stays open while the pointer is on it, and closes 1.5s after the pointer leaves, or at once when the focus leaves. Material [advises](https://m3.material.io/components/tooltips/accessibility#18f3c935-38a5-4db3-8a26-cf7e7f669480) that a tooltip stay long enough to read without disrupting the task, and that it hide no crucial information.
+- **Touch:** A touch shows no tooltip, and a disabled element shows none. A `TooltipPopover` in a `PreviewTrigger` opens on a long press. For a rich tooltip that opens on a press, use a [persistent rich tooltip](#persistent-rich-tooltips).
+
+### Focus
+
+- The keyboard cannot reach what is inside a `Tooltip`. Use a `TooltipPopover` for a tooltip with buttons or links.
+- In a `PreviewTrigger`, Tab from the element goes through the popover's links and buttons, and then on to the rest of the page. The focus moves from top to bottom and is not trapped, as Material [advises](https://m3.material.io/components/tooltips/accessibility#732fc2a0-2035-4a67-85cb-72fbfc04a0e0).
+- In a `DialogTrigger`, Tab stays in the dialog, and Escape closes it and returns the focus to its element.
+
+### Keyboard navigation
+
+| Keys           | Actions                                                                                                 |
+| -------------- | ------------------------------------------------------------------------------------------------------- |
+| Tab            | Move the focus to the element, which opens its `Tooltip`, or the `TooltipPopover` of a `PreviewTrigger` |
+| Space or Enter | Press the focused element, which closes its `Tooltip`, or opens a persistent rich tooltip               |
+| Escape         | Close the tooltip                                                                                       |
+
+- Escape, or the focus leaving, closes a `Tooltip`.
+- In a `PreviewTrigger`, Escape closes the popover at once from its element, and after the close delay from inside the popover.
+
+### Labeling elements
+
+- A `Tooltip` has the `tooltip` role, as Material [advises](https://m3.material.io/components/tooltips/accessibility#6613d18a-f9a4-447a-9b0e-8596fff2c902).
+- A tooltip describes its element while it is open, and does not name it. An `IconButton` still needs its `aria-label`. See [Labels and descriptions](#labels-and-descriptions).
+- A `TooltipPopover` in a `PreviewTrigger` has the `dialog` role. Its element reports it with `aria-haspopup` and `aria-expanded`, and is described by it while it is open.
+- In a `DialogTrigger`, name the `Dialog` with a `Heading` with `slot="title"`.
+- Label each button and link in a `TooltipPopover` as its own page describes, such as [buttons](/components/button#labeling-elements).
+
+## Props
+
+### Tooltip
+
+`className`, `style` and `children` can be functions of `placement`, `isEntering`, `isExiting` and `state`.
+
+These defaults differ from the ones in the table: `placement` is `top`, or `bottom` for a rich tooltip, `offset` is 4 and `containerPadding` is 8.
+
+<PropsTable {...tooltipApi} />
+
+### TooltipTrigger
+
+The default `delay` is 500 and the default `closeDelay` is 1500.
+
+<PropsTable {...tooltipTriggerApi} />
+
+### TooltipPopover
+
+The default `placement` is `bottom`, the default `offset` is 4 and the default `containerPadding` is 8.
+
+<PropsTable {...tooltipPopoverApi} />
+
+### PreviewTrigger
+
+The default `closeDelay` is 1500.
+
+<PropsTable {...previewTriggerApi} />

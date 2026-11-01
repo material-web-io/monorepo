@@ -1,0 +1,309 @@
+/* Menu (menu.tsx). --menu-open is how far open the panel is, 0 to 1, registered so that it
+ * runs on a spring: the panel is squeezed toward the edge it opened from and each row is
+ * stretched back, so the rows spread apart at full size, as in the guideline videos. */
+@property --menu-open {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
+
+/* The panel, React Aria's Popover: 112 to 280dp wide at elevation 2, its corners 16dp. It grows
+ * out of the edge it is placed at (data-placement) on the default spatial spring, fading in on the
+ * fast effects one, and fades out alone. It clips what is in it, its Dismiss buttons too. */
+@utility menu-panel {
+  @apply z-menu box-border flex min-w-28 flex-col overflow-clip rounded-shape-lg shadow-elevation-2 outline-none;
+  @apply forced-colors:container-border;
+  /* Room, past Compose's 8dp margin, for its spring to take the panel past its size without
+   * scrolling the page (--menu-open-max, menu.tsx). */
+  max-width: min(calc(var(--spacing) * 70), 100vw - 2 * var(--spacing-space-100));
+  /* How far open it is drawn: never shut, which its rows could not be stretched back from, and
+   * where its spring overshoots, no further than the window's edge (--menu-open-max, menu.tsx). */
+  --menu-scale: clamp(0.01, var(--menu-open), var(--menu-open-max, var(--menu-open)));
+  scale: 1 var(--menu-scale);
+  /* From the edge it is placed at. */
+  transform-origin: 50% 0%;
+  transition-property: --menu-open, opacity, border-radius;
+  transition-duration:
+    var(--md-sys-motion-spring-default-spatial-duration),
+    var(--md-sys-motion-spring-fast-effects-duration),
+    var(--md-sys-motion-spring-fast-spatial-duration);
+  transition-timing-function:
+    var(--md-sys-motion-spring-default-spatial-easing),
+    var(--md-sys-motion-spring-fast-effects-easing), var(--md-sys-motion-spring-fast-spatial-easing);
+  /* The corners of its first and last rows at its ends, 4dp inside its own (menu-item):
+   * its own to every panel, a submenu's as well. */
+  --menu-end-corner: var(--md-sys-shape-corner-medium);
+  /* With submenus, the menu the focus is in keeps the 16dp corners, and the others go to
+   * 8dp, their end rows' to 4dp, on the fast spatial spring: one whose submenu has the focus,
+   * and a submenu that the focus is not in. A radius class on the panel holds either way. */
+  &:where(:not(:focus-within)) {
+    border-radius: var(--md-sys-shape-corner-small);
+    --menu-end-corner: var(--md-sys-shape-corner-extra-small);
+  }
+  &[data-placement='top'] {
+    transform-origin: 50% 100%;
+  }
+  &:is([data-placement='left'], [data-placement='right']) {
+    scale: var(--menu-scale) 1;
+  }
+  &[data-placement='left'] {
+    transform-origin: 100% 50%;
+  }
+  &[data-placement='right'] {
+    transform-origin: 0% 50%;
+  }
+  /* Closing, it only fades: its corners, should the focus leave it then, go at once, and
+   * React Aria, which waits for its transitions before removing it, waits for the fade alone. */
+  &[data-exiting] {
+    opacity: 0;
+    transition-property: --menu-open, opacity;
+  }
+  &[data-entering] {
+    --menu-open: 0;
+    opacity: 0;
+  }
+  /* A submenu only fades in, at its full size, as the guideline video of submenus has it. */
+  &[data-trigger='SubmenuTrigger'],
+  &[data-trigger='SubmenuTrigger'][data-entering] {
+    --menu-open: 1;
+  }
+}
+
+/* The list, React Aria's Menu: its rows 4dp in from its sides, 2dp from its ends, it scrolls in the
+ * panel's room. Its rows, a section's too, are stretched back to full size as the panel grows, past
+ * its end: until open it scrolls only the way they do not fit (--menu-overflow, menu.tsx). */
+@utility menu-list {
+  @apply box-border flex min-h-0 flex-col rounded-inherit px-space-50 py-space-25 outline-none;
+  max-height: inherit;
+  overflow: auto;
+  /* data-growing (menu.tsx) is the panel's spring still running: React Aria's data-entering is
+   * gone before the panel has grown. */
+  :is([data-entering], [data-growing]) > & {
+    overflow: var(--menu-overflow, auto);
+  }
+  & > :not([role='group']),
+  & > [role='group'] > * {
+    scale: 1 calc(1 / var(--menu-scale));
+  }
+  & > [role='group'] {
+    overflow: clip;
+  }
+  :is([data-placement='left'], [data-placement='right']) > & {
+    & > :not([role='group']),
+    & > [role='group'] > * {
+      scale: calc(1 / var(--menu-scale)) 1;
+    }
+  }
+  /* React Aria's MenuSection, a group of items in a column, as the list's are. */
+  :where(& > [role='group']) {
+    @apply flex flex-col;
+  }
+  /* React Aria's Header, a section's label: a 32dp row, its text 12dp in, like an item's, in the
+   * label-large style. */
+  :where(& > header, & > [role='group'] > header) {
+    @apply flex min-h-8 items-center px-space-150 font-plain text-label-lg;
+  }
+  /* React Aria's Separator, a divider's row: 8dp tall with the line across its middle, 12dp in
+   * from each side of the panel. The line is decorative, as the spec's diagram draws it. */
+  :where(& > [role='separator'], & > [role='group'] > [role='separator']) {
+    @apply relative mx-space-100 h-space-100 shrink-0;
+    @apply before:absolute before:inset-x-0 before:top-1/2 before:border-t before:border-outline-variant;
+  }
+  /* Its scrollbar (layout.css) is 4dp in from the panel's end edge, as its rows are, and
+   * stops 12dp short of its top and bottom, clear of the corners, as the guidelines draw it. */
+  &::-webkit-scrollbar {
+    width: var(--spacing-space-100);
+  }
+  &::-webkit-scrollbar-track {
+    margin-block: var(--spacing-space-150);
+  }
+  /* The 4dp are a clear border of the thumb's, so its outer corners are 4dp wider to round
+   * the 4dp left of it by 2dp; forced colors would fill a border that is not the canvas's. */
+  &::-webkit-scrollbar-thumb {
+    border-inline-end: var(--spacing-space-50) solid transparent;
+    border-radius: var(--spacing-space-25);
+    border-start-end-radius: var(--spacing-space-75) var(--spacing-space-25);
+    border-end-end-radius: var(--spacing-space-75) var(--spacing-space-25);
+    background-clip: padding-box;
+    @media (forced-colors: active) {
+      border-inline-end-color: Canvas;
+    }
+  }
+}
+
+/* The menu's colors: standard on surface-container-low, its headers on-surface-variant. */
+@utility menu-list-standard {
+  @apply bg-surface-container-low text-on-surface;
+  :where(& > header, & > [role='group'] > header) {
+    @apply text-on-surface-variant;
+  }
+}
+
+/* Vibrant on tertiary-container, its headers too. */
+@utility menu-list-vibrant {
+  @apply bg-tertiary-container text-on-tertiary-container;
+}
+
+/* What opens a menu keeps the pressed state layer while the menu is open: React Aria's MenuTrigger
+ * puts `aria-haspopup="true"` and `aria-expanded` on its button; an item's submenu is `menu`. */
+[aria-haspopup='true'][aria-expanded='true'] > .state-layer {
+  opacity: var(--md-sys-state-pressed-state-layer-opacity);
+}
+
+/* An item, React Aria's MenuItem: its text and 12dp around it (less the density step), 44dp
+ * tall, with 2dp above and below it in its 48dp row, which press it too. Its 4dp corners are 12dp
+ * selected and at the panel's ends, on fast springs; its 20dp icons are filled when selected. */
+@utility menu-item {
+  @apply relative m-0 my-space-25 box-border grid shrink-0 touch-manipulation appearance-none items-center rounded-shape-xs border-0 bg-transparent px-space-150 py-space-150-variable text-start font-plain text-label-lg no-underline outline-none select-none;
+  @apply focus-ring-inset cursor-pointer icon-20 disabled:cursor-default;
+  @apply transition-shape-color;
+  @apply selected:icon-filled;
+  /* Its parts by their slots: a column for the checkmark and the `leading` part, the label's with
+   * the `description` under it, where text alone flows to as well, and one for each `trailing`
+   * part or keyboard command (kbd), at its end, in the middle of both lines, in written order. */
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-auto-flow: column;
+  :where(& > [slot='leading']) {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    margin-inline-end: var(--spacing-space-100);
+    transition: opacity var(--md-sys-motion-duration-short1) var(--md-sys-motion-easing-linear);
+  }
+  :where(& > [slot='label']) {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  :where(& > [slot='description']) {
+    @apply text-body-sm;
+    grid-column: 2;
+    grid-row: 2;
+  }
+  :where(& > :is([slot='trailing'], kbd)) {
+    grid-row: 1 / span 2;
+    margin-inline-start: var(--spacing-space-100);
+  }
+  /* A keyboard command is in the item's own type, not the browser's monospace. */
+  :where(& > kbd) {
+    font: inherit;
+  }
+  /* The leading part gives way to the checkmark when the item is selected, fading over a short-1
+   * as the checkmark is drawn over it. */
+  :where(&[data-selected] > [slot='leading']) {
+    opacity: 0;
+  }
+  :where(&[data-disabled] > [slot='leading']) {
+    transition: none;
+  }
+  /* The 2dp above and below it, its margins in the 48dp row, are its to press too: a
+   * pseudo-element over them makes the whole row hit it, and no two rows overlap. */
+  &::after {
+    content: '';
+    position: absolute;
+    inset: calc(-1 * var(--spacing-space-25)) 0;
+  }
+  /* It keeps the hover state layer while the submenu it opened is open (data-open), the spec's
+   * active state; React Aria reports no keyboard focus on it then, so it draws no ring. */
+  &[data-open] > .state-layer {
+    opacity: var(--md-sys-state-hover-state-layer-opacity);
+  }
+  /* Its corners selected, and at the list's ends below, are as specific as a class alone, so
+   * a radius class on the item holds in any state and at any place. */
+  &:where([data-selected]) {
+    @apply rounded-shape-md;
+  }
+  /* Unless selected, the list's first row rounds its top corners and its last row its bottom
+   * ones, a row of its own or of its first or last section, 4dp inside the panel's: 12dp, and
+   * 4dp in a menu the focus is not in (--menu-end-corner, menu-panel). */
+  &:where([role='menu'] > :first-child:not([data-selected])),
+  &:where([role='menu'] > :first-child > :first-child:not([data-selected])) {
+    border-start-start-radius: var(--menu-end-corner);
+    border-start-end-radius: var(--menu-end-corner);
+  }
+  &:where([role='menu'] > :last-child:not([data-selected])),
+  &:where([role='menu'] > :last-child > :last-child:not([data-selected])) {
+    border-end-start-radius: var(--menu-end-corner);
+    border-end-end-radius: var(--menu-end-corner);
+  }
+}
+
+/* A standard menu's item is on-surface, its icons, description and keyboard command
+ * on-surface-variant; selected it is on tertiary-container, all of it, and disabled at 38%. */
+@utility menu-item-standard {
+  @apply text-on-surface selected:bg-tertiary-container selected:text-on-tertiary-container;
+  @apply disabled:text-on-surface/disabled-content;
+  @apply selected:disabled:bg-tertiary-container/disabled-content selected:disabled:text-on-tertiary-container/disabled-content;
+  @apply disabled:forced-colors:text-gray-text selected:forced-colors:selected-fill;
+  :where(&:not([data-selected], [data-disabled]) > :is(.font-icon, [slot='description'], kbd)) {
+    @apply text-on-surface-variant;
+  }
+}
+
+/* A vibrant menu's item is on-tertiary-container, all of it, selected on tertiary, and disabled
+ * at 38%. Its icons go tertiary while it is hovered, focused or pressed, as its tokens have it;
+ * its text does not, so this reaches the icons alone, by Icon's font class. */
+@utility menu-item-vibrant {
+  @apply text-on-tertiary-container selected:bg-tertiary selected:text-on-tertiary;
+  @apply disabled:text-on-tertiary-container/disabled-content;
+  @apply selected:disabled:bg-tertiary/disabled-content selected:disabled:text-on-tertiary/disabled-content;
+  @apply disabled:forced-colors:text-gray-text selected:forced-colors:selected-fill;
+  &:not([data-selected], [data-disabled]) {
+    @variant hover {
+      & > .font-icon {
+        color: var(--md-sys-color-tertiary);
+      }
+    }
+    @variant focus-visible {
+      & > .font-icon {
+        color: var(--md-sys-color-tertiary);
+      }
+    }
+    @variant pressed {
+      & > .font-icon {
+        color: var(--md-sys-color-tertiary);
+      }
+    }
+  }
+}
+
+/* The checkmark's box, in the leading part's place, as a filter chip's is: shut, and open 20dp with
+ * the 8dp before the label while the item is selected, the mark clipped, in its middle, over a
+ * medium-1 on the standard easing, with no overshoot. */
+@utility menu-item-check {
+  @apply pointer-events-none grid w-0 min-w-0 grid-cols-1 place-items-center overflow-clip;
+  @apply group-selected/md-menu-item:me-space-100 group-selected/md-menu-item:w-5;
+  @apply group-disabled/md-menu-item:transition-none;
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  transition-property: width, margin-inline-end;
+  transition-duration: var(--md-sys-motion-duration-medium1);
+  transition-timing-function: var(--md-sys-motion-easing-standard);
+  /* Over a leading part, it is always open, as wide as that. */
+  &:has(~ [slot='leading']) {
+    @apply me-space-100 w-auto justify-self-stretch transition-none;
+  }
+  & > svg {
+    @apply size-5 shrink-0 fill-none stroke-current;
+  }
+}
+
+/* The checkmark, the `check` symbol at the 20dp of a menu's icons as one stroke, drawn as a
+ * filter chip's is: traced from its left tip over a medium-4, a short-1 after its box starts to
+ * open, when the item is selected; faded over a short-1 and only then undrawn when it is not. */
+@utility menu-item-checkmark {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+  transition-property: opacity, stroke-dashoffset;
+  transition-duration: var(--md-sys-motion-duration-short1), 0s;
+  transition-timing-function: var(--md-sys-motion-easing-linear);
+  transition-delay: 0s, var(--md-sys-motion-duration-short1);
+  @variant group-selected/md-menu-item {
+    stroke-dashoffset: 0;
+    opacity: 1;
+    transition-duration: 0s, var(--md-sys-motion-duration-medium4);
+    transition-timing-function: var(--md-sys-motion-easing-standard);
+  }
+  @variant group-disabled/md-menu-item {
+    transition: none;
+  }
+}

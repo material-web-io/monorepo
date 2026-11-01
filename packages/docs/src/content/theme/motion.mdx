@@ -1,0 +1,253 @@
+import * as easing from '../../examples/theme/motion-easing.tsx?example'
+import * as motionSchemes from '../../examples/theme/motion-schemes.tsx?example'
+import * as springs from '../../examples/theme/motion-springs.tsx?example'
+
+Use the Material 3 [motion tokens](https://m3.material.io/styles/motion/overview/specs#2daa7377-5106-4db9-bf80-ff04e2309dd0) as Tailwind's [`ease-*`](https://tailwindcss.com/docs/transition-timing-function) and [`duration-*`](https://tailwindcss.com/docs/transition-duration) utilities: the springs of the expressive and standard motion schemes, and the easing and duration sets. A transition preset puts a whole component on the springs with one class, and every duration follows the reader's reduced motion setting.
+
+## Springs
+
+The theme's motion follows Material's [motion physics system](https://m3.material.io/styles/motion/overview/how-it-works), where springs drive the motion of the components. Apply a spring with a pair of classes, its duration and its easing: `duration-spring-<name> ease-spring-<name>`. Add a [`transition-*`](https://tailwindcss.com/docs/transition-property) class for what moves.
+
+```html
+<div class="transition-transform duration-spring-default-spatial ease-spring-default-spatial"></div>
+```
+
+There are six springs: fast, default and slow, each spatial or effects.
+
+- **Spatial:** Use a spatial spring for what changes place, size or shape. It overshoots in the expressive scheme.
+- **Effects:** Use an effects spring for color and opacity. It does not overshoot.
+
+<Example {...springs} />
+
+| Spring          | Classes                                                              | Material's example                                                                            |
+| --------------- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Fast spatial    | `duration-spring-fast-spatial`<br />`ease-spring-fast-spatial`       | Small components, such as switches and buttons                                                |
+| Default spatial | `duration-spring-default-spatial`<br />`ease-spring-default-spatial` | Animations that partially cover the screen, such as bottom sheet and expanded navigation rail |
+| Slow spatial    | `duration-spring-slow-spatial`<br />`ease-spring-slow-spatial`       | Full-screen animations                                                                        |
+| Fast effects    | `duration-spring-fast-effects`<br />`ease-spring-fast-effects`       | Color change of the switch handle                                                             |
+| Default effects | `duration-spring-default-effects`<br />`ease-spring-default-effects` | Opacity of the content within a navigation rail                                               |
+| Slow effects    | `duration-spring-slow-effects`<br />`ease-spring-slow-effects`       | Full-screen content refresh                                                                   |
+
+Material [uses the default speed](https://m3.material.io/styles/motion/overview/how-it-works#17740687-82eb-4be1-9697-1363643f792c) for most motion, the fast one for smaller elements and the slow one for larger elements.
+
+- **Pairs:** Use the two classes of one spring together. A spring's easing is drawn for its own duration.
+- **Delay:** The theme has no delay classes. Use Tailwind's own [`delay-*`](https://tailwindcss.com/docs/transition-delay), such as `delay-100`.
+- **JavaScript:** For a spring run in JavaScript, use its damping and stiffness tokens: `--md-sys-motion-spring-fast-spatial-damping` and `-stiffness`.
+- **Your own CSS:** Use a spring's duration and easing as custom properties, as in `transition: transform var(--md-sys-motion-spring-default-spatial-duration) var(--md-sys-motion-spring-default-spatial-easing)`.
+- **Merged classes:** [tailwind-merge](https://github.com/dcastil/tailwind-merge) does not know the theme's durations and easings, and keeps both of two, such as `duration-short-2 duration-spring-fast-effects`. To merge them, use the [`tv` or the `twMerge`](/get-started/styling#custom-components) that `@material-web/react` exports, where the later class replaces the earlier one.
+
+## Motion scheme
+
+Set `data-motion="standard"` on the root to use the standard [motion scheme](https://m3.material.io/styles/motion/overview/how-it-works#45a5c33c-e5b4-4f61-afdc-595d2f0ff2b0). The expressive scheme is the default. To try them on this page, use the menu in this site's app bar.
+
+```html
+<html data-motion="standard"></html>
+```
+
+| Scheme     | Attribute                | Use                                                                              |
+| ---------- | ------------------------ | -------------------------------------------------------------------------------- |
+| Expressive | None, the default        | Most situations, particularly hero moments and key interactions                  |
+| Standard   | `data-motion="standard"` | Utilitarian products, for motion that feels more functional, with minimal bounce |
+
+The scheme sets the [springs](/theme/motion#springs): the expressive spatial springs overshoot, and the standard ones settle with next to no overshoot. The effects springs are the same in both schemes.
+
+Set the attribute on any other element for the spring classes inside it. `data-motion="expressive"` returns a part of a standard page to the default.
+
+<Example {...motionSchemes} />
+
+> **Note:** The [transition presets](/theme/motion#transition-presets), and the components that use them, such as `Button`, take the scheme of the root.
+
+## Transition presets
+
+A plain [`transition-*`](https://tailwindcss.com/docs/transition-property) class cannot put its properties on different springs. Use a preset to do so: it puts the shape and the size on the fast spatial spring, and the colors and the shadow on the fast effects one.
+
+```html
+<button
+  class="rounded-shape-xl bg-secondary-container transition-shape-color hover:rounded-shape-md"
+></button>
+```
+
+| Class                                | On the fast spatial spring | On the fast effects spring                 |
+| ------------------------------------ | -------------------------- | ------------------------------------------ |
+| `transition-shape-color-shadow`      | Corner radius              | Background color, color, shadow            |
+| `transition-shape-color`             | Corner radius              | Background color, color                    |
+| `transition-space-color-shadow`      | Padding                    | Background color, color, shadow            |
+| `transition-color-shadow`            | None                       | Background color, color, shadow            |
+| `transition-reveal`                  | Width and end margin       | None                                       |
+| `transition-fade`                    | None                       | Opacity                                    |
+| `transition-fade-visibility`         | None                       | Opacity, and visibility over the same time |
+| `transition-width-fade-color-shadow` | Width                      | Opacity, background color, color, shadow   |
+
+- **Complete:** A preset sets the properties, their durations and their easings. It needs no `duration-*` or `ease-*` class.
+- **One for each element:** Use one transition class on an element, the preset that names every property that changes. Of two, one replaces the other.
+- **Other properties:** For a property that no preset names, such as a transform, use Tailwind's `transition-*` class with the two classes of a [spring](/theme/motion#springs).
+
+## Easing and duration
+
+Use the easing and duration tokens for a transition that runs on a curve and a time instead of a spring. Material [keeps them for transitions](https://m3.material.io/styles/motion/easing-and-duration/applying-easing-and-duration#32a6ca61-a3bc-49ca-9321-393f3cdc3b0c), such as an element that enters or leaves the screen.
+
+```html
+<div class="transition-opacity duration-medium-4 ease-emphasized-decelerate"></div>
+```
+
+<Example {...easing} />
+
+### Easing
+
+Material has [two sets of three easings](https://m3.material.io/styles/motion/easing-and-duration/tokens-specs#cbea5c6e-7b0d-47a0-98c3-767080a38d95). The emphasized set is the most common, and the standard set is for simple, small or utility-focused transitions.
+
+| Class and token                                                                  | Curve                             |
+| -------------------------------------------------------------------------------- | --------------------------------- |
+| `ease-standard`<br />`--md-sys-motion-easing-standard`                           | `cubic-bezier(0.2, 0, 0, 1)`      |
+| `ease-standard-accelerate`<br />`--md-sys-motion-easing-standard-accelerate`     | `cubic-bezier(0.3, 0, 1, 1)`      |
+| `ease-standard-decelerate`<br />`--md-sys-motion-easing-standard-decelerate`     | `cubic-bezier(0, 0, 0, 1)`        |
+| `ease-emphasized`<br />`--md-sys-motion-easing-emphasized`                       | `cubic-bezier(0.2, 0, 0, 1)`      |
+| `ease-emphasized-accelerate`<br />`--md-sys-motion-easing-emphasized-accelerate` | `cubic-bezier(0.3, 0, 0.8, 0.15)` |
+| `ease-emphasized-decelerate`<br />`--md-sys-motion-easing-emphasized-decelerate` | `cubic-bezier(0.05, 0.7, 0.1, 1)` |
+| `ease-linear`<br />`--md-sys-motion-easing-linear`                               | `cubic-bezier(0, 0, 1, 1)`        |
+
+Material's emphasized curve has [no CSS form](https://m3.material.io/styles/motion/easing-and-duration/tokens-specs#ed7ab8eb-9b9a-40a3-806f-a4485558f3df), so `ease-emphasized` is the standard curve, its fallback on the web. Tailwind's own [easings](https://tailwindcss.com/docs/transition-timing-function), such as `ease-in-out`, are unchanged.
+
+### Duration
+
+The durations are four groups of four, 50ms apart up to 600ms and 100ms apart from there:
+
+| Classes and tokens                                                                                                | Durations             | Use                                                   |
+| ----------------------------------------------------------------------------------------------------------------- | --------------------- | ----------------------------------------------------- |
+| `duration-short-1` ... `duration-short-4`<br />`--md-sys-motion-duration-short1` ... `short4`                     | 50, 100, 150, 200ms   | Small utility-focused transitions                     |
+| `duration-medium-1` ... `duration-medium-4`<br />`--md-sys-motion-duration-medium1` ... `medium4`                 | 250, 300, 350, 400ms  | Transitions that traverse a medium area of the screen |
+| `duration-long-1` ... `duration-long-4`<br />`--md-sys-motion-duration-long1` ... `long4`                         | 450, 500, 550, 600ms  | Large expressive transitions                          |
+| `duration-extra-long-1` ... `duration-extra-long-4`<br />`--md-sys-motion-duration-extra-long1` ... `extra-long4` | 700, 800, 900, 1000ms | Ambient transitions that don't involve user input     |
+
+Tailwind's own [`transition`, `transition-colors`](https://tailwindcss.com/docs/transition-property) and the like come with its default duration and easing. Give them one of the theme's `duration-*` and `ease-*` classes.
+
+### Suggested pairs
+
+Material [suggests](https://m3.material.io/styles/motion/easing-and-duration/applying-easing-and-duration#27a05b8b-02b1-4695-a7e4-70797f205222) an easing and a duration for each type of transition, as a starting point:
+
+| Transition              | Emphasized set                                               | Standard set                                               |
+| ----------------------- | ------------------------------------------------------------ | ---------------------------------------------------------- |
+| Begin and end on screen | `ease-emphasized`<br />`duration-long-2`, 500ms              | `ease-standard`<br />`duration-medium-2`, 300ms            |
+| Enter the screen        | `ease-emphasized-decelerate`<br />`duration-medium-4`, 400ms | `ease-standard-decelerate`<br />`duration-medium-1`, 250ms |
+| Exit the screen         | `ease-emphasized-accelerate`<br />`duration-short-4`, 200ms  | `ease-standard-accelerate`<br />`duration-short-4`, 200ms  |
+
+## Reduced motion
+
+With `prefers-reduced-motion`, every duration token, a spring's too, is next to nothing, so whatever runs on them is instant. You do not need to add a [`motion-reduce:`](https://tailwindcss.com/docs/hover-focus-and-other-states#prefers-reduced-motion) class.
+
+- **Tailwind's durations:** A transition on one of Tailwind's own [durations](https://tailwindcss.com/docs/transition-duration), such as `duration-150`, or on its default duration, still runs. Give it one of the theme's durations.
+- **Custom durations:** A duration of your own must leave the reduced one in place. See [Custom motion](/theme/motion#custom-motion).
+
+## Custom motion
+
+Every easing, duration and spring is a custom property, so your own CSS can set it after the import. A value set before the import is replaced by the theme's.
+
+```css
+@import 'tailwindcss';
+@import '@material-web/tailwind';
+
+@media (prefers-reduced-motion: no-preference) {
+  :root {
+    --md-sys-motion-duration-short4: 180ms;
+    --md-sys-motion-easing-standard: cubic-bezier(0.3, 0, 0, 1);
+  }
+}
+```
+
+Set a duration inside the `prefers-reduced-motion: no-preference` query, as above. A duration set outside it replaces the reduced one too, and the motion then runs for a reader who asked for less.
+
+### Easing and duration tokens
+
+The table lists every easing and duration token with its default. For their classes and their use, see [Easing](/theme/motion#easing) and [Duration](/theme/motion#duration). A token you set changes every class and every component that uses it.
+
+| Token and theme variable                                                           | Default                           |
+| ---------------------------------------------------------------------------------- | --------------------------------- |
+| `--md-sys-motion-easing-standard`<br />`--ease-standard`                           | `cubic-bezier(0.2, 0, 0, 1)`      |
+| `--md-sys-motion-easing-standard-accelerate`<br />`--ease-standard-accelerate`     | `cubic-bezier(0.3, 0, 1, 1)`      |
+| `--md-sys-motion-easing-standard-decelerate`<br />`--ease-standard-decelerate`     | `cubic-bezier(0, 0, 0, 1)`        |
+| `--md-sys-motion-easing-emphasized`<br />`--ease-emphasized`                       | `cubic-bezier(0.2, 0, 0, 1)`      |
+| `--md-sys-motion-easing-emphasized-accelerate`<br />`--ease-emphasized-accelerate` | `cubic-bezier(0.3, 0, 0.8, 0.15)` |
+| `--md-sys-motion-easing-emphasized-decelerate`<br />`--ease-emphasized-decelerate` | `cubic-bezier(0.05, 0.7, 0.1, 1)` |
+| `--md-sys-motion-easing-linear`<br />`--ease-linear`                               | `cubic-bezier(0, 0, 1, 1)`        |
+| `--md-sys-motion-duration-short1`<br />`--transition-duration-short-1`             | `50ms`                            |
+| `--md-sys-motion-duration-short2`<br />`--transition-duration-short-2`             | `100ms`                           |
+| `--md-sys-motion-duration-short3`<br />`--transition-duration-short-3`             | `150ms`                           |
+| `--md-sys-motion-duration-short4`<br />`--transition-duration-short-4`             | `200ms`                           |
+| `--md-sys-motion-duration-medium1`<br />`--transition-duration-medium-1`           | `250ms`                           |
+| `--md-sys-motion-duration-medium2`<br />`--transition-duration-medium-2`           | `300ms`                           |
+| `--md-sys-motion-duration-medium3`<br />`--transition-duration-medium-3`           | `350ms`                           |
+| `--md-sys-motion-duration-medium4`<br />`--transition-duration-medium-4`           | `400ms`                           |
+| `--md-sys-motion-duration-long1`<br />`--transition-duration-long-1`               | `450ms`                           |
+| `--md-sys-motion-duration-long2`<br />`--transition-duration-long-2`               | `500ms`                           |
+| `--md-sys-motion-duration-long3`<br />`--transition-duration-long-3`               | `550ms`                           |
+| `--md-sys-motion-duration-long4`<br />`--transition-duration-long-4`               | `600ms`                           |
+| `--md-sys-motion-duration-extra-long1`<br />`--transition-duration-extra-long-1`   | `700ms`                           |
+| `--md-sys-motion-duration-extra-long2`<br />`--transition-duration-extra-long-2`   | `800ms`                           |
+| `--md-sys-motion-duration-extra-long3`<br />`--transition-duration-extra-long-3`   | `900ms`                           |
+| `--md-sys-motion-duration-extra-long4`<br />`--transition-duration-extra-long-4`   | `1000ms`                          |
+
+### Spring tokens
+
+A spring has four tokens. Each is `--md-sys-motion-spring-`, the spring's name and one of four endings, as in `--md-sys-motion-spring-fast-spatial-duration`.
+
+| Ending                   | Value                                               | Used by                                               |
+| ------------------------ | --------------------------------------------------- | ----------------------------------------------------- |
+| `-duration`              | The time the spring takes to settle                 | The spring classes, the presets and the components    |
+| `-easing`                | The spring's motion over that time, as a CSS easing | The spring classes, the presets and the components    |
+| `-damping`, `-stiffness` | The damping ratio and the stiffness of the spring   | Your own JavaScript. No class or component reads them |
+
+Set a spring's duration and easing together. The easing is any CSS easing function: Material lists a [`cubic-bezier` curve](https://m3.material.io/styles/motion/overview/specs) for each of its springs.
+
+```css
+@media (prefers-reduced-motion: no-preference) {
+  :root {
+    --md-sys-motion-spring-fast-spatial-duration: 350ms;
+    --md-sys-motion-spring-fast-spatial-easing: cubic-bezier(0.42, 1.67, 0.21, 0.9);
+  }
+}
+```
+
+The table lists every spring token with its default in the two schemes. An easing's default is the spring's curve as a `linear()` function:
+
+| Token and theme variable                                                                              | Expressive         | Standard                 |
+| ----------------------------------------------------------------------------------------------------- | ------------------ | ------------------------ |
+| `--md-sys-motion-spring-fast-spatial-duration`<br />`--transition-duration-spring-fast-spatial`       | `360ms`            | `230ms`                  |
+| `--md-sys-motion-spring-fast-spatial-easing`<br />`--ease-spring-fast-spatial`                        | A `linear()` curve | Another `linear()` curve |
+| `--md-sys-motion-spring-fast-spatial-damping`                                                         | `0.6`              | `0.9`                    |
+| `--md-sys-motion-spring-fast-spatial-stiffness`                                                       | `800`              | `1400`                   |
+| `--md-sys-motion-spring-default-spatial-duration`<br />`--transition-duration-spring-default-spatial` | `440ms`            | `320ms`                  |
+| `--md-sys-motion-spring-default-spatial-easing`<br />`--ease-spring-default-spatial`                  | A `linear()` curve | Another `linear()` curve |
+| `--md-sys-motion-spring-default-spatial-damping`                                                      | `0.8`              | `0.9`                    |
+| `--md-sys-motion-spring-default-spatial-stiffness`                                                    | `380`              | `700`                    |
+| `--md-sys-motion-spring-slow-spatial-duration`<br />`--transition-duration-spring-slow-spatial`       | `600ms`            | `490ms`                  |
+| `--md-sys-motion-spring-slow-spatial-easing`<br />`--ease-spring-slow-spatial`                        | A `linear()` curve | Another `linear()` curve |
+| `--md-sys-motion-spring-slow-spatial-damping`                                                         | `0.8`              | `0.9`                    |
+| `--md-sys-motion-spring-slow-spatial-stiffness`                                                       | `200`              | `300`                    |
+| `--md-sys-motion-spring-fast-effects-duration`<br />`--transition-duration-spring-fast-effects`       | `150ms`            | `150ms`                  |
+| `--md-sys-motion-spring-fast-effects-easing`<br />`--ease-spring-fast-effects`                        | A `linear()` curve | The same curve           |
+| `--md-sys-motion-spring-fast-effects-damping`                                                         | `1`                | `1`                      |
+| `--md-sys-motion-spring-fast-effects-stiffness`                                                       | `3800`             | `3800`                   |
+| `--md-sys-motion-spring-default-effects-duration`<br />`--transition-duration-spring-default-effects` | `240ms`            | `240ms`                  |
+| `--md-sys-motion-spring-default-effects-easing`<br />`--ease-spring-default-effects`                  | A `linear()` curve | The same curve           |
+| `--md-sys-motion-spring-default-effects-damping`                                                      | `1`                | `1`                      |
+| `--md-sys-motion-spring-default-effects-stiffness`                                                    | `1600`             | `1600`                   |
+| `--md-sys-motion-spring-slow-effects-duration`<br />`--transition-duration-spring-slow-effects`       | `330ms`            | `330ms`                  |
+| `--md-sys-motion-spring-slow-effects-easing`<br />`--ease-spring-slow-effects`                        | A `linear()` curve | The same curve           |
+| `--md-sys-motion-spring-slow-effects-damping`                                                         | `1`                | `1`                      |
+| `--md-sys-motion-spring-slow-effects-stiffness`                                                       | `800`              | `800`                    |
+
+A spring you set changes its classes, the presets and the components on it:
+
+| Spring            | Components that use it, such as          |
+| ----------------- | ---------------------------------------- |
+| `fast-spatial`    | Button, switch, radio button, menu       |
+| `default-spatial` | Bottom sheet, navigation rail, slider    |
+| `slow-spatial`    | None                                     |
+| `fast-effects`    | Button, chip, tooltip, menu              |
+| `default-effects` | App bar, tabs, navigation rail, calendar |
+| `slow-effects`    | Bottom sheet                             |
+
+- **Theme variables:** Under a token is its Tailwind [theme variable](https://tailwindcss.com/docs/theme), which gives the token its classes. In your own CSS, read the token, as in `var(--md-sys-motion-duration-short4)`: a theme variable has the root's value, and does not follow a `data-motion` or a token set on an element.
+- **Standard scheme:** A value set on `:root` is the root's, in either scheme. To change a spring of the standard scheme alone, set it under `[data-motion='standard']`.
+- **Scheme of your own:** Set the springs under a value of your own, such as `[data-motion='brisk']`, and set that value on the root. A spring you leave out keeps the expressive one.
+- **One part of the page:** Set an easing or a duration token on an element, in place of the root, to change the motion inside it only.

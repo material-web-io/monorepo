@@ -1,0 +1,157 @@
+import * as firstTheme from '../../examples/get-started/first-theme.tsx?example'
+import * as first from '../../examples/get-started/first.tsx?example'
+import { BetaNote } from '../../components/release'
+
+## Choose a setup
+
+<Setups
+  aria-label="Setup"
+  parts={[
+    {
+      id: 'components',
+      icon: 'widgets',
+      title: 'React components',
+      description: 'Material 3 components, ready to use.',
+    },
+    {
+      id: 'classes',
+      icon: 'palette',
+      title: 'Tailwind classes',
+      description: 'Every design token as a class, for your own markup.',
+    },
+    {
+      id: 'properties',
+      icon: 'data_object',
+      title: 'CSS custom properties',
+      description: 'Every design token as a variable, for your own CSS.',
+    },
+  ]}
+  options={[
+    {
+      id: 'react-tailwind',
+      title: 'React components with Tailwind theme',
+      audience: 'For a React app with Tailwind CSS.',
+      includes: ['components', 'classes', 'properties'],
+      requires: ['React 19', 'Tailwind CSS v4'],
+    },
+    {
+      id: 'tailwind',
+      title: 'Tailwind theme only',
+      audience: 'For your own markup or components, in React or any other framework.',
+      includes: ['classes', 'properties'],
+      requires: ['Tailwind CSS v4'],
+    },
+  ]}
+>
+
+### Install the library
+
+Both setups need Tailwind CSS v4 in your project. To add it, follow Tailwind's [installation guide](https://tailwindcss.com/docs/installation).
+
+<When setup="react-tailwind">
+
+Install the components. The theme, `@material-web/tailwind`, is installed with them.
+
+```sh
+npm install @material-web/react
+```
+
+</When>
+
+<When setup="tailwind">
+
+Install the theme. It is CSS only, with no JavaScript and no dependencies.
+
+```sh
+npm install @material-web/tailwind
+```
+
+</When>
+
+<BetaNote />
+
+### Load the styles and fonts
+
+<When setup="react-tailwind">
+
+Import the library's stylesheet after Tailwind's. It adds the theme, the components' styles and the state variants to your build, and needs no [`@source`](https://tailwindcss.com/docs/detecting-classes-in-source-files#explicitly-registering-sources).
+
+```css
+@import 'tailwindcss';
+@import '@material-web/react';
+```
+
+</When>
+
+<When setup="tailwind">
+
+Import the theme after Tailwind. It extends Tailwind's [default theme](https://tailwindcss.com/docs/theme#default-theme-variables), so Tailwind's own classes keep working.
+
+```css
+@import 'tailwindcss';
+@import '@material-web/tailwind';
+```
+
+</When>
+
+Import Roboto and Material Symbols Outlined from Google Fonts at the top of your CSS, above any other import:
+
+```css
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+```
+
+To use other fonts, see [Typography](/theme/typography#custom-fonts).
+
+### Use the library
+
+<When setup="react-tailwind">
+
+Import the components you need. Style around them with the classes of the [theme](/theme), next to Tailwind's own.
+
+<Example {...first} />
+
+</When>
+
+<When setup="tailwind">
+
+Use the classes of the [theme](/theme) in your markup, next to Tailwind's own.
+
+<Example {...firstTheme} />
+
+</When>
+
+</Setups>
+
+## Tailwind theme
+
+`@material-web/tailwind` is installed with `@material-web/react`. Install it alone to use its classes in your own markup or components, in any framework.
+
+| Tokens                                | Utilities                                                                                                              |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| [Color](/theme/color#color-roles)     | Color roles for the light and dark schemes at every contrast level. The tonal palettes are a separate import.          |
+| [Typography](/theme/typography)       | The type scale, where each style sets its size, line height, tracking and weight, with the typefaces and font weights. |
+| [Shape](/theme/shape)                 | The corner radius scale, for all corners or for a single side or corner, and the shape library.                        |
+| [Spacing](/theme/spacing)             | The spacing scale, for every spacing utility, next to Tailwind's own scale.                                            |
+| [Elevation](/theme/elevation)         | The elevation levels, as shadows.                                                                                      |
+| [Motion](/theme/motion)               | Easings, durations and springs, with transition presets.                                                               |
+| [State](/theme/state)                 | State layer opacities, disabled opacities and focus rings.                                                             |
+| [Layout](/theme/layout)               | Breakpoints for the window size, the stacking order and the scrollbar.                                                 |
+| [Density](/theme/spacing#density)     | Spacing that adjusts to the density level of an element or its container.                                              |
+| [Accessibility](/theme/accessibility) | Touch targets, forced colors utilities and raised contrast variants.                                                   |
+
+In your own CSS, use any token as a custom property, named as in the Material 3 spec: `var(--md-sys-color-primary)`, `var(--md-sys-shape-corner-medium)`, `var(--md-sys-motion-easing-emphasized)`.
+
+To change the tokens, such as the colors, the typefaces or the corners, see [Styling](/get-started/styling#theme).
+
+## Global styles
+
+Neither library includes a CSS reset, so the existing styles of your page are not changed. Tailwind's own reset, [Preflight](https://tailwindcss.com/docs/preflight), comes with `@import 'tailwindcss'`. The following styles are the only ones that apply to the whole page:
+
+- **Color scheme:** The theme sets `color-scheme` on the root element and on any element with a `data-theme` attribute, so that the browser's own controls match the light or dark theme. The page follows the system's scheme unless you set one. See [Color](/theme/color#light-and-dark).
+- **Scrollbars:** The theme styles the scrollbar of the page and of every scroll container as a 4dp thumb with no track. Add the `scrollbar-hidden` class to an element to hide its scrollbar. See [Layout](/theme/layout#scrollbar).
+
+Neither library sets the color or the typeface of the page. Add the page's color roles, its typeface and its type style to the `body`:
+
+```html
+<body class="bg-surface font-plain text-body-lg text-on-surface"></body>
+```

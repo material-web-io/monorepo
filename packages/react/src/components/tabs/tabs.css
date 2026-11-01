@@ -1,0 +1,85 @@
+/* Tabs (tab-list.tsx). A scrollable list's first tab is offset 52dp from its leading
+ * edge, as the guidelines ask, and its last tab the same from its trailing edge. */
+@theme inline {
+  --spacing-tab-list-offset: calc(var(--spacing) * 13);
+}
+
+/* A tab (tab.tsx), its content 16dp from each end. Its text color is its label's, icon's and
+ * state layer's, fading on the default effects spring; selected, it is its variant's (tab.tsx). */
+@utility tab {
+  @apply touch-target relative box-border inline-flex min-w-0 cursor-pointer touch-manipulation justify-center px-space-200 font-plain text-label-lg no-underline outline-none select-none;
+  @apply transition-colors duration-spring-default-effects ease-spring-default-effects;
+  @apply text-on-surface-variant hover:text-on-surface focus-visible:text-on-surface pressed:text-on-surface;
+  @apply disabled:cursor-default disabled:text-on-surface/disabled-content forced-colors:disabled:text-gray-text;
+  /* Selected as well: the selected color is a variant class, which sorts after this utility. */
+  @apply selected:disabled:text-on-surface/disabled-content forced-colors:selected:disabled:text-gray-text;
+}
+
+/* The focus indicator, the state tokens' ring inside its own box at the tab's edges, with 12dp
+ * corners, 4dp from the divider (tab.tsx), as the states diagram draws it: the state layer keeps
+ * square ones. */
+@utility tab-focus-indicator {
+  @apply pointer-events-none absolute rounded-shape-md group-focus-visible/md-tab:focus-indicator-inset;
+}
+
+/* The content, its children drawn as written and centered: 10dp above and below (tab.tsx), less half
+ * the density step, around a line at least 28dp tall, so a 48dp tab, or 64dp with an icon over the
+ * label. A label too long for its tab wraps, and the tab grows with it. */
+@utility tab-content {
+  @apply relative box-content flex min-h-7 min-w-0 items-center justify-center pt-space-125-variable text-center icon-24;
+}
+
+/* A primary tab's indicator in a row (tab.tsx) runs from 2dp inside each end of the tab's content
+ * to the other, and no less than 24dp, centered, under content narrower than 28dp. */
+@utility tab-indicator-primary {
+  inset-inline: min(var(--spacing-space-25), calc((100% - var(--spacing-space-300)) / 2));
+}
+
+/* The active indicator, there at once when its tab is selected. It slides from the tab it leaves,
+ * each edge on the M3 emphasized easing, the one ahead over an extra-long2 and the one behind over
+ * an extra-long4, as the guideline and accessibility videos have it; tab.tsx reads these. */
+@utility tab-indicator {
+  @apply pointer-events-none absolute bg-primary opacity-0 group-selected/md-tab:opacity-100;
+  @apply forced-colors:bg-canvas-text forced-colors:forced-color-adjust-none;
+  /* The emphasized easing as the path M3 gives it, which motion.css approximates with one curve. */
+  --tab-indicator-easing: linear(
+    0 0%,
+    0.0032 2%,
+    0.013 4%,
+    0.0302 6%,
+    0.0563 8%,
+    0.0935 10%,
+    0.146 12%,
+    0.1801 13%,
+    0.2216 14%,
+    0.2733 15%,
+    0.3406 16%,
+    0.433 17%,
+    0.5198 18%,
+    0.5859 19%,
+    0.6357 20%,
+    0.6745 21%,
+    0.7058 22%,
+    0.7317 23%,
+    0.7538 24%,
+    0.7895 26%,
+    0.8176 28%,
+    0.8405 30%,
+    0.8829 35%,
+    0.9125 40%,
+    0.9342 45%,
+    0.9506 50%,
+    0.9633 55%,
+    0.9732 60%,
+    0.9809 65%,
+    0.9868 70%,
+    0.9914 75%,
+    0.9948 80%,
+    0.9972 85%,
+    0.9988 90%,
+    0.9997 95%,
+    1 100%
+  );
+  --tab-indicator-lead: var(--md-sys-motion-duration-extra-long2);
+  --tab-indicator-trail: var(--md-sys-motion-duration-extra-long4);
+}

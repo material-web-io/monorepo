@@ -1,0 +1,83 @@
+/* React Aria's SwitchButton, the <label> that is pressed, with the hidden <input>; the named
+ * group its parts style from, group/md-switch, is on it in switch.tsx, since @apply takes no group. */
+@utility switch-button {
+  @apply inline-flex cursor-pointer items-center text-on-surface select-none;
+  @apply disabled:cursor-default disabled:text-on-surface/disabled-content disabled:forced-colors:text-gray-text;
+}
+
+/* The 52x32dp switch, with focus ring and 52x48dp target, holding the track and, over it, the
+ * state layer host. */
+@utility switch-host {
+  @apply touch-target relative inline-flex h-8 w-13 shrink-0 touch-manipulation rounded-full;
+  @apply group-focus-visible/md-switch:focus-indicator;
+}
+
+/* The track's outline takes its fill's color when selected, so the track is one flat shape; its
+ * colors change at once, as on Android, before the handle has moved. Disabled, the spec's 12% is
+ * the whole track's opacity, its outline included. */
+@utility switch-track {
+  @apply pointer-events-none absolute inset-0 box-border rounded-full border-2 border-outline bg-surface-container-highest;
+  @apply group-selected/md-switch:border-primary group-selected/md-switch:bg-primary;
+  @apply group-disabled/md-switch:border-on-surface group-disabled/md-switch:opacity-disabled-container group-disabled/md-switch:group-selected/md-switch:bg-on-surface;
+  /* Forced colors outline it in CanvasText, fill it with Highlight once selected, and grey it out
+   * at full opacity when disabled. */
+  @apply forced-colors:border-canvas-text forced-colors:bg-canvas forced-colors:forced-color-adjust-none;
+  @apply group-selected/md-switch:forced-colors:border-highlight group-selected/md-switch:forced-colors:bg-highlight;
+  @apply group-disabled/md-switch:forced-colors:border-gray-text group-disabled/md-switch:forced-colors:bg-canvas group-disabled/md-switch:forced-colors:opacity-100 group-disabled/md-switch:group-selected/md-switch:forced-colors:bg-gray-text;
+}
+
+/* The 40dp state layer host holds the handle at its center and carries it along the track on the
+ * fast spatial spring of its motion scheme. It takes no pointer: the target is the track's, not its
+ * box, which reaches past the track's end. Its text color is the state layer's and the ripple's. */
+@utility switch-state-layer-host {
+  transition-property: inset-inline-start;
+  transition-duration: var(--md-sys-motion-spring-fast-spatial-duration);
+  transition-timing-function: var(--md-sys-motion-spring-fast-spatial-easing);
+  @apply pointer-events-none absolute -start-1 -top-1 flex size-10 items-center justify-center rounded-full text-on-surface;
+  @apply group-selected/md-switch:start-4 group-selected/md-switch:text-primary;
+  @apply group-disabled/md-switch:transition-none;
+}
+
+/* The handle is 16dp unselected, 24dp selected and 28dp pressed, round at every size; 24dp
+ * unselected too when it holds an icon (switch.tsx). It resizes on the spring the state layer
+ * host slides on, so its size keeps pace with its place and both overshoot together, as on Android. */
+@utility switch-handle {
+  /* Its color is listed, with no duration, for the press delay's sake. */
+  transition-property: width, height, background-color;
+  transition-duration:
+    var(--md-sys-motion-spring-fast-spatial-duration),
+    var(--md-sys-motion-spring-fast-spatial-duration), 0s;
+  transition-timing-function: var(--md-sys-motion-spring-fast-spatial-easing);
+  @apply pointer-events-none relative flex shrink-0 items-center justify-center rounded-full bg-outline;
+  @apply group-selected/md-switch:size-6 group-selected/md-switch:bg-on-primary;
+  /* It darkens at once while hovered or focused, and once a press is held, stacked on the state
+   * to outweigh it; forced colors keep the state's own. */
+  @apply not-forced-colors:group-hover/md-switch:bg-on-surface-variant not-forced-colors:group-selected/md-switch:group-hover/md-switch:bg-primary-container;
+  @apply not-forced-colors:group-focus-visible/md-switch:bg-on-surface-variant not-forced-colors:group-selected/md-switch:group-focus-visible/md-switch:bg-primary-container;
+  @apply group-pressed/md-switch:size-7 group-pressed/md-switch:switch-press-delay not-forced-colors:group-pressed/md-switch:bg-on-surface-variant not-forced-colors:group-selected/md-switch:group-pressed/md-switch:bg-primary-container;
+  /* Disabled, it rests: these sort after the states above. */
+  @apply group-disabled/md-switch:bg-on-surface/disabled-content group-disabled/md-switch:transition-none group-disabled/md-switch:group-selected/md-switch:size-6 group-disabled/md-switch:group-selected/md-switch:bg-surface;
+  @apply forced-colors:bg-canvas-text forced-colors:forced-color-adjust-none group-selected/md-switch:forced-colors:bg-highlight-text;
+  @apply group-disabled/md-switch:forced-colors:bg-gray-text group-disabled/md-switch:group-selected/md-switch:forced-colors:bg-canvas;
+}
+
+/* A press grows and darkens the handle only once it is held for a short-1, so a tap goes
+ * straight into the slide, from the size the handle rests at. */
+@utility switch-press-delay {
+  transition-delay: var(--transition-duration-short-1);
+}
+
+/* Each icon is 16dp and shows in its own state only: it fades in over a short-1 and is gone at
+ * once, as in the guideline videos. The selected one is primary, as in the spec's token table:
+ * on the on-primary handle it holds at every contrast level. */
+@utility switch-selected-icon {
+  @apply absolute size-4 fill-current text-primary opacity-0 transition-none forced-colors:text-highlight forced-colors:forced-color-adjust-none;
+  @apply group-selected/md-switch:opacity-100 group-selected/md-switch:transition-opacity group-selected/md-switch:duration-short-1 group-selected/md-switch:ease-linear;
+  @apply group-disabled/md-switch:text-on-surface/disabled-content group-disabled/md-switch:transition-none group-disabled/md-switch:forced-colors:text-gray-text;
+}
+
+@utility switch-unselected-icon {
+  @apply absolute size-4 fill-current text-surface-container-highest opacity-100 transition-opacity duration-short-1 ease-linear forced-colors:text-canvas forced-colors:forced-color-adjust-none;
+  @apply group-selected/md-switch:opacity-0 group-selected/md-switch:transition-none;
+  @apply group-disabled/md-switch:text-surface-container-highest/disabled-content group-disabled/md-switch:transition-none group-disabled/md-switch:forced-colors:text-canvas;
+}

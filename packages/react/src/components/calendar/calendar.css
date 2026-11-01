@@ -1,0 +1,459 @@
+/* The calendar's parts (calendar*.tsx and range-calendar.tsx), which the date pickers are pieced
+ * from. The motion is Compose's, whose date picker it is. Times are steps of short1 (50ms) or the
+ * spring tokens: reduced motion skips them. */
+
+/* Compose's scroll to the next month: a spring of no bounce and stiffness 1500, its default, over
+ * the default effects spring's time, which it settles in. On the view transitions that slide a
+ * month, which inherit from the root alone. */
+::view-transition {
+  --calendar-scroll: linear(
+    0,
+    0.0045 1.05%,
+    0.0215 2.4%,
+    0.0472 3.7%,
+    0.088 5.3%,
+    0.1662 7.85%,
+    0.3753 14.05%,
+    0.4686 17%,
+    0.5491 19.8%,
+    0.6182 22.5%,
+    0.6778 25.15%,
+    0.7393 28.35%,
+    0.7876 31.35%,
+    0.8356 35%,
+    0.8722 38.5%,
+    0.9058 42.65%,
+    0.9343 47.45%,
+    0.9572 53.05%,
+    0.9767 60.85%,
+    0.9897 71.05%,
+    0.9977 89.55%,
+    1
+  );
+}
+
+/* Calendar or RangeCalendar, React Aria's (calendar.tsx): a column, its text body-large on-surface,
+ * as wide as what holds it, 360dp in a picker. React Aria's Text in its `errorMessage` slot is a
+ * field's error text: body-small error, 4dp under the days, on the title's 24dp line. */
+@utility calendar {
+  @apply relative box-border flex w-full min-w-0 flex-col font-plain text-body-lg text-on-surface outline-none;
+  :where(& > [slot='errorMessage']) {
+    @apply m-0 px-space-300 pt-space-50 text-body-sm text-error;
+  }
+}
+/* The range calendar fills the column it is in, and its months scroll in it. */
+@utility calendar-range {
+  @apply min-h-0 flex-1;
+}
+
+/* The modal picker's navigation row: 56dp tall, the month and year's menu button 16dp in at the
+ * start, its text on the title's 24dp line, and the arrows 12dp in at the end, hidden in place
+ * while the button has its picker open. */
+@utility calendar-nav {
+  @apply flex h-14 shrink-0 items-center ps-space-200 pe-space-150;
+}
+@utility calendar-nav-arrows {
+  @apply ms-auto flex items-center;
+  .calendar-nav:has(> [aria-expanded='true']) > & {
+    visibility: hidden;
+  }
+}
+
+/* An arrow's slot: 48dp square, its 40dp icon button in the middle, whose target the slot is,
+ * raised over the menu button beside it, which would take the slot's last pixel. */
+@utility calendar-arrow-slot {
+  @apply relative z-raised flex size-12 shrink-0 items-center justify-center;
+}
+
+/* The month and year's menu button, the M3 design kit's: a 40dp pill, 8dp, the label-large text, 8dp,
+ * the 18dp dropdown arrow, which turns while the years are open, and 4dp; on-surface-variant, its
+ * ripple's states too, and 38% disabled. Its 48dp target and its ring are its own. */
+@utility calendar-menu-button {
+  @apply relative m-0 inline-flex h-10 shrink-0 cursor-pointer touch-manipulation appearance-none items-center gap-space-100 rounded-shape-full border-0 bg-transparent ps-space-100 pe-space-50 font-plain text-label-lg whitespace-nowrap text-on-surface-variant outline-none select-none;
+  @apply touch-target focus-ring icon-18;
+  & > .font-icon {
+    transition: rotate var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+  }
+  &[data-disabled] {
+    @apply cursor-default text-on-surface-variant/disabled-content;
+    @apply forced-colors:text-gray-text;
+  }
+}
+@utility calendar-menu-icon-open {
+  rotate: 180deg;
+}
+
+/* How far down a picker is open, and how opaque it is: the room's own clip and opacity, which the
+ * body mirrors for the days under it (calendar-days). Registered, so that they transition. */
+@property --calendar-picker-shown {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+@property --calendar-picker-opacity {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0.6;
+}
+
+/* The body under the navigation row: the day of week labels and six weeks' rows, whatever the
+ * month's, which a picker covers while open. Clipped, 8dp past its edges so that a focus ring at
+ * them shows. */
+@utility calendar-body {
+  @apply relative flex h-84 flex-col overflow-clip;
+  overflow-clip-margin: var(--spacing-space-100);
+
+  /* While a picker is there, on the room's own timing (calendar-room). */
+  &:has(> .calendar-room) {
+    transition-property: --calendar-picker-shown, --calendar-picker-opacity;
+    transition-duration: var(--md-sys-motion-spring-default-effects-duration);
+    transition-timing-function: var(--md-sys-motion-spring-default-effects-easing);
+  }
+  &:has(> .calendar-room-open) {
+    --calendar-picker-shown: 1;
+    --calendar-picker-opacity: 1;
+  }
+  &:has(> .calendar-room-leaving) {
+    --calendar-picker-opacity: 0;
+    transition-duration:
+      var(--md-sys-motion-spring-default-effects-duration),
+      var(--md-sys-motion-spring-fast-effects-duration);
+    transition-timing-function:
+      var(--md-sys-motion-spring-default-effects-easing),
+      var(--md-sys-motion-spring-fast-effects-easing);
+  }
+}
+
+/* The day of week labels and the page, under a picker while it is there: drawn below its edge,
+ * and above it only as much as it lets through, as if it were filled with what is behind it. The
+ * modal picker leaves the days of the months around its own out. */
+@utility calendar-days {
+  @apply flex min-h-0 flex-1 flex-col;
+  & [data-outside-month] {
+    display: none;
+  }
+
+  .calendar-body:has(> .calendar-room) > & {
+    mask-image: linear-gradient(
+      rgb(0 0 0 / calc(1 - var(--calendar-picker-opacity)))
+        calc(var(--calendar-picker-shown) * 100%),
+      black calc(var(--calendar-picker-shown) * 100%)
+    );
+  }
+}
+
+/* CalendarWeekdays, the day of week labels once over the grids: a 48dp row of seven 48dp columns
+ * evenly spaced 12dp in from the sides, as the days are, in a table drawn as a grid. */
+@utility calendar-weekdays {
+  @apply grid h-12 shrink-0 items-center justify-evenly px-space-150;
+  grid-template-columns: repeat(7, minmax(0, var(--spacing-space-600)));
+  & > thead,
+  & > thead > tr {
+    display: contents;
+  }
+}
+
+/* CalendarGridHeader, React Aria's, a grid's own row of them: 48dp tall. */
+@utility calendar-grid-header {
+  & > tr {
+    @apply h-12;
+  }
+}
+
+/* CalendarHeaderCell, React Aria's, a day of week label: body-large on-surface, in the middle of
+ * its column. */
+@utility calendar-header-cell {
+  @apply p-0 text-center align-middle font-plain text-body-lg font-normal text-on-surface;
+}
+
+/* CalendarPage, the page the arrows turn: 12dp in, six weeks' rows tall whatever the month's, or
+ * what it holds, such as months side by side; it slides out by its own width as the next slides
+ * in (calendar-page-*), cut at its edges as Compose's row of months is; the years cover it. */
+@utility calendar-page {
+  @apply mx-space-150 box-border min-h-72 shrink-0;
+  view-transition-class: calendar-page var(--calendar-page);
+}
+/* Forward, the next page comes in from the right, and backward from the left; the other way where
+ * the page itself is right to left, as its arrows are. */
+@utility calendar-page-forward {
+  --calendar-page: calendar-from-right;
+  &:dir(rtl) {
+    --calendar-page: calendar-from-left;
+  }
+}
+@utility calendar-page-backward {
+  --calendar-page: calendar-from-left;
+  &:dir(rtl) {
+    --calendar-page: calendar-from-right;
+  }
+}
+
+/* Half the space Compose's SpaceEvenly puts between seven 48dp columns across the width: a grid's
+ * inset, so that the middles of its cells are where Compose's columns' are. */
+@utility calendar-gutter {
+  --calendar-gutter: max(0px, (100% - 7 * var(--spacing-space-600)) / 16);
+}
+
+/* CalendarGrid, React Aria's: a table of seven 48dp cells evenly spaced across the width, as the
+ * day of week labels, a day's button in the middle of each. A range's band is drawn in the cells,
+ * from the middle of an end's, and on past a row's first or last cell across the spacing. */
+@utility calendar-grid {
+  @apply table-fixed border-separate border-spacing-0 calendar-gutter;
+  margin-inline: var(--calendar-gutter);
+  width: calc(100% - 2 * var(--calendar-gutter));
+  &.calendar-grid-range td:has(> [data-selected])::before {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    top: 50%;
+    height: var(--spacing-space-500);
+    translate: 0 -50%;
+    background-color: var(--md-sys-color-secondary-container);
+    @media (forced-colors: active) {
+      background-color: Highlight;
+      forced-color-adjust: none;
+    }
+  }
+  &.calendar-grid-range td:has(> [data-selection-start])::before {
+    inset-inline-start: 50%;
+  }
+  &.calendar-grid-range td:has(> [data-selection-end])::before {
+    inset-inline-end: 50%;
+  }
+  /* Past a month's first and last days, where the range goes on in the month before or after,
+   * the band stops at the cell's edge, as Compose's does. */
+  &.calendar-grid-range
+    tr:not(:first-child)
+    > td:first-child:has(> [data-selected]:not([data-selection-start]))::before {
+    inset-inline-start: min(0px, (var(--spacing-space-600) - 100%) / 2);
+  }
+  &.calendar-grid-range
+    tr:not(:last-child)
+    > td:last-child:has(> [data-selected]:not([data-selection-end]))::before {
+    inset-inline-end: min(0px, (var(--spacing-space-600) - 100%) / 2);
+  }
+  /* The ends of a range keep the body-large of the days; a day in the range, not at its ends, is
+   * on-secondary-container on the band. */
+  &.calendar-grid-range [data-selected] {
+    @apply text-body-lg;
+  }
+  &.calendar-grid-range [data-selected]:not([data-selection-start], [data-selection-end]) {
+    @apply bg-transparent text-on-secondary-container;
+    @apply forced-colors:bg-transparent forced-colors:text-highlight-text;
+  }
+  /* A range React Aria finds invalid, by `isInvalid` or its own bounds, is drawn in the error
+   * colors where it would be in primary and secondary: its band error-container, the days on it
+   * on-error-container, its ends filled with error (calendar-cell). */
+  &.calendar-grid-range td:has(> [data-invalid])::before {
+    background-color: var(--md-sys-color-error-container);
+    @media (forced-colors: active) {
+      background-color: Highlight;
+    }
+  }
+  &.calendar-grid-range [data-invalid]:not([data-selection-start], [data-selection-end]) {
+    @apply text-on-error-container forced-colors:text-highlight-text;
+  }
+}
+
+/* CalendarGridBody, React Aria's: a 48dp row a week, each day in the middle of its cell. */
+@utility calendar-grid-body {
+  & > tr > td {
+    @apply relative h-12 p-0 text-center align-middle;
+  }
+}
+
+/* CalendarCell, React Aria's, a day: a 40dp round button, its 48dp cell its target, body-large
+ * on-surface, today ringed in primary, the selected day filled with it; the months around and
+ * days past the bounds at 38%. Colors change on the default effects spring, as Compose's do. */
+@utility calendar-cell {
+  @apply relative z-raised mx-auto box-border flex size-10 cursor-pointer items-center justify-center rounded-shape-full border border-transparent text-body-lg text-on-surface outline-none select-none;
+  @apply touch-target focus-ring;
+  transition-property: background-color, color, border-color;
+  transition-duration: var(--md-sys-motion-spring-default-effects-duration);
+  transition-timing-function: var(--md-sys-motion-spring-default-effects-easing);
+  &[data-today] {
+    @apply border-primary text-primary;
+  }
+  &[data-selected] {
+    @apply bg-primary text-on-primary;
+    @apply forced-colors:selected-fill;
+  }
+  /* The selected day of an invalid calendar, or an end of an invalid range: filled with error,
+   * ringed with it if today. */
+  &[data-invalid] {
+    @apply bg-error text-on-error;
+    @apply forced-colors:selected-fill;
+    &[data-today] {
+      @apply border-error;
+    }
+  }
+  &:is([data-outside-month], [data-disabled], [data-unavailable]) {
+    @apply cursor-default text-on-surface/disabled-content;
+    @apply forced-colors:text-gray-text;
+  }
+  &[data-unavailable] {
+    @apply line-through;
+  }
+}
+
+/* The room a picker opens in over the days, unfilled, ended by a divider, as Compose's
+ * AnimatedVisibility shows its years: opening down from the top, the picker drawn up against that
+ * edge, on the default effects spring from 60% opacity; back up on the same, fading on the fast one. */
+@utility calendar-room {
+  @apply absolute inset-0 z-raised flex flex-col border-b border-outline-variant;
+  clip-path: inset(0 0 100% 0);
+  opacity: 0.6;
+  transition-property: clip-path, opacity;
+  transition-duration: var(--md-sys-motion-spring-default-effects-duration);
+  transition-timing-function: var(--md-sys-motion-spring-default-effects-easing);
+  & > * {
+    translate: 0 -100%;
+    transition-property: translate;
+    transition-duration: var(--md-sys-motion-spring-default-effects-duration);
+    transition-timing-function: var(--md-sys-motion-spring-default-effects-easing);
+  }
+  &.calendar-room-open {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+    & > * {
+      translate: 0 0;
+    }
+  }
+  &.calendar-room-leaving {
+    opacity: 0;
+    transition-duration:
+      var(--md-sys-motion-spring-default-effects-duration),
+      var(--md-sys-motion-spring-fast-effects-duration);
+    transition-timing-function:
+      var(--md-sys-motion-spring-default-effects-easing),
+      var(--md-sys-motion-spring-fast-effects-easing);
+  }
+}
+
+/* CalendarYearPicker, the modal picker's years, React Aria's ListBox as a grid: three to a row,
+ * 12dp in from the sides, the rows 16dp apart, scrolling in the room from its top edge, as Compose's. */
+@utility calendar-year-picker {
+  @apply relative grid min-h-0 flex-1 grid-cols-3 content-start justify-items-center gap-y-space-200 overflow-y-auto px-space-150 outline-none;
+}
+
+/* A year: a 72x36dp pill, body-large on-surface-variant, the current year ringed in primary and
+ * in it, the chosen year filled with primary; its 48dp target is its own. */
+@utility calendar-year-option {
+  @apply relative z-raised box-border flex h-9 w-18 cursor-pointer items-center justify-center rounded-shape-full border border-transparent text-body-lg text-on-surface-variant outline-none select-none;
+  @apply touch-target focus-ring;
+  @apply selected:bg-primary selected:text-on-primary selected:forced-colors:selected-fill;
+  transition-property: background-color, color, border-color;
+  transition-duration: var(--md-sys-motion-spring-default-effects-duration);
+  transition-timing-function: var(--md-sys-motion-spring-default-effects-easing);
+}
+@utility calendar-year-current {
+  @apply border-primary text-primary;
+}
+
+/* CalendarMonthPicker, the docked picker's month menu, React Aria's ListBox: its rows 8dp in from
+ * the top and bottom, scrolling in the room. */
+@utility calendar-month-picker {
+  @apply relative flex min-h-0 flex-1 flex-col overflow-y-auto py-space-100 outline-none;
+}
+
+/* A month: a 48dp row, its 24dp check 16dp in and its name 16dp after, body-large on-surface; the
+ * chosen one filled with surface-variant and checked, in on-surface-variant. Its ring is inside. */
+@utility calendar-month-option {
+  @apply relative flex h-12 shrink-0 cursor-pointer items-center gap-space-200 px-space-200 text-body-lg text-on-surface outline-none select-none;
+  @apply focus-ring-inset icon-24;
+  @apply selected:bg-surface-variant selected:forced-colors:selected-fill;
+  & > .font-icon {
+    @apply invisible text-on-surface-variant;
+  }
+  /* Inherited, not visible, so that an ancestor hidden hides it with it. */
+  &[data-selected] > .font-icon {
+    visibility: inherit;
+    @apply forced-colors:text-highlight-text;
+  }
+}
+
+/* CalendarMonths, the months in a column that scrolls under the day of week labels, each under its
+ * name (calendar-heading), 12dp in, and as tall as its own weeks' rows; without the days of the
+ * months around. */
+@utility calendar-months {
+  @apply relative min-h-0 flex-1 overflow-y-auto overscroll-contain;
+}
+@utility calendar-month {
+  @apply box-border px-space-150;
+  & [data-outside-month] {
+    display: none;
+  }
+}
+/* The room of a month not drawn: its subhead's, as calendar-heading's, and its `--calendar-weeks`
+ * 48dp rows. */
+@utility calendar-month-placeholder {
+  height: calc(
+    var(--spacing-space-250) + var(--text-title-sm--line-height) + var(--spacing-space-100) +
+      var(--calendar-weeks) * --spacing(12)
+  );
+}
+
+/* CalendarHeading, React Aria's, Compose's month subhead: title-small on-surface-variant, in line
+ * with its first column's two-digit days, 16dp into their 48dp cell past the grid's gutter and a
+ * column's spacing, 20dp under what is above it and 8dp over its days. */
+@utility calendar-heading {
+  @apply m-0 pt-space-250 pb-space-100 font-plain text-title-sm text-on-surface-variant calendar-gutter;
+  padding-inline-start: calc(2 * var(--calendar-gutter) + var(--spacing-space-200));
+}
+
+/* The pages as they turn, a view transition: the page there slides out as the next slides in,
+ * side by side, on Compose's scroll spring. The page is used meanwhile, under the slide. */
+::view-transition-group(.calendar-page) {
+  animation-duration: var(--md-sys-motion-spring-default-effects-duration);
+  animation-timing-function: var(--calendar-scroll);
+}
+::view-transition-image-pair(.calendar-page) {
+  overflow: clip;
+}
+/* The rest of the page takes no part, which would take it out of hit testing, and the slide lets
+ * the pointer through: an arrow pressed meanwhile turns the page on, not a press outside. */
+:root:active-view-transition-type(calendar-page) {
+  view-transition-name: none;
+}
+:root:active-view-transition-type(calendar-page)::view-transition {
+  pointer-events: none;
+}
+::view-transition-old(.calendar-page),
+::view-transition-new(.calendar-page) {
+  mix-blend-mode: normal;
+  animation-fill-mode: both;
+  animation-duration: var(--md-sys-motion-spring-default-effects-duration);
+  animation-timing-function: var(--calendar-scroll);
+}
+::view-transition-old(.calendar-from-right) {
+  animation-name: calendar-page-out-start;
+}
+::view-transition-new(.calendar-from-right) {
+  animation-name: calendar-page-in-from-end;
+}
+::view-transition-old(.calendar-from-left) {
+  animation-name: calendar-page-out-end;
+}
+::view-transition-new(.calendar-from-left) {
+  animation-name: calendar-page-in-from-start;
+}
+@keyframes calendar-page-out-start {
+  to {
+    translate: -100% 0;
+  }
+}
+@keyframes calendar-page-out-end {
+  to {
+    translate: 100% 0;
+  }
+}
+@keyframes calendar-page-in-from-end {
+  from {
+    translate: 100% 0;
+  }
+}
+@keyframes calendar-page-in-from-start {
+  from {
+    translate: -100% 0;
+  }
+}

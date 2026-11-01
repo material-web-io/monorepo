@@ -1,0 +1,72 @@
+/* Text field (text-field.tsx). Its vertical rhythm, 8, 16 and 24dp, is the density spacing,
+ * space-100-variable, space-200-variable and space-300-variable, so a denser field loses the same
+ * above and below its text. text-field-icon: 12dp, a 24dp icon and 16dp. */
+@theme inline {
+  --spacing-text-field-icon: calc(var(--spacing) * 6 + 28px);
+}
+
+/* populated: a text control that holds text, typed or autofilled: one not showing its placeholder,
+ * which a TextField's control always has, a space when it is given none. No Tailwind name. */
+@custom-variant populated (&:is(:not(:placeholder-shown), :autofill));
+
+/* What an outlined field's outline tells its three parts, which are its children and so cannot
+ * read the control's state themselves: how thick they are, and how much of the notch's top edge
+ * each of its two halves still draws. Registered, so both can be animated. */
+@property --text-field-outline-width {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 1px;
+}
+
+@property --text-field-notch-edge {
+  syntax: '<percentage>';
+  inherits: true;
+  initial-value: 50%;
+}
+
+/* The focused outline, 3dp. */
+@utility field-outline-thick {
+  --text-field-outline-width: 3px;
+}
+
+/* The notch open for the label on the outline: its halves drawn back from the center to nothing. */
+@utility field-notch-open {
+  --text-field-notch-edge: 0%;
+}
+
+/* The outline's parts, a TextField's and a DateField's: 12dp at the start, the notch, as wide as
+ * the small label, an unseen copy of it, and 4dp each side, and the rest. The notch's top edge is
+ * two halves that draw back from the center, as the guideline video opens it. */
+@utility field-outline-start {
+  @apply box-border w-space-150 shrink-0 rounded-s-shape-xs border-y-(length:--text-field-outline-width) border-s-(length:--text-field-outline-width);
+}
+@utility field-outline-notch {
+  @apply relative min-w-0 overflow-hidden border-b-(length:--text-field-outline-width);
+  @apply before:absolute before:start-0 before:top-0 before:w-(--text-field-notch-edge) before:border-t-(length:--text-field-outline-width);
+  @apply after:absolute after:end-0 after:top-0 after:w-(--text-field-notch-edge) after:border-t-(length:--text-field-outline-width);
+}
+@utility field-outline-label {
+  @apply invisible block px-space-50 text-body-sm whitespace-nowrap;
+}
+@utility field-outline-end {
+  @apply box-border min-w-space-150 flex-1 rounded-e-shape-xs border-y-(length:--text-field-outline-width) border-e-(length:--text-field-outline-width);
+}
+
+/* Every part of a text field moves and recolors together over a short-4 on the standard easing,
+ * as in the guideline video, where the label settles with no overshoot: the tokens, not a spring. */
+@utility transition-text-field {
+  transition-property:
+    top, inset-inline-start, font-size, line-height, letter-spacing, color, background-color,
+    border-color, border-bottom-width, opacity, --text-field-outline-width, --text-field-notch-edge;
+  transition-duration: var(--md-sys-motion-duration-short4);
+  transition-timing-function: var(--md-sys-motion-easing-standard);
+}
+
+/* A search input draws a clear button and, in WebKit, a magnifier of its own; a text field's
+ * icons are its `leading` and `trailing`. */
+@utility search-decoration-none {
+  &::-webkit-search-cancel-button,
+  &::-webkit-search-decoration {
+    appearance: none;
+  }
+}

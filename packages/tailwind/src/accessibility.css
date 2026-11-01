@@ -1,0 +1,60 @@
+/* Accessibility helpers. Reduced motion is in motion.css and theme-default.css,
+ * where prefers-reduced-motion collapses every duration to ~0. */
+
+/* Extends a small control's hit area to the 48dp Material minimum without
+ * changing its visual size; put it on a positioned element (`relative
+ * touch-target`). Controls already 48dp or larger are unaffected. */
+@utility touch-target {
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    width: max(100%, 48px);
+    height: max(100%, 48px);
+  }
+}
+
+/* contrast-raised: inside a `data-contrast="medium|high"` scope, for a role pair of
+ * the spec that holds 3:1 at standard contrast only: a selected input chip's primary
+ * icon on secondary-container. `contrast-raised:text-on-secondary-container`. */
+@custom-variant contrast-raised (&:where([data-contrast='medium'], [data-contrast='medium'] *, [data-contrast='high'], [data-contrast='high'] *));
+
+/* The forced-colors system colors as color utilities, for an element that keeps
+ * a border or fill of its own in that mode and only needs it recolored
+ * (forced-colors:border-gray-text); container-border and selected-fill bundle more. */
+@theme inline {
+  --color-canvas: Canvas;
+  --color-canvas-text: CanvasText;
+  --color-gray-text: GrayText;
+  --color-highlight: Highlight;
+  --color-highlight-text: HighlightText;
+}
+
+/* Forced-colors (Windows High Contrast) drops backgrounds and shadows, leaving
+ * a container with no edge, so this gives it a system-color border. Used as
+ * `forced-colors:container-border`, so Tailwind sorts it after base's border-0. */
+@utility container-border {
+  border-style: solid;
+  border-width: 1px;
+  border-color: ButtonText;
+
+  @variant disabled {
+    border-color: GrayText;
+  }
+}
+
+/* Fills a selected toggle, or a Checkbox's box, which would otherwise look unselected
+ * in forced-colors mode, with the system highlight colors. Applied with the
+ * forced-colors: variant at the call site. */
+@utility selected-fill {
+  background-color: Highlight;
+  color: HighlightText;
+  forced-color-adjust: none;
+
+  @variant disabled {
+    background-color: GrayText;
+    color: Canvas;
+  }
+}

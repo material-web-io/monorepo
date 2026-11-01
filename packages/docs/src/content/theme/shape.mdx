@@ -1,0 +1,177 @@
+import * as scale from '../../examples/theme/shape-scale.tsx?example'
+import * as sides from '../../examples/theme/shape-sides.tsx?example'
+import * as library from '../../examples/theme/shape-library.tsx?example'
+import * as containers from '../../examples/theme/shape-containers.tsx?example'
+import * as rotation from '../../examples/theme/shape-rotation.tsx?example'
+
+Use a `rounded-shape-<size>` class to set one of the ten corner radii of the Material 3 [shape scale](https://m3.material.io/styles/shape/overview-principles), from none to full. The scale works with every side and corner of Tailwind's [`rounded-*` utilities](https://tailwindcss.com/docs/border-radius), and each radius is also a custom property. Use a `shape-<name>` class to cut an element to a shape of the [shape library](/theme/shape#shape-library).
+
+## Corner scale
+
+The theme's corners follow Material's [corner radius scale](https://m3.material.io/styles/shape/corner-radius-scale): ten steps, each named for how round it is. Use a step as a class, `rounded-shape-<size>`, or as a custom property, such as `var(--md-sys-shape-corner-medium)`.
+
+<Example {...scale} showCode={false} />
+
+| Class                  | Token                                         | Radius |
+| ---------------------- | --------------------------------------------- | ------ |
+| `rounded-shape-none`   | `--md-sys-shape-corner-none`                  | 0      |
+| `rounded-shape-xs`     | `--md-sys-shape-corner-extra-small`           | 4dp    |
+| `rounded-shape-sm`     | `--md-sys-shape-corner-small`                 | 8dp    |
+| `rounded-shape-md`     | `--md-sys-shape-corner-medium`                | 12dp   |
+| `rounded-shape-lg`     | `--md-sys-shape-corner-large`                 | 16dp   |
+| `rounded-shape-lg-inc` | `--md-sys-shape-corner-large-increased`       | 20dp   |
+| `rounded-shape-xl`     | `--md-sys-shape-corner-extra-large`           | 28dp   |
+| `rounded-shape-xl-inc` | `--md-sys-shape-corner-extra-large-increased` | 32dp   |
+| `rounded-shape-2xl`    | `--md-sys-shape-corner-extra-extra-large`     | 48dp   |
+| `rounded-shape-full`   | `--md-sys-shape-corner-full`                  | full   |
+
+One dp is one px. The full corner is a radius of 9999px, more than half of any box, so it rounds the ends of a box of any size.
+
+A corner class is one of Tailwind's [border radius utilities](https://tailwindcss.com/docs/border-radius), and is used like any other:
+
+- **Tailwind's radii:** Tailwind's own radii, such as `rounded-sm`, `rounded-md` and `rounded-lg`, are unchanged. Use them next to the scale.
+- **States:** Add a [state variant](/theme/state#state-variants) for another corner in a state, as in `hover:rounded-shape-lg`. To animate the change, add a [transition preset](/theme/motion#transition-presets), such as `transition-shape-color`.
+- **Your own CSS:** Apply a corner with Tailwind's [`@apply`](https://tailwindcss.com/docs/functions-and-directives#apply-directive), as in `@apply rounded-shape-lg`, or use its custom property.
+- **Nested corners:** For a rounded element inside a padded one, Material [subtracts the padding](https://m3.material.io/styles/shape/corner-radius-scale) from the outer radius, as in `calc(var(--md-sys-shape-corner-extra-large) - 8px)`.
+- **Merged classes:** [tailwind-merge](https://github.com/dcastil/tailwind-merge) does not know the scale, and keeps both of two corner classes. To merge them, use the [`tv` or the `twMerge`](/get-started/styling#custom-components) that `@material-web/react` exports, where the later class replaces the earlier one.
+
+## Sides and corners
+
+Use the scale with any of Tailwind's [`rounded-*` utilities](https://tailwindcss.com/docs/border-radius): a side (`rounded-t-shape-lg`, `rounded-e-shape-xl`) or a single corner (`rounded-tl-shape-2xl`).
+
+<Example {...sides} />
+
+The `s` and `e` sides are the start and the end of a line of text, and follow the text direction, as Tailwind's [logical properties](https://tailwindcss.com/docs/border-radius#using-logical-properties) do.
+
+Material [uses different corners](https://m3.material.io/styles/shape/corner-radius-scale#527ffa9c-ae91-46da-872a-e384a6fbc103) on one shape for closely grouped items, such as the inner corners of a split button.
+
+## Inherited corners
+
+Use `rounded-inherit` to give an element its parent's corner radius. The element follows the parent's corner as it changes, in a state or during a transition.
+
+| Class               | Corners        | Use                                                           |
+| ------------------- | -------------- | ------------------------------------------------------------- |
+| `rounded-inherit`   | All four       | An overlay that must always match its parent's current corner |
+| `rounded-t-inherit` | The top two    | The first part of a clipped container                         |
+| `rounded-b-inherit` | The bottom two | The last part of a clipped container                          |
+
+## Fully round corners
+
+Two classes round the ends of a box fully. Which to use depends on whether the corner changes.
+
+| Class                        | Use                                            |
+| ---------------------------- | ---------------------------------------------- |
+| `rounded-shape-full`         | A box whose corners stay round                 |
+| `rounded-space-<n>-variable` | A box whose corners change to a smaller radius |
+
+Use `rounded-space-<n>-variable` on a one-line box padded with `py-space-<n>-variable`, with the same step of the [spacing scale](/theme/spacing) for both:
+
+```html
+<button class="rounded-space-125-variable px-space-200 py-space-125-variable">Save</button>
+```
+
+The radius is half the box's height as a length, so the box is round at any [density](/theme/spacing#density), and a transition from it to a smaller corner shows throughout. A transition from `rounded-shape-full` does not: the corner stays round until the transition's end.
+
+The class takes a side or a corner too, as in `rounded-s-space-125-variable`.
+
+## Shape library
+
+Use a `shape-<name>` class to cut an element to one of the shapes of Material's [shape library](https://m3.material.io/styles/shape/overview-principles#1e5ec5be-a651-43c3-9fb2-dc9668a5f424). Each shape is a [`clip-path`](https://developer.mozilla.org/en-US/docs/Web/CSS/clip-path) polygon that fills the element's box, so its edge stays sharp at any size or scale. To add a shape of your own, see [New shapes](/theme/shape#new-shapes).
+
+<Example {...library} showCode={false} />
+
+The element is the shape's container: its background, its border and its children, such as an image, an icon or text, show only inside the shape.
+
+<Example {...containers} />
+
+- **Proportions:** A shape stretches to the element's box. Give the element a square box, as with `size-32` or [`aspect-square`](https://tailwindcss.com/docs/aspect-ratio), to keep the shape's own proportions.
+- **Images:** Use Tailwind's [`object-cover`](https://tailwindcss.com/docs/object-fit) on an image, so that the picture fills the shape without stretching.
+- **Shadows and focus rings:** The clip path also hides what the element draws outside the shape, such as a shadow or a focus ring. For a shadow that follows the shape, put Tailwind's [`drop-shadow-*`](https://tailwindcss.com/docs/filter-drop-shadow) on a parent.
+- **Where to use:** Material uses abstract shapes [on imagery and decorative UI](https://m3.material.io/styles/shape/overview-principles#3e29ff18-95f6-427c-a03c-dfaa664057d5), such as photo crops and avatars, and advises using them [sparingly](https://m3.material.io/styles/shape/overview-principles#d93d75e5-8127-4b58-9aaf-ba18080d8673).
+- **Pointer:** Only the shape takes clicks and hovers. A pointer over a corner cut away reaches what is behind the element.
+- **States and breakpoints:** Add a [state variant](/theme/state#state-variants) or a [breakpoint](https://tailwindcss.com/docs/responsive-design) for another shape, as in `hover:shape-sunny`, or remove the shape with `shape-none`, as in `md:shape-none`. The shape changes at once, without a transition.
+- **Merged classes:** [tailwind-merge](https://github.com/dcastil/tailwind-merge) does not know the shapes, and keeps both of two shape classes. To merge them, use the [`tv` or the `twMerge`](/get-started/styling#custom-components) that `@material-web/react` exports. There a later shape or `shape-none` replaces an earlier one, and a turn of a shape and Tailwind's `rotate-*` replace each other.
+
+### Rotation
+
+Use `shape-rotate-<n>` to turn a shape by a number of degrees, or `animate-shape-spin` to turn it slowly and continuously. The element's content turns back as far, so it stays upright.
+
+<Example {...rotation} />
+
+- **Content:** Each child of the element turns back about its own middle. A single child that fills the element or sits in its middle stays in place, so wrap several children, or an image, in one.
+- **Angles:** Turn the other way with `-shape-rotate-<n>`, or by any angle with a value in brackets, as in `shape-rotate-[0.1turn]`. With `animate-shape-spin`, the shape spins from its `shape-rotate-<n>` angle.
+- **Speed:** The shape turns once every 20 seconds. Set another time with an [arbitrary property](https://tailwindcss.com/docs/adding-custom-styles#arbitrary-properties), as in `[animation-duration:10s]`, or stop the turn with Tailwind's [`animate-none`](https://tailwindcss.com/docs/animation).
+- **Reduced motion:** With [`prefers-reduced-motion`](/theme/motion#reduced-motion), the shape holds still at its `shape-rotate-<n>` angle.
+- **Tailwind's rotation:** Tailwind's [`rotate-*`](https://tailwindcss.com/docs/rotate) turns the content with the shape. Use `shape-rotate-<n>` in its place.
+
+## Custom shapes
+
+Every corner of the scale is a custom property, so your own CSS can set it after the import. A value set before the import is replaced by the theme's. A corner you set changes every class and every component that uses it:
+
+```css
+@import 'tailwindcss';
+@import '@material-web/tailwind';
+
+:root {
+  --md-sys-shape-corner-medium: 8px;
+  --md-sys-shape-corner-extra-large: 20px;
+}
+```
+
+| Token and theme variable                                                   | Default  | Components that use it, such as                |
+| -------------------------------------------------------------------------- | -------- | ---------------------------------------------- |
+| `--md-sys-shape-corner-none`<br />`--radius-shape-none`                    | `0px`    | None                                           |
+| `--md-sys-shape-corner-extra-small`<br />`--radius-shape-xs`               | `4px`    | Snackbar, text field, plain tooltip, menu item |
+| `--md-sys-shape-corner-small`<br />`--radius-shape-sm`                     | `8px`    | Chip                                           |
+| `--md-sys-shape-corner-medium`<br />`--radius-shape-md`                    | `12px`   | Card, rich tooltip                             |
+| `--md-sys-shape-corner-large`<br />`--radius-shape-lg`                     | `16px`   | Menu, FAB, side sheet                          |
+| `--md-sys-shape-corner-large-increased`<br />`--radius-shape-lg-inc`       | `20px`   | Medium FAB                                     |
+| `--md-sys-shape-corner-extra-large`<br />`--radius-shape-xl`               | `28px`   | Dialog, bottom sheet, large FAB                |
+| `--md-sys-shape-corner-extra-large-increased`<br />`--radius-shape-xl-inc` | `32px`   | None                                           |
+| `--md-sys-shape-corner-extra-extra-large`<br />`--radius-shape-2xl`        | `48px`   | None                                           |
+| `--md-sys-shape-corner-full`<br />`--radius-shape-full`                    | `9999px` | Floating toolbar, a day of a calendar          |
+
+The [fully round corner](/theme/shape#fully-round-corners) of a padded box is a theme variable too, one for each step of the spacing scale:
+
+| Theme variable                | Steps                                                                               | Default                                                                      |
+| ----------------------------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `--radius-space-<n>-variable` | 0, 25, 50, 75, 100, 125, 150, 175, 200, 250, 300, 400, 450, 500, 600, 700, 800, 900 | Half a line of text and the step's [density padding](/theme/spacing#density) |
+
+- **Theme variables:** Under each token is its Tailwind [theme variable](https://tailwindcss.com/docs/theme), which gives the token its classes. In your own CSS, read the token, as in `var(--md-sys-shape-corner-medium)`: a theme variable has the root's value, and does not follow a token set on an element.
+- **Fully round corners:** Use `rounded-space-<n>-variable` as a class, or with Tailwind's [`@apply`](https://tailwindcss.com/docs/functions-and-directives#apply-directive). Read as a variable, it has the root's line height and density.
+- **One part of the page:** Set a token on an element, in place of the root, to change the corners inside it only.
+- **One component:** Pass a corner class in the component's [`className`](/get-started/styling#classes), as in `<Card className="rounded-shape-xl">`.
+- **Round buttons:** A round `Button`, `IconButton`, `ButtonGroup` or `SplitButton` takes its corner from its padding, as a [fully round corner](/theme/shape#fully-round-corners), so the full corner's token does not change it. For a squarer `Button` or `IconButton`, set its `shape` to `square`, or pass a corner class in its `className`.
+- **Large corners:** Material [cautions against](https://m3.material.io/styles/shape/corner-radius-scale#c482f37d-3e19-4142-b33c-f6f9de080545) large or full corners on information-dense components, such as cards.
+
+### New shapes
+
+Each shape of the [shape library](/theme/shape#shape-library) is a [theme variable](https://tailwindcss.com/docs/theme) in the `--shape-*` namespace. Define one in `@theme` to add a shape, which gets its own `shape-<name>` class:
+
+```css
+@import 'tailwindcss';
+@import '@material-web/tailwind';
+
+@theme {
+  --shape-ticket: polygon(
+    0 0,
+    100% 0,
+    100% 35%,
+    95% 50%,
+    100% 65%,
+    100% 100%,
+    0 100%,
+    0 65%,
+    5% 50%,
+    0 35%
+  );
+}
+```
+
+```html
+<div class="shape-ticket h-24 w-64 bg-tertiary-container">...</div>
+```
+
+- **The value:** A shape is any `clip-path` value. The points of a [`polygon()`](https://developer.mozilla.org/en-US/docs/Web/CSS/basic-shape/polygon), in percent of the element's box, stretch with it as the library's shapes do. [`circle()`](https://developer.mozilla.org/en-US/docs/Web/CSS/basic-shape/circle), [`ellipse()`](https://developer.mozilla.org/en-US/docs/Web/CSS/basic-shape/ellipse) and [`inset()`](https://developer.mozilla.org/en-US/docs/Web/CSS/basic-shape/inset) work as well, and [`shape()`](https://developer.mozilla.org/en-US/docs/Web/CSS/basic-shape/shape) draws curves in percent in the browsers that support it.
+- **Library shapes:** A variable named for a shape of the library, such as `--shape-circle`, replaces that shape. To leave out every shape of the library, set `--shape-*: initial` first, as when [overriding a namespace](https://tailwindcss.com/docs/theme#overriding-the-default-theme).
+- **Classes:** A shape's class works like the library's, with [state variants](/theme/state#state-variants), `shape-rotate-<n>` and `animate-shape-spin`.

@@ -1,0 +1,105 @@
+/* Navigation bar (navigation-bar.tsx): a row of items on surface-container, across its parent
+ * and at least 64dp tall, growing with labels that wrap. */
+@utility navigation-bar {
+  @apply box-border flex min-h-16 w-full bg-surface-container text-on-surface-variant;
+}
+
+/* A centered bar's items sit together in its middle, and it counts them, up to six, for their
+ * widths below: they are its element children in the page, whichever component drew them, so
+ * the count is right in the markup a server sends and as items come and go. */
+@utility navigation-bar-centered {
+  @apply justify-center;
+  --navigation-bar-items: 1;
+  &:has(> :nth-child(2)) {
+    --navigation-bar-items: 2;
+  }
+  &:has(> :nth-child(3)) {
+    --navigation-bar-items: 3;
+  }
+  &:has(> :nth-child(4)) {
+    --navigation-bar-items: 4;
+  }
+  &:has(> :nth-child(5)) {
+    --navigation-bar-items: 5;
+  }
+  &:has(> :nth-child(6)) {
+    --navigation-bar-items: 6;
+  }
+}
+
+/* The item (navigation-bar-item.tsx): React Aria's ToggleButton with its native styling reset,
+ * the whole of its part of the bar. An indicator as wide as its item is cut at the item's sides
+ * while its spring is past them. */
+@utility navigation-bar-item {
+  @apply relative focus-ring-inset m-0 box-border flex cursor-pointer touch-manipulation appearance-none rounded-shape-xs border-0 bg-transparent px-0 font-plain text-label-md text-inherit no-underline outline-none select-none;
+  @apply overflow-x-clip;
+  @apply disabled:cursor-default;
+}
+
+/* An item of a centered bar is as wide as its content, and no less than its share of what the
+ * items take of the bar together: 60% for three of them, 70% for four, 80% for five and 90% for
+ * six, as Compose has it; no more than an equal part. */
+@utility navigation-bar-item-centered {
+  flex: none;
+  min-width: calc((var(--navigation-bar-items) + 3) * 10% / var(--navigation-bar-items));
+  max-width: calc(100% / var(--navigation-bar-items));
+  /* Seven or more have the whole bar between them there, so an equal part each. */
+  :has(> :nth-child(7)) > & {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: none;
+  }
+}
+
+/* What an item holds, drawn as written over the indicator's box, which takes no pointer: a 24dp
+ * icon, on-surface-variant, filled and on-secondary-container when the item is selected, at once.
+ * Its own stacking context, so the box under the icon and the label is drawn in it. */
+@utility navigation-bar-item-content {
+  @apply pointer-events-none relative isolate text-on-surface-variant icon-24;
+  @apply group-selected/md-navigation-bar-item:text-on-secondary-container group-selected/md-navigation-bar-item:icon-filled;
+  @apply group-disabled/md-navigation-bar-item:text-on-surface-variant/disabled-content;
+  @apply forced-colors:group-selected/md-navigation-bar-item:text-highlight-text;
+  @apply forced-colors:group-disabled/md-navigation-bar-item:text-gray-text;
+}
+
+/* A vertical item's content: a 32dp row, the indicator's box with the icon in its middle, and
+ * the label 4dp under it in a row of its own, both centered across the item. With no label, it
+ * is in the middle of the item, however tall the bar is, as Compose places an icon alone. */
+@utility navigation-bar-item-content-vertical {
+  @apply grid grid-cols-1 items-center justify-items-center gap-y-space-50;
+  grid-template-rows: --spacing(8);
+  &:not(:has([slot='label'])) {
+    @apply my-auto;
+  }
+}
+
+/* The indicator's box, which the state layer and ripple fill and whose text color is theirs,
+ * under what the item holds. Round at its ends, in the shape of the indicator. */
+@utility navigation-bar-state-layer-host {
+  @apply pointer-events-none absolute -z-1 rounded-full text-on-secondary-container;
+}
+
+/* The active indicator: secondary-container, at its box's middle, with no width and clear when
+ * the item is not selected, the whole of its box when it is. Forced colors, which drop the fill,
+ * draw it in the system highlight. */
+@utility navigation-bar-active-indicator {
+  @apply absolute inset-y-0 left-1/2 w-0 -translate-x-1/2 rounded-inherit bg-secondary-container opacity-0 transition-navigation-bar-indicator;
+  @apply group-selected/md-navigation-bar-item:w-full group-selected/md-navigation-bar-item:opacity-100;
+  @apply forced-colors:bg-highlight forced-colors:forced-color-adjust-none;
+}
+
+/* A vertical item's label, under the indicator: secondary when the item is selected, at once,
+ * centered and free to wrap as the text is scaled up. */
+@utility navigation-bar-label-vertical {
+  @apply row-start-2 max-w-full text-center;
+  @apply group-selected/md-navigation-bar-item:group-not-disabled/md-navigation-bar-item:text-secondary;
+}
+
+/* The active indicator grows from no width at the middle of its item and fades in with it, both
+ * by one spring, the default spatial one, a little past its box before it settles, and goes the
+ * same way back, as Compose has it. The md tokens, so a standard motion scope is followed. */
+@utility transition-navigation-bar-indicator {
+  transition-property: width, opacity;
+  transition-duration: var(--md-sys-motion-spring-default-spatial-duration);
+  transition-timing-function: var(--md-sys-motion-spring-default-spatial-easing);
+}

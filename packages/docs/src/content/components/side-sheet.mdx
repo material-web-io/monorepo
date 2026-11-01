@@ -1,0 +1,233 @@
+import sideSheetApi from 'virtual:api/SideSheet'
+import { SideSheetSlots } from '../../slot-pictures/side-sheet.tsx'
+import sideSheetHeaderApi from 'virtual:api/SideSheetHeader'
+import sheetTriggerApi from 'virtual:api/SheetTrigger'
+import * as backButton from '../../examples/side-sheet/back-button.tsx?example'
+import * as basic from '../../examples/side-sheet/basic.tsx?example'
+import * as detached from '../../examples/side-sheet/detached.tsx?example'
+import * as divider from '../../examples/side-sheet/divider.tsx?example'
+import * as modalDetached from '../../examples/side-sheet/modal-detached.tsx?example'
+import * as preventDismissal from '../../examples/side-sheet/prevent-dismissal.tsx?example'
+import * as responsive from '../../examples/side-sheet/responsive.tsx?example'
+import * as standard from '../../examples/side-sheet/standard.tsx?example'
+import * as width from '../../examples/side-sheet/width.tsx?example'
+
+Side sheets show secondary content anchored to the side of the screen. Use a side sheet to provide optional content and actions without interrupting the main content, from a list of actions to supplemental content in a table.
+
+A `SideSheet` comes in two variants:
+
+- **Standard** (the default): The sheet sits beside the page's body, at the end of a row that makes room for it, and the page remains in use. Standard sheets are used mostly in medium to expanded windows, like tablet and desktop.
+- **Modal**, with `isModal`: The sheet opens in front of the page over a scrim and stays until it is closed. Modal sheets are preferred in compact windows, like mobile.
+
+In compact windows, consider a [bottom sheet](/components/bottom-sheet) instead.
+
+A side sheet is composed of these parts:
+
+| Part              | Use                                                                                                                                                            |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SheetTrigger`    | The trigger. Wraps the button that opens the sheet and the `SideSheet`, with the button first. Without it, control the sheet with `isOpen` and `onOpenChange`. |
+| `SideSheet`       | The sheet: a standard sheet (the default) or, with `isModal`, a [modal sheet](#modal-side-sheet)                                                               |
+| `SideSheetHeader` | The header, first in the sheet. It holds the headline and the icon buttons. See [Header, content and actions](#header-content-and-actions).                    |
+
+```tsx
+import { SheetTrigger, SideSheet, SideSheetHeader } from '@material-web/react'
+import { Heading } from 'react-aria-components'
+```
+
+## Basic side sheet
+
+Wrap the button that opens the sheet and the sheet in a `SheetTrigger`. Write the sheet's content as its children: a `SideSheetHeader` first, then the rest, as described under [Header, content and actions](#header-content-and-actions). This sheet is a [modal sheet](#modal-side-sheet).
+
+<Example {...basic} />
+
+## Modal side sheet
+
+Set `isModal` for a modal sheet. It is at the end edge of the window and as tall as the window. Without a trigger, control the sheet with `isOpen` and `onOpenChange`, or set `defaultOpen` to start with it open, as with React Aria's [Sheet](https://react-aria.adobe.com/Sheet#api).
+
+While a modal sheet is open, the page behind it cannot be used or scrolled, and the focus stays in the sheet. A [menu](/components/menu) in a modal sheet opens in front of it. Another [dialog](/components/dialog) or modal sheet opened from it shows in front of it, and Escape closes the one in front.
+
+### Dismissal
+
+A click on the scrim, Escape, and a swipe toward the end edge of the window close a modal sheet. Set `preventDismissal` to turn all of these off. Every side sheet needs a close icon button: put one in the header with `slot="close"`. Any other button in the sheet with `slot="close"`, such as an action, closes it too.
+
+<Example {...preventDismissal} />
+
+To decide for each press outside the sheet whether it closes the sheet, pass a function as `shouldCloseOnInteractOutside`. It receives the pressed element, and the sheet stays open when it returns `false`.
+
+### Swiping
+
+A swipe toward the end edge of the window closes a modal sheet. A swipe released part way either returns the sheet to its place or closes it. With `preventDismissal`, a swipe does not move the sheet. A finger swipes the sheet, and a mouse does not drag it.
+
+A side sheet has no `snapPoints`, and a standard sheet cannot be swiped.
+
+## Standard side sheet
+
+Without `isModal`, a sheet is a standard sheet. It has no scrim, and the page beside it remains in use.
+
+A standard sheet is a flex item. Write it after the body, in a row as tall as the sheet should be (`flex h-dvh`, for example), and give the body `min-w-0 grow`. The sheet stretches to the row's height at the end of the row.
+
+```tsx
+<div className="flex h-dvh">
+  <main className="min-w-0 grow">…</main>
+  <SideSheet isOpen={info} onOpenChange={setInfo}>
+    …
+  </SideSheet>
+</div>
+```
+
+A standard sheet shows unless `isOpen` is `false`. Pass `onOpenChange` to let it be dismissed: Escape in the sheet and a button with `slot="close"` each call `onOpenChange` with `false`. The sheet stays until you set `isOpen` to `false`. Without `onOpenChange`, Escape does nothing in the sheet.
+
+When a standard sheet is shown, the focus moves to the first focusable element in it, such as the close button. Tab then moves the focus out to the page. When the sheet is hidden, the focus returns to where it was.
+
+In this example, a box stands in for the row. The info button shows and hides the sheet, and the body shrinks and grows to make room for it. The close button and Escape hide the sheet too.
+
+<Example {...standard} isFlush />
+
+## Slots
+
+<SideSheetSlots showLegend />
+
+| Slot    | Child                      | Use                                                                                      |
+| ------- | -------------------------- | ---------------------------------------------------------------------------------------- |
+| `title` | A `Heading`, in the header | The sheet's headline, which names the sheet. It is an `<h2>` unless you set its `level`. |
+| `close` | Any button                 | Closes the sheet after its own `onPress`                                                 |
+
+Write a back icon button before the headline if the sheet needs one, and the close icon button after the headline, following any other icon buttons. With no headline, the last button is still at the end of the header.
+
+## Header, content and actions
+
+A side sheet is composed of these parts, from top to bottom:
+
+| Part              | Use                                                                                                                         |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `SideSheetHeader` | The header, first in the sheet. It holds the headline and the icon buttons.                                                 |
+| Content           | The rest of the sheet's content, laid out in a column, which scrolls vertically as a whole when it is taller than the sheet |
+| Actions           | For bottom actions, a row of `Button`s under a `Divider`                                                                    |
+
+Give the content its side padding, and lay out the actions, with the theme's classes:
+
+```tsx
+<SideSheet>
+  <SideSheetHeader>…</SideSheetHeader>
+  <div className="px-space-300">…</div>
+  <Divider />
+  <div className="flex gap-space-100 px-space-300 pt-space-200 pb-space-300">…</div>
+</SideSheet>
+```
+
+To scroll the content on its own instead of with the sheet, between the header and the actions, give it `min-h-0 grow overflow-y-auto`.
+
+A sheet can hold more than one region. In this example, a section opened from the list shows a back icon button before its headline, which returns to the list.
+
+<Example {...backButton} />
+
+## Detached side sheet
+
+Set `isDetached` to inset either sheet 16dp from the edges of the window, or of its row, with rounded corners all around.
+
+<Example {...modalDetached} />
+
+A detached standard sheet keeps the same margin from the body. In this example, the sheet's `className` sets `bg-surface-container` to set it off from the body.
+
+<Example {...detached} isFlush />
+
+## Responsive
+
+A modal sheet in a compact window can become a standard sheet in a wider one. Set `isModal` from your own breakpoint, and control the sheet with `isOpen` and `onOpenChange`, which both variants take.
+
+In this example, the sheet is modal in a window narrower than 600dp, the theme's medium [breakpoint](/theme/layout#breakpoints), and standard in a wider one.
+
+<Example {...responsive} isFlush />
+
+> **Note:** Changing `isModal` while a sheet is shown remounts its content, so the content's scroll position and state are lost.
+
+## Right to left
+
+A standard sheet follows the page's `dir`, and a modal sheet follows the locale, which `I18nProvider` sets. For a right-to-left language, set both: either sheet is then at the left edge, with its layout mirrored. See [Internationalization](/get-started/react-aria#internationalization).
+
+## Customization
+
+Pass classes in `className` to restyle one sheet. `className`, `style` and `ref` apply to the sheet's container. See [Styling](/get-started/styling) for the classes, the states and the theme.
+
+- **States:** While a standard sheet appears and leaves, it has `data-entering` and `data-exiting`. See [States](/get-started/styling#states).
+- **Functions:** `className`, `style` and `children` can be functions of the sheet's state, on a standard sheet and a modal one alike: `state`, whose `close()` closes the sheet, `isEntering`, `isExiting`, `isExpanded` (true once the whole sheet shows), `position`, `swipeDirection`, `stackIndex` and `hasDescendants`. See [Children as a function](/get-started/composition#children-as-a-function).
+- **Ancestors:** A modal sheet is rendered at the end of the page, not inside the element it is written in. A class or a `data-theme` on an element around it does not reach it: set it on the `SideSheet` itself, or on the root element. A standard sheet is rendered where it is written. See [Theme](/get-started/styling#theme).
+- **Attributes:** A `SideSheet` also takes attributes and events of its `<div>`, such as `id` and `onClick`.
+
+### Width
+
+A sheet is 256dp wide by default. To set another width, add a `side-sheet-width-*` class to its `className`. The value is a number on Tailwind's spacing scale (`side-sheet-width-90`), a spacing token (`side-sheet-width-space-900`) or any length (`side-sheet-width-[22rem]`). A sheet is no wider than 400dp, and a modal sheet no wider than the window less its margins.
+
+> **Note:** Set the width with `side-sheet-width-*`, not with `w-*`.
+
+<Example {...width} />
+
+### Divider
+
+To show a divider at the start of a standard sheet that is not detached, set `className="border-s border-outline-variant"`. Without Tailwind's [Preflight](https://tailwindcss.com/docs/preflight#border-styles-are-reset), add `border-0 border-solid` as well.
+
+<Example {...divider} isFlush />
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/side-sheets/accessibility#e096f254-f7ea-4e9c-a9f9-107929cb5b9a) what people should be able to do with assistive technology:
+
+- Dismiss the side sheet
+
+### Interaction and style
+
+- **Color contrast:** The headline has 4.5:1 contrast or more with the container of either sheet, in light and dark schemes at every [contrast level](/theme/color#contrast).
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), a modal sheet opens at once, and a standard sheet shows and hides at once.
+- **Forced colors:** Either sheet keeps an edge in [forced colors](/theme/accessibility#forced-colors).
+- **Right to left:** In a right-to-left language, either sheet is at the left edge, with its layout mirrored. See [Right to left](#right-to-left).
+- **Close button:** Material [requires](https://m3.material.io/components/side-sheets/accessibility#b9deb24c-627b-4742-beef-178cc54043ca) a close affordance in every side sheet: put a close icon button in the header, with `slot="close"` and an `aria-label`. It closes a modal sheet even with `preventDismissal`, and asks a standard sheet to hide through `onOpenChange`.
+
+### Focus
+
+- When a modal sheet opens, the focus moves to the sheet itself, and Tab then moves it to the close button. To focus an element as the sheet opens, give it `autoFocus`.
+- While a modal sheet is open, the focus stays in the sheet. When the sheet closes by Escape or a close button, the focus returns to its trigger.
+- When a standard sheet is shown, the focus moves to the first focusable element in it, such as the close button. When the sheet is hidden, the focus returns to where it was.
+- A standard sheet does not keep the focus: Tab moves it out to the page.
+- Tab moves through the header first and then the content, in the order written, as Material [shows](https://m3.material.io/components/side-sheets/accessibility#f86655b9-da5d-4085-846d-d5ba2ba2203b): write the `SideSheetHeader` first and the actions last.
+
+### Keyboard navigation
+
+| Keys           | Actions                                                             |
+| -------------- | ------------------------------------------------------------------- |
+| Tab            | Move the focus to the next button in the sheet                      |
+| Space or Enter | Press the focused button, such as the close button                  |
+| Escape         | Close a modal sheet, or a standard sheet that has an `onOpenChange` |
+
+- Escape closes a modal sheet, or the one in front when one is over another, unless `preventDismissal` is set.
+- Escape dismisses a standard sheet only while the focus is in the sheet, and only one that has an `onOpenChange`.
+
+### Labeling elements
+
+- A side sheet has the `dialog` role, as Material [advises](https://m3.material.io/components/side-sheets/accessibility#bbd711bc-4823-4cee-a744-6844479264c0). Set `role` to `alertdialog` to change it.
+- The header's `Heading` in the `title` slot names the sheet, unless you set an `aria-label`. You can also set `aria-labelledby` and `aria-describedby`. Render the headline when the sheet is first shown: a headline added later does not name the sheet.
+- With neither a headline nor an `aria-label`, a modal sheet is named by its trigger's text.
+- Describe a modal sheet that has `role="alertdialog"` with a `Text` in the `description` slot.
+- An `IconButton` in the header has no visible label, so give each an `aria-label` that names its action, such as Close or Back. See [Icon button](/components/icon-button#labeling-elements).
+- The button of a `SheetTrigger` reports whether the modal sheet is open with `aria-expanded`.
+- While a modal sheet is open, the page behind it is hidden from assistive technology.
+
+## Props
+
+### SideSheet
+
+<PropsTable {...sideSheetApi} />
+
+### SideSheetHeader
+
+`SideSheetHeader` accepts every prop of a `<div>`, including `className` and `ref`.
+
+<PropsTable
+  {...sideSheetHeaderApi}
+  inherited={sideSheetHeaderApi.inherited.filter((prop) => prop.name !== 'ref')}
+/>
+
+### SheetTrigger
+
+<PropsTable {...sheetTriggerApi} />

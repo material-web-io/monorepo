@@ -1,0 +1,5 @@
+export { Tabs, type TabsProps, type TabsRenderProps } from './tabs'
+export { TabList, type TabListProps, type TabListRenderProps } from './tab-list'
+export { Tab, type TabProps, type TabRenderProps } from './tab'
+export { TabPanel, type TabPanelProps, type TabPanelRenderProps } from './tab-panel'
+export type { TabsVariant } from './context'

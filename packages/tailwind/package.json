@@ -1,0 +1,49 @@
+{
+  "name": "@material-web/tailwind",
+  "version": "0.1.0",
+  "description": "Material 3 for Tailwind CSS v4: the design tokens as CSS custom properties and Tailwind utilities.",
+  "keywords": [
+    "material-design",
+    "material-3",
+    "m3",
+    "tailwindcss",
+    "design-system",
+    "design-tokens",
+    "css"
+  ],
+  "license": "MIT",
+  "author": "Yunfan Yang",
+  "homepage": "https://github.com/material3-web/monorepo/tree/main/packages/tailwind#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/material3-web/monorepo.git",
+    "directory": "packages/tailwind"
+  },
+  "bugs": {
+    "url": "https://github.com/material3-web/monorepo/issues"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "files": [
+    "src/*.css",
+    "dist"
+  ],
+  "bin": {
+    "material3-theme": "./dist/material3-theme.mjs"
+  },
+  "style": "./src/index.css",
+  "exports": {
+    ".": "./src/index.css",
+    "./*.css": "./src/*.css",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "esbuild scripts/generate-tokens.mjs --bundle --platform=node --format=esm --minify --outfile=dist/material3-theme.mjs",
+    "tokens:generate": "tsx scripts/generate-tokens.mjs --out src/theme-default.css",
+    "prepublishOnly": "npm run --prefix ../.. check && npm run build"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

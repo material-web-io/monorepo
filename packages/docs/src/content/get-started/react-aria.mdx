@@ -1,0 +1,98 @@
+import * as slots from '../../examples/get-started/slots.tsx?example'
+
+Use the components the way you use [React Aria Components](https://react-aria.adobe.com/): with the same props, parts and providers. This page covers what the components have in common, and each component's page covers its own props.
+
+## Component props
+
+Pass React Aria's props to a component next to its Material 3 ones:
+
+```tsx
+<Button variant="tonal" isDisabled={!canSave} onPress={save}>
+  Save
+</Button>
+```
+
+These props work the same way across components:
+
+| Prop                 | Use                                                                                                                                                                                                      |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `className`, `style` | A value, or a function of the component's state, such as `isHovered`, `isPressed`, `isFocusVisible`, `isDisabled` or `isSelected`. See [Styling](/get-started/styling).                                  |
+| `children`           | The content, or a function of the same state. See [Composition](/get-started/composition#children-as-a-function).                                                                                        |
+| `slot`               | The place a component takes in its parent. See [Composition](/get-started/composition#slots).                                                                                                            |
+| `onPress`            | A press with a mouse, a touch, the keyboard or assistive technology, on a button or an item. Use it in place of `onClick`.                                                                               |
+| `isDisabled`         | Disables a control, in place of the `disabled` attribute.                                                                                                                                                |
+| `render`             | A function that renders another element in the component's place, as React Aria's [`render` prop](https://react-aria.adobe.com/customization#dom-elements) does. On a button, use `elementType` instead. |
+| `ref`                | The element that `className` is on. A `TextField`, a `Checkbox`, a `Radio` and a `Switch` also take `inputRef`, for their input.                                                                         |
+
+A component's page lists its props. For how each one behaves, see the page of its React Aria component, such as [Button](https://react-aria.adobe.com/Button), [Menu](https://react-aria.adobe.com/Menu) or [Calendar](https://react-aria.adobe.com/Calendar).
+
+## Imports
+
+Import the components from `@material-web/react`, with the triggers `DialogTrigger`, `SheetTrigger`, `TooltipTrigger` and `PreviewTrigger`. Import the parts React Aria already provides from `react-aria-components`:
+
+| Import                                                      | Use                                                                                                                                                   |
+| ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Text`, `Heading`, `Label`, `Keyboard`, `Header`            | The text of a component, each in its [slot](/get-started/composition#slots)                                                                           |
+| `MenuTrigger`, `SubmenuTrigger`, `MenuSection`, `Separator` | The trigger, the sections and the dividers of a [menu](/components/menu)                                                                              |
+| `Input`, `Autocomplete`                                     | The input of a [search field](/components/search), and the filtering of a list as the query is typed                                                  |
+| `Form`, `FieldError`                                        | A form, and the error message of a field. See [Forms](/get-started/react-aria#forms).                                                                 |
+| `RouterProvider`, `I18nProvider`                            | The app's router and locale. See [Routing](/get-started/react-aria#routing) and [Internationalization](/get-started/react-aria#internationalization). |
+
+<Example {...slots} />
+
+- **Hooks:** React Aria's hooks work with the components, such as [`useFilter`](https://react-aria.adobe.com/useFilter) and [`useListData`](https://react-aria.adobe.com/useListData).
+- **Dates:** Pass a date or a time as an object from `@internationalized/date`, such as a [`CalendarDate`](https://react-aria.adobe.com/internationalized/date/CalendarDate) or a `Time`.
+- **Package managers:** npm installs both packages with the library. With a package manager that keeps a project from importing the dependencies of its dependencies, such as pnpm, add them to your project as well.
+
+## Routing
+
+To make an item a link, give it an `href`. To send these links through a client-side router, wrap the app in `RouterProvider` once:
+
+```tsx
+import { RouterProvider } from 'react-aria-components'
+import { useHref, useNavigate } from 'react-router'
+
+function App() {
+  const navigate = useNavigate()
+  return (
+    <RouterProvider navigate={navigate} useHref={useHref}>
+      {/* ... */}
+    </RouterProvider>
+  )
+}
+```
+
+| Component                                           | Link                                                                                                 |
+| --------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `ListItem`, `MenuItem`, `FabMenuItem`, `Tab`        | Set `href`. The link goes through the router.                                                        |
+| `Button`, `IconButton`, `Fab`, `SplitButtonLeading` | Set `elementType="a"` and `href`. It is a native link, which the browser follows without the router. |
+| `NavigationBarItem`, `NavigationRailItem`           | Takes no `href`. Navigate in its `onChange` or `onPress`.                                            |
+
+For the setup of each framework, see React Aria's [Framework setup](https://react-aria.adobe.com/frameworks) guide.
+
+## Forms
+
+Give a field a `name` to include it in a form. It is submitted and reset with the form. To validate it, set `isRequired` or pass a `validate` function: an invalid field blocks its form from being submitted. See React Aria's [Forms](https://react-aria.adobe.com/forms#validation) guide.
+
+For what each field submits and how it shows an error, see its page: [Text field](/components/text-field#forms), [Checkbox](/components/checkbox#forms), [Radio button](/components/radio#forms), [Switch](/components/switch#forms) and [Date field](/components/date-field#forms). To put a form in a dialog, see [Dialog](/components/dialog#forms).
+
+## Internationalization
+
+The locale is the browser's by default. To set another, wrap the app in an [`I18nProvider`](https://react-aria.adobe.com/I18nProvider):
+
+```tsx
+import { I18nProvider } from 'react-aria-components'
+
+function Root() {
+  return (
+    <I18nProvider locale="ar-AE">
+      <App />
+    </I18nProvider>
+  )
+}
+```
+
+- **Direction:** For a right-to-left language, set both the locale and the `dir` attribute. The arrow keys follow the locale, and the layout follows `dir`.
+- **Dates:** Dates and times are formatted for the locale, which also sets the calendar system and the first day of the week.
+- **Built-in names:** The few controls that React Aria names itself, such as the close button of a snackbar, are named in the locale's language. All other text is yours to write.
+- **Server rendering:** Set the locale explicitly on a server-rendered page, so that the server and the browser format dates alike.

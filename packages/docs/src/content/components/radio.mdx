@@ -1,0 +1,176 @@
+import radioApi from 'virtual:api/Radio'
+import { RadioGroupSlots } from '../../slot-pictures/radio.tsx'
+import radioGroupApi from 'virtual:api/RadioGroup'
+import * as basic from '../../examples/radio/basic.tsx?example'
+import * as controlled from '../../examples/radio/controlled.tsx?example'
+import * as custom from '../../examples/radio/custom.tsx?example'
+import * as disabled from '../../examples/radio/disabled.tsx?example'
+import * as form from '../../examples/radio/form.tsx?example'
+import * as group from '../../examples/radio/group.tsx?example'
+import * as label from '../../examples/radio/label.tsx?example'
+import * as orientation from '../../examples/radio/orientation.tsx?example'
+import * as renderProps from '../../examples/radio/render-props.tsx?example'
+import * as required from '../../examples/radio/required.tsx?example'
+
+Radio buttons let people select one option from a set of options. Only one radio button of a set can be selected at a time. Use them to:
+
+- Select a single option from a set
+- Expose all available options
+
+Compared with the other selection controls:
+
+- **Radio button or checkbox:** Radio buttons are single-select. To let people select several options from a list, use [checkboxes](/components/checkbox).
+- **Radio button or switch:** To let people turn the items of a list on or off independently, use [switches](/components/switch).
+
+A radio group is composed of these parts:
+
+| Part                             | Use                                                                                            |
+| -------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `RadioGroup`                     | The group, which holds the other parts                                                         |
+| `Label`                          | The group's name. Without one, name the group with an `aria-label`.                            |
+| `Radio`                          | An option, with its `value`                                                                    |
+| `Text` with `slot="description"` | The group's description                                                                        |
+| `FieldError`                     | The group's error, displayed once a form submission is blocked. See [Validation](#validation). |
+
+```tsx
+import { Radio, RadioGroup } from '@material-web/react'
+import { FieldError, Label, Text } from 'react-aria-components'
+```
+
+## Basic radio button
+
+Put radio buttons in a `RadioGroup` and give each a `value`. Selecting one deselects the others. Set the initial selection with `defaultValue` on the group: the group's value is the `value` of the selected `Radio`.
+
+<Example {...basic} />
+
+The group has no layout of its own, so give it one, such as a column.
+
+<Example {...group} />
+
+> **Note:** A `Radio` outside a `RadioGroup` throws an error.
+
+## Slots
+
+<RadioGroupSlots showLegend />
+
+| Slot          | Child    | Use                                             |
+| ------------- | -------- | ----------------------------------------------- |
+| `description` | A `Text` | Describes the group and each radio button in it |
+
+## Label
+
+Write the label as the radio button's children. Pressing the label selects the radio button. With no label text, set an `aria-label`.
+
+<Example {...label} />
+
+The label takes the [type style](/theme/typography#type-scale) of the text around it. To set one, add its class to the radio button, to the group or to an element around them, as in `text-body-lg`.
+
+## Controlled
+
+Control the selection with `value` and `onChange` on the group, as with React Aria's [`RadioGroup`](https://react-aria.adobe.com/RadioGroup#value). `onChange` is called with the `value` of the newly selected `Radio`.
+
+Pressing a selected radio button does not deselect it. To clear the selection, set the group's `value` to `null`, as the button in this example does.
+
+<Example {...controlled} />
+
+## Disabled
+
+Set `isDisabled` on the group to disable every radio button in it, or on a `Radio` to disable that one alone. A disabled radio button cannot be selected or focused, and Tab and the arrow keys skip it. Set `isReadOnly` on the group to keep its selection as it is while it can still be focused.
+
+<Example {...disabled} />
+
+## Orientation
+
+Set `orientation` to `vertical` (the default) or `horizontal`. It tells assistive technology which way the group runs, and in a right-to-left locale it makes the left and right arrow keys of a horizontal group follow the row. It does not set the layout, so give a horizontal group a row.
+
+<Example {...orientation} />
+
+## Validation
+
+Set `isRequired` on the group to require a selection. A required group blocks its form from being submitted while no radio button is selected. Once a submission is blocked, a `FieldError` in the group is displayed until one is selected. See React Aria's [Forms](https://react-aria.adobe.com/forms#validation) guide.
+
+<Example {...required} />
+
+To mark a group as invalid yourself, set `isInvalid` on it. The group's `isRequired` and `isInvalid` apply to every radio button in it. An invalid radio button keeps its colors, so show the error in a `FieldError`.
+
+## Forms
+
+Set a `name` on the group to include it in a form. The selected `value` is submitted with the form, and the selection is reset with it. A group with no selection submits nothing.
+
+<Example {...form} />
+
+## In a list
+
+In a selection [list](/components/list), a `Radio` in an item's slot does not select the item, as a `Checkbox` does. It is a separate control, and still needs a `RadioGroup` around it.
+
+## Customization
+
+Pass classes in `className` to restyle one radio button. They go on its outermost element, an inline flex box aligned to the middle of its line, as do `style` and `ref`. `inputRef` is the ref of its input. See [Styling](/get-started/styling) for the classes, the states and the theme.
+
+<Example {...custom} />
+
+- **Color:** `className` does not reach the circles. To change their colors, set the color roles they use. See [Theme](/get-started/styling#theme).
+- **States:** On a radio button, the variants `selected:`, `invalid:`, `disabled:`, `read-only:` and `required:` style those states. Hover, press and focus are reported on an element inside it, so use their `has-*` form, as in `has-hover:bg-surface-container`. See [States](/get-started/styling#variants).
+- **Functions:** `className` and `style` can be functions of `isSelected`, `isInvalid`, `isDisabled`, `isReadOnly` and `isRequired`. To read hover, press and focus, pass a function as [children](#children-as-a-function).
+- **Every radio button:** To restyle all the radio buttons at once, change the [theme](/get-started/styling#theme).
+
+### Children as a function
+
+Pass a function as children to render the label from the radio button's state: `isSelected`, `isHovered`, `isPressed`, `isFocused`, `isFocusVisible`, `isDisabled`, `isReadOnly`, `isInvalid` and `isRequired`. `isFocused` is any focus, and `isFocusVisible` is keyboard focus only. The state's type is exported as `RadioRenderProps`. See [Children as a function](/get-started/composition#children-as-a-function).
+
+<Example {...renderProps} />
+
+On a `RadioGroup`, `className`, `style` and `children` can be functions of `isDisabled`, `isReadOnly`, `isRequired`, `isInvalid`, `orientation` and `state`.
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/radio-button/accessibility#4ea04a76-1d53-4c1b-882c-ffa051aeece9) what people should be able to do with assistive technology:
+
+- Navigate to a radio button
+- Select a radio button
+- Get appropriate feedback based on input type
+
+### Interaction and style
+
+- **States:** Hovering shows a state layer, and a press shows a ripple. Keyboard focus shows a [focus ring](/theme/accessibility#focus-ring), and a press with a mouse or touch does not.
+- **Touch target:** A radio button has a [touch target](/theme/accessibility#touch-targets) of 48dp around its circle. Pressing its label selects it too.
+- **Color contrast:** In the light and dark schemes, at every contrast level, the circle and its dot keep 3:1 contrast with the surface. Keep that contrast when you change the [color roles](/theme/color#color-roles) they use.
+- **Density:** Material [advises](https://m3.material.io/components/radio-button/accessibility#89bcae8f-c445-41c7-9290-a12fcb5bb3bf) against density that brings a radio button's target under 48dp. A radio button does not follow the [density](/get-started/styling#density) classes: it keeps its size and its 48dp target in a denser layout.
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), the circle changes color and the dot appears instantly.
+- **Forced colors:** In [forced colors](/theme/accessibility#forced-colors), the circle and its dot are drawn in the system's text color, and a disabled radio button and its label are grayed out.
+- **Deselecting:** Pressing a selected radio button does not deselect it. Material [advises](https://m3.material.io/components/radio-button/accessibility#a9ae16aa-00a3-4c02-9e25-4f1efb5d1095) giving people a way to opt out: an option such as Not applicable, or a separate control such as Clear selection, which sets the group's `value` to `null`, as in the [Controlled](#controlled) example.
+
+### Focus
+
+- The group is one tab stop. Tab moves the focus to the selected radio button, as Material [advises](https://m3.material.io/components/radio-button/accessibility#4b6773dc-833d-4f4b-a0cc-fb5d55f49789). With none selected, Tab moves it to the first radio button, and Shift+Tab to the last.
+- A disabled radio button cannot be focused: Tab and the arrow keys skip it. A read-only group can still be focused.
+- Set `autoFocus` on a `Radio` to move the focus to it when it is first rendered.
+
+### Keyboard navigation
+
+| Keys           | Actions                                                                                          |
+| -------------- | ------------------------------------------------------------------------------------------------ |
+| Tab            | Move the focus into the group, to the selected radio button, or to the first with none selected  |
+| Shift+Tab      | Move the focus into the group, to the selected radio button, or to the last with none selected   |
+| Arrow keys     | Move the focus and the selection to the previous or next radio button, wrapping around the group |
+| Space or Enter | Select the focused radio button                                                                  |
+
+- In a right-to-left locale, the Left and Right arrow keys of a `horizontal` group follow the row. See [Orientation](#orientation).
+
+### Labeling elements
+
+- The group has the radiogroup role. Name it with a `Label` or an `aria-label`, which Material [advises](https://m3.material.io/components/radio-button/accessibility#786b2b90-c001-4eeb-98d7-a320dc31b235) be the same as the title of the options. A `Text` in its `description` slot describes the group and each radio button in it.
+- Each radio button has the radio role, and its label names it. With no label, set an `aria-label`.
+- The group reports its `orientation`, and `isDisabled`, `isReadOnly`, `isRequired` and `isInvalid`, to assistive technology.
+
+## Props
+
+### Radio
+
+<PropsTable {...radioApi} />
+
+### RadioGroup
+
+<PropsTable {...radioGroupApi} />

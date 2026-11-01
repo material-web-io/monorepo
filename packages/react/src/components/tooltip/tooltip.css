@@ -1,0 +1,59 @@
+/* Tooltip and TooltipPopover (tooltip.tsx). Opening and closing, it only fades, in its place and
+ * at its size, on the fast effects spring: Compose's tooltip alpha. Compose also grows it from 80%
+ * of its size, which is left out. */
+
+/* What both variants share: the box, the type and the fade, a transition from the frame React Aria
+ * marks it entering: so it fades in once, and a fade out it is opened again in turns back. Reduced
+ * motion collapses it; React Aria waits for it before it takes the tooltip away. */
+@utility tooltip {
+  @apply box-border font-plain outline-none forced-colors:container-border;
+  transition: opacity var(--md-sys-motion-spring-fast-effects-duration)
+    var(--md-sys-motion-spring-fast-effects-easing);
+  &[data-entering],
+  &[data-exiting] {
+    @apply opacity-0;
+  }
+}
+
+/* Plain: inverse-surface, 4dp corners, its body-small text 8dp from its sides and 4dp from its top
+ * and bottom, so a line of it is 24dp tall; it wraps past 200dp, as Compose's does. */
+@utility tooltip-plain {
+  @apply max-w-50 rounded-shape-xs bg-inverse-surface px-space-100 py-space-50 text-body-sm text-inverse-on-surface;
+}
+
+/* Rich: surface-container, 12dp corners, elevation 2, up to 320dp wide, as Compose's; its text
+ * 16dp from its sides and 12dp from its top and bottom. */
+@utility tooltip-rich {
+  @apply max-w-80 rounded-shape-md bg-surface-container text-body-md text-on-surface-variant shadow-elevation-2;
+  /* Its parts, or a React Aria Dialog's in it, which takes the focus in a DialogTrigger, as written
+   * in a grid: each on a row of its own, but its buttons, side by side in two columns of theirs. */
+  &,
+  & > [role='dialog'] {
+    @apply grid px-space-200 py-space-150;
+    grid-template-columns: auto auto 1fr;
+  }
+  &:has(> [role='dialog']) {
+    @apply p-0;
+  }
+  & > [role='dialog'] {
+    @apply outline-none;
+  }
+  :where(&, & > [role='dialog']) > :where(*) {
+    @apply m-0;
+  }
+  :is(&, & > [role='dialog']) > :not(button, [role='button']) {
+    @apply col-span-full;
+  }
+  /* A React Aria Heading, its subhead, in title-small 4dp above its supporting text. */
+  :is(&, & > [role='dialog']) > :is(h1, h2, h3, h4, h5, h6) {
+    @apply mb-space-50 text-title-sm;
+  }
+  /* Its buttons, 40dp text buttons, 12dp below the text and 8dp above the bottom, as the kit's
+   * are: the first one's label 16dp in, as the text is, and the second right after it. */
+  :is(&, & > [role='dialog']) > :is(button, [role='button']) {
+    @apply mt-space-150 -mb-space-50;
+  }
+  :is(&, & > [role='dialog']) > :nth-child(1 of :is(button, [role='button'])) {
+    @apply -ms-space-200;
+  }
+}

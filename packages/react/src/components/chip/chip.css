@@ -1,0 +1,132 @@
+/* React Aria's Tag, the chip: a 32dp row (its label's 20dp line and 6dp above and below, less half
+ * the density) with 8dp corners, a 48dp target, the focus ring and the ripple. Its colors and the
+ * padding beside its label are its variant's, in chip.tsx. */
+@utility chip {
+  @apply touch-target relative box-border inline-flex max-w-full shrink-0 items-center justify-between gap-space-100 rounded-shape-sm py-space-75-variable font-plain text-label-lg whitespace-nowrap outline-none select-none;
+  /* Its icons are 18dp, the remove button's as well, under a size class of the icon's own. */
+  @apply icon-18;
+  @apply focus-ring hover:cursor-pointer;
+  @apply transition-color-shadow;
+  /* The gridcell React Aria puts the content in (display: contents) takes no pointer, so that the
+   * ripple's host is the row, and passes the row's corners on to the ripple. */
+  @apply *:pointer-events-none *:rounded-inherit;
+  /* Forced colors drop shadows and backgrounds, so the container gets a border of its own. */
+  @apply forced-colors:container-border;
+
+  /* Its slots, by React Aria's slot prop: leading before the label, and trailing or the Tag's
+   * remove button after it, in whatever order they are given, 8dp from the label and its edge. An
+   * image is the avatar, slot or none. An icon without a slot is drawn where it is written, in the
+   * label's color and with its padding beside it: nothing but the slot tells its side of the text. */
+  & > * > [slot='leading'] {
+    @apply order-first;
+  }
+  & > * > :is([slot='trailing'], [slot='remove']) {
+    @apply order-last;
+  }
+  &:has(> * > :is([slot='leading'], img)) {
+    @apply ps-space-100;
+  }
+  &:has(> * > :is([slot='trailing'], [slot='remove'])) {
+    @apply pe-space-100;
+  }
+
+  /* The label, React Aria's Text given slot="label": it takes the room a wider chip has, keeping
+   * what is after it at the end, and is cut short with an ellipsis in a chip too narrow for it,
+   * under a class of its own. Plain text is drawn as it is, what is after it at the end. */
+  :where(& > * > [slot='label']) {
+    @apply min-w-0 grow truncate;
+  }
+
+  /* An icon in a slot is in its slot's color (chip-*-icons), under a color class of its own. */
+  :where(& > * > [slot='leading']) {
+    color: var(--chip-leading-color, currentcolor);
+  }
+  :where(& > * > [slot='trailing']) {
+    color: var(--chip-trailing-color, currentcolor);
+  }
+
+  /* An image, in the leading slot or none, is the avatar: 24dp and round, 4dp from the start edge,
+   * the 2dp it overhangs the label's line taken back so the chip stays 32dp. Disabled, it is drawn
+   * at 38%. */
+  & > * > img {
+    @apply -my-space-25 -ms-space-50 size-space-300 rounded-full object-cover;
+    @apply group-disabled/md-chip:opacity-disabled-content;
+  }
+
+  /* The remove button, or a button of yours after another chip's label: 24dp and round around its
+   * 18dp icon, an IconButton's own sizes given way, in the label's color, with a ring of its own and
+   * its 48dp target above the chip's, and the chip 88dp wide at least, room for both targets. */
+  & > * > button:is([slot='trailing'], [slot='remove']) {
+    @apply touch-target relative z-raised -m-0.75 inline-flex size-space-300 appearance-none items-center justify-center rounded-full border-0 bg-transparent p-0 text-inherit outline-none icon-18;
+    @apply pointer-events-auto focus-ring-icon not-disabled:cursor-pointer;
+  }
+  &:has(> * > button) {
+    @apply min-w-22;
+  }
+  /* A Text label too short for that is centered in the room it leaves, as the guidelines draw one. */
+  &:has(> * > button) > * > [slot='label'] {
+    @apply text-center;
+  }
+  /* Focused, as the spec's states diagram draws the remove icon: the button's ring alone, over the
+   * chip's focus layer. Hovered or pressed, the button's own layer and ripple alone (state-layer). */
+  &
+    > *
+    > button:is([slot='trailing'], [slot='remove'])[data-focus-visible]:not([data-hovered])
+    > .state-layer {
+    @apply opacity-0;
+  }
+  &:has(> * > button:is([slot='trailing'], [slot='remove'])[data-focus-visible])
+    > *
+    > .state-layer {
+    @apply opacity-state-focus;
+  }
+}
+
+/* The disabled colors, as disabled:chip-disabled, and selected:disabled: on a selected chip: a
+ * variant class, which sorts after the hover shadows and the variants' own colors. */
+@utility chip-disabled {
+  @apply text-on-surface/disabled-content shadow-none inset-ring-on-surface/disabled-container;
+  --chip-leading-color: currentcolor;
+  --chip-trailing-color: currentcolor;
+}
+
+/* The colors of the icons in its slots, by its variant (chip.tsx), currentcolor being the label's;
+ * an assist or suggestion chip has no trailing slot. Selected, a filter chip's are the label's. */
+@utility chip-assist-icons {
+  --chip-leading-color: var(--md-sys-color-primary);
+}
+
+@utility chip-filter-icons {
+  --chip-leading-color: var(--md-sys-color-primary);
+  --chip-trailing-color: var(--md-sys-color-on-surface-variant);
+  @variant selected {
+    --chip-leading-color: currentcolor;
+    --chip-trailing-color: currentcolor;
+  }
+}
+
+/* An input chip has no trailing slot: its remove button is in the label's color. Selected, its
+ * leading icon is primary, which holds 3:1 on the container at standard contrast only, and in forced
+ * colors the label's. */
+@utility chip-input-icons {
+  --chip-leading-color: var(--md-sys-color-on-surface-variant);
+  @variant selected {
+    --chip-leading-color: var(--md-sys-color-primary);
+    @variant forced-colors {
+      --chip-leading-color: currentcolor;
+    }
+    @variant contrast-raised {
+      --chip-leading-color: currentcolor;
+    }
+  }
+}
+
+@utility chip-suggestion-icons {
+  --chip-leading-color: var(--md-sys-color-primary);
+}
+
+/* React Aria's TagList in a ChipGroup: the chips in rows, 8dp apart, and 16dp between the rows,
+ * where their 48dp targets meet. */
+@utility chip-group-list {
+  @apply flex flex-wrap gap-x-space-100 gap-y-space-200;
+}

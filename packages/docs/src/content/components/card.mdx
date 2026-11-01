@@ -1,0 +1,142 @@
+import api from 'virtual:api/Card'
+import * as basic from '../../examples/card/basic.tsx?example'
+import * as collection from '../../examples/card/collection.tsx?example'
+import * as controls from '../../examples/card/controls.tsx?example'
+import * as custom from '../../examples/card/custom.tsx?example'
+import * as elevated from '../../examples/card/elevated.tsx?example'
+import * as filled from '../../examples/card/filled.tsx?example'
+import * as media from '../../examples/card/media.tsx?example'
+import * as outlined from '../../examples/card/outlined.tsx?example'
+import * as primaryAction from '../../examples/card/primary-action.tsx?example'
+import * as variants from '../../examples/card/variants.tsx?example'
+
+Cards display content and actions about a single subject. Use a card to contain related elements, such as:
+
+- Images
+- Headlines and supporting text
+- [Buttons](/components/button)
+- [Lists](/components/list) and other components
+
+To show a set of items of the same kind, such as messages or contacts, use a [list](/components/list) instead.
+
+```tsx
+import { Card } from '@material-web/react'
+```
+
+## Basic card
+
+Write the content of a card as its children, and choose its look with `variant`. A card is a container only, and adds no behavior.
+
+<Example {...basic} />
+
+The `Card` comes in three variants: `elevated` (the default), `filled` and `outlined`. The three differ in style only, so choose the one that suits your design.
+
+<Example {...variants} />
+
+### Elevated card
+
+An elevated card has a shadow, which sets it further apart from the background than a filled card, and less than an outlined one.
+
+<Example {...elevated} />
+
+### Filled card
+
+A filled card has a fill that sets it subtly apart from the background, with less emphasis than the other two.
+
+<Example {...filled} />
+
+### Outlined card
+
+An outlined card has an outline, which can give it more emphasis than the other two.
+
+<Example {...outlined} />
+
+## Content
+
+A card shows its children in a column, in the order written: an image that reaches the card's edges, padded text, a row of buttons. It clips its content to its rounded corners.
+
+- **Padding:** A card has no padding. Add your own to its children, such as `p-space-200` for 16dp from its sides.
+- **Size:** A card is as tall as its content. Like any `<div>`, it fills the width of a block container and fits its content in a flex row. Give it a width with a class, such as `w-80`.
+- **Direction:** Add `flex-row` to lay the children out in a row.
+- **Text:** Text in a card has the `text-body-md` style and the on-surface color. Give a headline its own style, such as `text-title-md`.
+- **Children:** The children of a card cannot be a function.
+
+## Media
+
+Write an image as a child of the card, with a height and `w-full object-cover`. It reaches the card's edges, and the card clips it to its rounded corners.
+
+<Example {...media} />
+
+## UI controls
+
+A card can hold controls, such as buttons and [icon buttons](/components/icon-button). Each one is a tab stop of its own. This card lays its children out in a row with `flex-row`, with the playback controls beside the cover.
+
+<Example {...controls} />
+
+## Primary action
+
+A card itself cannot be pressed. To give a card a primary action, such as a link to a detail page, wrap the content that the action covers in a link or a button of your own inside the card:
+
+- Position it with `relative` and add a [`Ripple`](/components/ripple) as its direct child, for the hover and focus layer and the press ripple.
+- Add the [`focus-ring-inset`](/theme/state#focus-ring) class for the focus indicator. It is drawn inside the element, where the card does not clip it.
+
+<Example {...primaryAction} />
+
+Write the card's other buttons outside the primary action, so that each one stays a control and a tab stop of its own.
+
+## Collections
+
+Show cards together in a grid, a vertical list or a carousel, at most 8dp apart (`gap-space-100`).
+
+<Example {...collection} />
+
+## Customization
+
+Pass classes in `className` to restyle one card. A class of yours replaces the card's own class for the same property. See [Styling](/get-started/styling) for the classes and the theme.
+
+<Example {...custom} />
+
+- **Color:** Pass a container [color role](/theme/color#color-roles) and its on-color, such as `bg-tertiary-container text-on-tertiary-container`.
+- **Shape:** A card has 12dp corners. Pass a class of the [corner scale](/theme/shape#corner-scale) for another radius, such as `rounded-shape-xl`.
+- **Elevation:** Pass an [elevation level](/theme/elevation#elevation-levels) for another shadow, such as `shadow-elevation-3`.
+- **States:** A card reports no state, so `className` and `style` take a value and cannot be a function.
+- **Every card:** To restyle all the cards at once, change the [theme](/get-started/styling#theme).
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/cards/accessibility#0e4390a4-06ed-4a1d-bb8a-4812559e418c) what people should be able to do with assistive technology:
+
+- Navigate to a card and the elements within a card
+- Get appropriate feedback based on input type documented under Interaction & style
+
+### Interaction and style
+
+- **States:** A card has no states of its own: hovering or pressing it changes nothing, as Material [advises](https://m3.material.io/components/cards/accessibility#77f3c9d4-e5e4-4c82-82b4-162a8015d1ab) for a card that holds buttons and links. Each button and link in it shows its own states. For a [primary action](#primary-action), the `Ripple` in your link or button shows a state layer on hover and a ripple on a press, and `focus-ring-inset` shows a [focus ring](/theme/accessibility#focus-ring) for keyboard focus.
+- **Color contrast:** On-surface text has 4.5:1 contrast or more with the container of every variant, in light and dark schemes at every [contrast level](/theme/color#contrast). Keep that contrast when you change a card's [colors](#customization).
+- **Forced colors:** Every card keeps an edge in [forced colors](/theme/accessibility#forced-colors).
+- **Dragging:** A card cannot be dragged by itself. If you make cards draggable or swipeable, such as to reorder or dismiss them, Material [requires](https://m3.material.io/components/cards/accessibility#26b009bd-1ae2-4409-add7-6059827091ee) a single-pointer alternative: offer the same actions in a [menu](/components/menu) or a [bottom sheet](/components/bottom-sheet), opened from a button in the card.
+
+### Focus
+
+- A card cannot be pressed and is not a tab stop.
+- Tab moves the focus to each button and link in it, in the order written, so that all of a card's controls come before the next card's, as Material [advises](https://m3.material.io/components/cards/accessibility#e29b1799-d235-4d49-8c35-941624876812).
+- A [primary action](#primary-action) is a tab stop of its own. Write it before the card's other buttons, so that the focus reaches it first.
+
+### Keyboard navigation
+
+| Keys           | Actions                                                              |
+| -------------- | -------------------------------------------------------------------- |
+| Tab            | Move the focus to the next button or link, through each card in turn |
+| Space or Enter | Press the focused button                                             |
+| Enter          | Follow the focused link                                              |
+
+### Labeling elements
+
+- A card is a `<div>` with no role. Screen readers read its content in the order written, so write it in reading order, such as a headline, an image, the supporting text and then the buttons.
+- Material [advises](https://m3.material.io/components/cards/accessibility#04bf5e71-89ba-4485-8c0c-7f2c09de7bc2) hiding a purely decorative image from screen readers: give it an empty `alt`, as in [Media](#media). For a directly actionable card, it advises the link or the button role by its use: wrap a [primary action](#primary-action) in a link to go to a page, and in a button to take an action.
+
+## Props
+
+<PropsTable {...api} />

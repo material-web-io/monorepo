@@ -1,0 +1,240 @@
+import fieldApi from 'virtual:api/SearchField'
+import { SearchFieldSlots } from '../../slot-pictures/search.tsx'
+import viewApi from 'virtual:api/SearchView'
+import * as appBar from '../../examples/search/app-bar.tsx?example'
+import * as bar from '../../examples/search/bar.tsx?example'
+import * as basic from '../../examples/search/basic.tsx?example'
+import * as controlled from '../../examples/search/controlled.tsx?example'
+import * as custom from '../../examples/search/custom.tsx?example'
+import * as disabled from '../../examples/search/disabled.tsx?example'
+import * as divided from '../../examples/search/divided.tsx?example'
+import * as fullScreen from '../../examples/search/full-screen.tsx?example'
+
+Search lets people enter a keyword or phrase to get relevant information. Use it where finding content is a primary task. For a field that takes other text, use a [text field](/components/text-field) instead.
+
+Search has two parts:
+
+| Part          | Use                                                                         |
+| ------------- | --------------------------------------------------------------------------- |
+| `SearchField` | The search bar, to search the contents of a view, like Search your messages |
+| `SearchView`  | The focused search, for the suggestions or results that a search bar opens  |
+
+```tsx
+import { Icon, IconButton, List, ListItem, SearchField, SearchView } from '@material-web/react'
+import { Autocomplete, Input, Text, useFilter } from 'react-aria-components'
+```
+
+## Basic search
+
+Write a `SearchField` for the search bar in the page, and a `SearchView` for the focused search that it opens. In the `SearchView`, write a second `SearchField` and, below it, what you show, typically a [`List`](/components/list). Wrap the two in React Aria's [`Autocomplete`](https://react-aria.adobe.com/Autocomplete) to filter the list as the query is typed.
+
+<Example {...basic} isFlush />
+
+## Search bar
+
+Write the parts of the bar as the children of a `SearchField`. They are shown in the order written. Their places are listed under [Slots](#slots).
+
+<Example {...bar} />
+
+The bar is 56dp tall and fills the width available to it, up to 720dp, and is at least 360dp wide where there is room. In a page, add its 24dp side margins yourself with `mx-space-300`.
+
+Pressing the bar outside its controls focuses the input.
+
+## Slots
+
+<SearchFieldSlots showLegend />
+
+| Slot       | Child                        | Use              |
+| ---------- | ---------------------------- | ---------------- |
+| `leading`  | An `Icon` or an `IconButton` | Before the input |
+| `trailing` | An `Icon` or an `IconButton` | After the input  |
+
+A bar also takes these parts:
+
+| Part                                      | Use                                                                                                                                     |
+| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `Input`                                   | The text field. Set its `placeholder` to the hinted search text.                                                                        |
+| A button with no `slot`                   | The clear button. It is shown while there is text, and clears it. A button in the `leading` or `trailing` slot does not clear the text. |
+| `<img>`, on its own or in an `IconButton` | Shown as a round avatar                                                                                                                 |
+
+## Focused search
+
+A `SearchView` is modal, like a [dialog](/components/dialog). Its props are `isOpen`, `defaultOpen` and `onOpenChange`, `layout`, `variant`, `triggerRef` and `aria-label`.
+
+As its children, write a `SearchField` with `autoFocus`, then typically a `List`, both in an `Autocomplete`, as in the first example. `children` can also be a function of `isEntering`, `isExiting` and `state`. Call `state.close()` to close the view.
+
+In the view's bar, write the icon of the page's bar first, before the back button, as the example does. The view shows that icon where the page's bar has it, and cross-fades it with the back button.
+
+### Opening
+
+You decide what opens focused search, and when it shows suggestions or results. The first example opens it when the bar is pressed or text is typed. You can also open it on the Down arrow in `onKeyDown`, or in `onSubmit` once a query is entered.
+
+A `SearchView` also opens from the button of a `DialogTrigger`, such as the `Button` in the `search` slot of a search [app bar](/components/app-bar). Wrap the `DialogTrigger` around that button and the `SearchView` alone: any other button in the trigger would open the view too.
+
+<Example {...appBar} isFlush />
+
+Set `triggerRef` to the element the view opens from, typically the page's search bar. The view takes its position and width from that element. In a `DialogTrigger` without a `triggerRef`, the view opens from the trigger's button. With neither, it fades in and out, docked at the top of the window.
+
+### Layout
+
+Set `layout` to `docked` (the default) or `full-screen`. Use `full-screen` in compact windows and `docked` in larger ones, and switch between them by the window's size.
+
+- `docked` opens over the bar that opened it, at the same width. It is at least 240dp tall and at most two thirds of the window's height, and it ends 12dp above the bottom of the window where the bar is near that edge.
+- `full-screen` fills the window, with its bar at the top.
+
+<Example {...fullScreen} />
+
+### Style
+
+Set `variant` to choose the style:
+
+- `contained` (the default) keeps the bar in its own container, with the list in a separate container below it. When docked, it opens over a scrim.
+- `divided` shows the bar and the list in one container, with a divider between them. When docked, it has no scrim.
+
+<Example {...divided} />
+
+### Keyboard and focus
+
+Set `autoFocus` on the view's bar. When focused search opens, the focus moves to that bar, with the query in it.
+
+- Tab moves the focus into the list. The arrow keys move through the items, Enter acts on the focused item, and Shift+Tab returns to the bar.
+- Typing does not focus an item, so Enter in the bar submits the query as typed. A `List` behaves this way on its own. For a listbox, set `disableAutoFocusFirst` on the `Autocomplete`, as the example does.
+- Escape clears the bar first, then closes the view. A press outside a docked view closes it too, and so does a back button of yours that calls `state.close()`.
+- When the view closes, the focus returns to the element that opened it.
+
+While the view is open, the page behind it is inert and does not scroll.
+
+## Handling input
+
+The bar reports the query as it changes and when it is entered:
+
+| Event      | Called                                          |
+| ---------- | ----------------------------------------------- |
+| `onChange` | With the query, as it is typed or cleared       |
+| `onSubmit` | With the query, on Enter                        |
+| `onClear`  | When Escape or the clear button empties the bar |
+
+<Example {...controlled} />
+
+## Controlled
+
+Search has two states, each controlled on its own component:
+
+1. **Query:** Set the initial query of a `SearchField` with `defaultValue`, or control it with `value` and `onChange`.
+2. **Open state:** Control a `SearchView` with `isOpen` and `onOpenChange`, or set `defaultOpen`.
+
+```tsx
+const [query, setQuery] = useState('')
+const [isOpen, setOpen] = useState(false)
+
+<SearchField value={query} onChange={setQuery}>
+  {/* ... */}
+</SearchField>
+<SearchView isOpen={isOpen} onOpenChange={setOpen}>
+  {/* ... */}
+</SearchView>
+```
+
+The page's bar and the view's bar show the same query. Give both the same `value`, or control the view's `Autocomplete` with `inputValue` and `onInputChange`, as the first example does.
+
+## Custom filter
+
+An `Autocomplete` shows the items that its `filter` accepts. `filter` is called with the text of an item and the query, and returns whether the item matches. React Aria's [`useFilter`](https://react-aria.adobe.com/useFilter) provides `contains`, `startsWith` and `endsWith`, which compare text in the locale. The first example uses `contains`, without regard to case.
+
+```tsx
+const { startsWith } = useFilter({ sensitivity: 'base' })
+
+<Autocomplete filter={startsWith}>
+  {/* ... */}
+</Autocomplete>
+```
+
+Give each item a `textValue` when its children are not plain text. Without an `Autocomplete`, the list is not filtered: show the items you choose, such as recent searches.
+
+## Disabled
+
+Set `isDisabled` to disable the bar. Its leading and trailing buttons are disabled with it, unless one sets `isDisabled={false}` itself. A `SearchField` also takes `isReadOnly`, `isRequired` and `name`.
+
+<Example {...disabled} />
+
+## Customization
+
+Pass classes in `className` to restyle one bar. A class of yours replaces the bar's own class for the same property. See [Styling](/get-started/styling) for the classes, the states and the theme.
+
+In this example, `rounded-shape-lg` replaces the bar's round corners, and the voice search button is shown only while the bar is empty.
+
+<Example {...custom} />
+
+- **Width:** In a flex row, a bar is 360dp wide: add `w-full` to make it fill the row. Add `max-w-none` to let a bar grow past 720dp.
+- **Input:** The `Input` takes classes of its own, such as a text color.
+- **States:** On the bar, style the empty, disabled, invalid, read-only and required states with their variants, such as `disabled:`, or with `data-empty` and the like in your own CSS. Hover and focus are reported on the input: use the `has-*` form for them, as in `has-hover:bg-surface-container`. See [Variants](/get-started/styling#variants).
+- **Functions:** `className`, `style` and `children` can be functions of the bar's state: `isEmpty`, `isDisabled`, `isInvalid`, `isReadOnly`, `isRequired` and `state`. See [Children as a function](/get-started/composition#children-as-a-function).
+- **Every bar:** To restyle all the search bars at once, change the [theme](/get-started/styling#theme).
+
+## Limitations
+
+### Search app bar
+
+Give the search bar of a search app bar a search icon in its `leading` slot. Without one, its text jumps as the view opens and closes.
+
+### View styling
+
+A `SearchView` takes no `className` or `style`. Its look comes from `layout` and `variant`, and from the bar and the list you write in it.
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/search/accessibility#62c73f83-31bb-484f-b22e-c34bcf182662) what people should be able to do with assistive technology:
+
+- Navigate to and focus on a search bar
+- View the hinted search text or persistent label
+- Input text and complete a search
+- Interact with a list of search suggestions and results
+- Clear the input text
+
+### Interaction and style
+
+- **States:** Hovering the bar shows a state layer, except over its own buttons, and a press shows a ripple. Keyboard focus in its input shows a [focus ring](/theme/accessibility#focus-ring) around the bar, and a press does not. In focused search, the bar shows no state layer.
+- **Touch target:** The bar is 56dp tall, and each icon button in it has a 48dp [touch target](/theme/accessibility#touch-targets).
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), focused search opens and closes at once.
+- **Forced colors:** In [forced colors](/theme/accessibility#forced-colors), the bar keeps an edge. In focused search, so does the container of the list when `contained`, and the whole view when `divided`.
+- **Autosuggest:** Material [advises](https://m3.material.io/components/search/accessibility#de213f1e-7213-41cf-a558-18b49230551b) that screen readers announce suggestions and results as they appear, so that people know there are items to choose.
+
+> **Note:** Nothing is announced as suggestions appear or change.
+
+### Focus
+
+- Tab moves the focus through the bar's leading buttons, its input and its trailing buttons, in the order written. So the focus lands first on a leading button, or else on the input, as Material [advises](https://m3.material.io/components/search/accessibility#d244fecd-813e-4d94-bbda-b9777feecd0d).
+- The clear button is not a tab stop.
+- Pressing the bar outside its controls focuses the input.
+- When focused search opens, the focus moves to its bar, which needs `autoFocus`, and the page behind it is inert. When it closes, the focus returns to the element that opened it. See [Keyboard and focus](#keyboard-and-focus).
+
+### Keyboard navigation
+
+| Keys             | Actions                                                                             |
+| ---------------- | ----------------------------------------------------------------------------------- |
+| Tab              | Move the focus to the next control, or from the bar of focused search into its list |
+| Shift+Tab        | Move the focus to the previous control, or from the list back to the bar            |
+| Up or Down arrow | Move the focus between the items of the list                                        |
+| Enter            | Submit the query in the bar, or act on the focused item                             |
+| Escape           | Clear the bar, and in focused search, close the view once the bar is empty          |
+
+- Typing in the bar does not focus an item of a `List`, so Enter submits the query as typed. The arrow keys move through the list once Tab has moved the focus into it.
+
+### Labeling elements
+
+- The input is a search box. Set the bar's `aria-label` to the hinted search text, as Material [advises](https://m3.material.io/components/search/accessibility#09d905e7-ee50-4dda-9852-292fb2c95f76).
+- The default name of the clear button is Clear search, and an `IconButton` still requires you to set an `aria-label`. Give each leading and trailing `IconButton` an `aria-label` too. See [Icon button](/components/icon-button#labeling-elements).
+- Name the list of suggestions and results as any `List`. See [List](/components/list#labeling-elements).
+- Focused search is a dialog. Set an `aria-label` on the `SearchView` to name it. In a `DialogTrigger`, a view with no `aria-label` is named by the trigger's button.
+
+## Props
+
+### SearchField
+
+<PropsTable {...fieldApi} />
+
+### SearchView
+
+<PropsTable {...viewApi} />

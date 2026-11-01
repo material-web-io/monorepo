@@ -1,0 +1,83 @@
+/* A FAB menu's FAB (fab-menu-button.tsx `button`). --fab-menu-open is how far it has shrunk
+ * into the close button, 0 to 1, registered so that it runs on a spring. */
+@property --fab-menu-open {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+/* The close button's box, padded by --fab-menu-inset, the FAB's size, while shut. The padding
+ * stops at 0 when the spring overshoots and keeps to quarter pixels, which lay out exactly, so the
+ * margin read from it gives back what it loses: the FAB shrinks from its top end corner in place. */
+@utility fab-menu-button {
+  --fab-menu-padding: round(
+    max(0px, (1 - var(--fab-menu-open)) * var(--fab-menu-inset, 0px)),
+    0.25px
+  );
+  --fab-menu-given-back: calc(2 * (var(--fab-menu-inset, 0px) - var(--fab-menu-padding)));
+  margin: 0;
+  margin-block-end: var(--fab-menu-given-back);
+  margin-inline-start: var(--fab-menu-given-back);
+  padding: var(--fab-menu-padding);
+}
+
+/* The FAB's size around the close button: fab-menu-inset-3 for a medium FAB, -5 for a large one. */
+@utility fab-menu-inset-* {
+  --fab-menu-inset: calc(var(--spacing) * --value(number));
+}
+
+@utility fab-menu-open {
+  --fab-menu-open: 1;
+}
+
+/* Its corner and its shrink on the fast spatial spring, its colors and shadow on the fast effects
+ * one, as the --md tokens give them, which reduced motion and data-motion set. */
+@utility transition-fab-menu-button {
+  transition-property: border-radius, --fab-menu-open, background-color, color, box-shadow;
+  transition-duration:
+    var(--md-sys-motion-spring-fast-spatial-duration),
+    var(--md-sys-motion-spring-fast-spatial-duration),
+    var(--md-sys-motion-spring-fast-effects-duration),
+    var(--md-sys-motion-spring-fast-effects-duration),
+    var(--md-sys-motion-spring-fast-effects-duration);
+  transition-timing-function:
+    var(--md-sys-motion-spring-fast-spatial-easing),
+    var(--md-sys-motion-spring-fast-spatial-easing),
+    var(--md-sys-motion-spring-fast-effects-easing),
+    var(--md-sys-motion-spring-fast-effects-easing), var(--md-sys-motion-spring-fast-effects-easing);
+}
+
+/* The list's padding below its items (fab-menu.tsx `list`): the 8dp to the close button, the 56dp
+ * button itself and the 16dp under it that the stack sits at (fab-menu-popover.tsx), so the items
+ * rest 8dp above the button and scroll behind it and below it, as in Compose's column. */
+@utility fab-menu-list {
+  padding-block-end: calc(
+    var(--spacing-space-100) + var(--spacing-space-700) + var(--spacing-space-200)
+  );
+}
+
+/* Staggers a FAB menu item's reveal by its distance from the close button: the
+ * last item (nearest it) has no delay and each one before it waits longer, so
+ * the stack grows outward. Capped at the guidelines' 6 items; a 7th+ gets the 6th's. */
+@utility fab-menu-item-stagger {
+  &:nth-last-child(2) {
+    transition-delay: 30ms;
+  }
+  &:nth-last-child(3) {
+    transition-delay: 60ms;
+  }
+  &:nth-last-child(4) {
+    transition-delay: 90ms;
+  }
+  &:nth-last-child(n + 5) {
+    transition-delay: 120ms;
+  }
+}
+
+/* A closing FAB menu's stack of items (fab-menu-popover.tsx `stack`, under data-exiting): as
+ * it is until the last item has collapsed, the longest stagger above past the spatial spring,
+ * then gone. React Aria removes it once this, the stack's own transition, has ended. */
+@utility fab-menu-items-closed {
+  opacity: 0;
+  transition: opacity 0s linear calc(var(--md-sys-motion-spring-fast-spatial-duration) + 120ms);
+}

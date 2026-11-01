@@ -1,0 +1,211 @@
+import barApi from 'virtual:api/NavigationBar'
+import { NavigationBarItemSlots } from '../../slot-pictures/navigation-bar.tsx'
+import itemApi from 'virtual:api/NavigationBarItem'
+import * as arrangements from '../../examples/navigation-bar/arrangements.tsx?example'
+import * as basic from '../../examples/navigation-bar/basic.tsx?example'
+import * as disabled from '../../examples/navigation-bar/disabled.tsx?example'
+import * as fixed from '../../examples/navigation-bar/fixed.tsx?example'
+import * as functionChildren from '../../examples/navigation-bar/function-children.tsx?example'
+import * as horizontal from '../../examples/navigation-bar/horizontal.tsx?example'
+import * as vertical from '../../examples/navigation-bar/vertical.tsx?example'
+
+Navigation bars let people switch between UI views on smaller devices. A navigation bar gives access to three to five destinations at the bottom of the window, each represented by an icon and label text. Use a navigation bar for:
+
+- Three to five main pages in the product
+- Mobile or tablet only
+
+On larger devices, use a [navigation rail](/components/navigation-rail) instead.
+
+A navigation bar is composed of these parts:
+
+| Part                | Use                                                          |
+| ------------------- | ------------------------------------------------------------ |
+| `NavigationBar`     | The bar, which holds the items                               |
+| `NavigationBarItem` | A destination, with its icon and label. See [Slots](#slots). |
+
+```tsx
+import { Icon, NavigationBar, NavigationBarItem } from '@material-web/react'
+import { Text } from 'react-aria-components'
+```
+
+## Basic navigation bar
+
+Put one `NavigationBarItem` per destination in a `NavigationBar`, each with its icon and its label.
+
+<Example {...basic} isFlush />
+
+The items can be vertical or horizontal. Set `layout` on the `NavigationBar` to `vertical` (the default) or `horizontal`.
+
+### Vertical items
+
+A vertical item shows its label under its icon. Use vertical items in a compact window, like a phone.
+
+<Example {...vertical} isFlush />
+
+### Horizontal items
+
+A horizontal item shows its icon and its label side by side. Use horizontal items in a medium window, like a tablet: set `layout="horizontal"` and `arrangement="centered"`.
+
+<Example {...horizontal} isFlush />
+
+> **Note:** The bar does not switch its `layout` or its `arrangement` on its own as the window changes size.
+
+## Slots
+
+<NavigationBarItemSlots showLegend />
+
+| Slot    | Child    | Use                             |
+| ------- | -------- | ------------------------------- |
+| `label` | A `Text` | The label, which names the item |
+
+Write an item's icon and label as its children. The `Icon` is sized and colored by the item. A `Text` with another slot, or with none, throws an error.
+
+For an item with an icon alone, set an `aria-label`.
+
+## Selection
+
+Set `isSelected` on the `NavigationBarItem` of the view being shown, and handle a press with `onChange` or `onPress`. A selected item shows the active indicator and fills its `Icon`.
+
+```tsx
+<NavigationBarItem isSelected={page === 'home'} onChange={() => setPage('home')}>
+  <Icon name="home" />
+  <Text slot="label">Home</Text>
+</NavigationBarItem>
+```
+
+- **Your own state:** Selecting an item does not deselect the others, and a press on the selected item calls `onChange(false)`, so keep the selection in your own state.
+- **Uncontrolled:** With `defaultSelected` instead, an item keeps its own selection, and a second press turns it off.
+
+## Disabled
+
+Set `isDisabled` on an item to disable it. It cannot be pressed, and the arrow keys skip it.
+
+<Example {...disabled} isFlush />
+
+## Arrangement
+
+Set `arrangement` to `equal-weight` (the default) or `centered`. It is independent of `layout`.
+
+- `equal-weight` divides the bar equally between the items. Use it in a compact window.
+- `centered` groups the items in the middle of the bar. Use it in a medium window. Three items take 60% of its width between them, four 70%, five 80%, six 90%, and seven or more all of it. An item whose content needs more room takes up to an equal share.
+
+<Example {...arrangements} isFlush />
+
+A component of your own between the bar and its items can render several items.
+
+## Placement
+
+The bar is as wide as its container and is not positioned for you. Place it at the bottom of the window yourself:
+
+- **In a column:** Make the bar the last row of a column as tall as the window, under content that scrolls, as in this example.
+- **Fixed:** Or fix it to the bottom of the window, with `className="fixed inset-x-0 bottom-0 z-navigation"` on its `<nav>`. See [Stacking order](/theme/layout#stacking-order).
+
+<Example {...fixed} isFlush />
+
+The bar is not a landmark. Put it in a `<nav>` of your own, or name it with an `aria-label`.
+
+## Third-party routing library
+
+An item takes no `href`. To move between the pages of an app, call the router in the item's `onChange` or `onPress`, and set `isSelected` from the current location. See [Routing](/get-started/react-aria#routing).
+
+With React Router:
+
+```tsx
+import { Icon, NavigationBar, NavigationBarItem } from '@material-web/react'
+import { Text } from 'react-aria-components'
+import { useLocation, useNavigate } from 'react-router'
+
+const destinations = [
+  ['/', 'Home', 'home'],
+  ['/browse', 'Browse', 'explore'],
+  ['/library', 'Library', 'library_music'],
+] as const
+
+function MainNavigation() {
+  const { pathname } = useLocation()
+  const navigate = useNavigate()
+  return (
+    <nav aria-label="Main">
+      <NavigationBar>
+        {destinations.map(([path, name, icon]) => (
+          <NavigationBarItem
+            key={path}
+            isSelected={pathname === path}
+            onPress={() => navigate(path)}
+          >
+            <Icon name={icon} />
+            <Text slot="label">{name}</Text>
+          </NavigationBarItem>
+        ))}
+      </NavigationBar>
+    </nav>
+  )
+}
+```
+
+## Customization
+
+Pass classes in `className` to restyle the bar or one item. A class of yours replaces the component's own class for the same property. See [Styling](/get-started/styling) for the classes, the states and the theme.
+
+Pass a function as an item's children to render them from its state: `isHovered`, `isPressed`, `isFocused`, `isFocusVisible`, `isSelected` and `isDisabled`. In this example, an item shows another icon when it is selected.
+
+<Example {...functionChildren} isFlush />
+
+- **States:** Style an item's state with its variant, such as `hover:`, `pressed:` or `selected:`. See [States](/get-started/styling#states).
+- **Functions:** The `className` and `style` of an item can be functions of the same state, and the children of a `NavigationBar` can be a function too. See [Children as a function](/get-started/composition#children-as-a-function).
+- **Every navigation bar:** To restyle all the navigation bars at once, change the [theme](/get-started/styling#theme).
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/navigation-bar/accessibility#7ef6776b-8c89-49c8-b2f0-24b6d5b410dc) what people should be able to do with assistive technology:
+
+- Move between navigation destinations
+- Select a particular navigation destination from a set
+- Get appropriate feedback based on input type
+
+### Interaction and style
+
+- **States:** Hovering an item shows a state layer in its indicator's box, and a press shows a ripple there. Keyboard focus shows a [focus ring](/theme/accessibility#focus-ring) inside the item's edges, and a press with a mouse or touch does not. A disabled item shows no state layer.
+- **Touch target:** An item takes a press anywhere in its part of the bar, which is at least 64dp tall, more than the 48dp minimum [touch target](/theme/accessibility#touch-targets).
+- **Color contrast:** With the default colors, the icons keep 3:1 contrast and the labels 4.5:1 with what is behind them, in the light and dark schemes at every contrast level. Keep that contrast when you change the bar's colors.
+- **Text size:** A vertical item's label wraps as the text grows, and the bar grows taller with it. A horizontal item's label stays on one line, and is cut where the item has no more room. Material [advises](https://m3.material.io/components/navigation-bar/accessibility#550f19aa-0f31-4ab4-9224-4bb9958f06bc) keeping the full label visible at up to twice the text size, so keep labels short.
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), the active indicator appears at once.
+- **Forced colors:** In [forced colors](/theme/accessibility#forced-colors), the active indicator is drawn in the system's highlight color, and a disabled item in its gray text color.
+- **Right to left:** The bar is mirrored in a right-to-left direction, with the first item at the right end.
+- **Selected icon:** A selected item fills its `Icon`, as Material [advises](https://m3.material.io/components/navigation-bar/accessibility#0cc4260c-01be-4f3a-a885-fcef43f8acd3). For an icon with no filled style, Material advises a heavier one: give it a font weight class, such as `font-semibold`, while the item is selected. See [Customization](#customization).
+
+### Focus
+
+- Tab moves the focus into the bar once: to its first item, as Material [advises](https://m3.material.io/components/navigation-bar/accessibility#61a31647-9e8a-4712-a4a0-ec66f1dbb4e8), or to the item focused last. The next Tab leaves the bar, and Shift+Tab comes back to the item focused last.
+- A disabled item cannot be focused.
+
+### Keyboard navigation
+
+| Keys                | Actions                                     |
+| ------------------- | ------------------------------------------- |
+| Tab                 | Move the focus into the bar, or out of it   |
+| Left or Right arrow | Move the focus to the previous or next item |
+| Space or Enter      | Select the focused item                     |
+
+- The arrow keys skip a disabled item, and stop at the first and the last.
+- They are reversed in a right-to-left locale, which is set with an `I18nProvider`, not with `dir`.
+- An item's `onKeyDown` is not called for the arrow keys.
+
+### Labeling elements
+
+- The bar is a toolbar, and each item a toggle button. Name the bar with an `aria-label`, or put it in a `<nav>`.
+- The label names each item. Material [advises](https://m3.material.io/components/navigation-bar/accessibility#2daa662b-857e-4a2c-920e-6760945110bb) a name that matches the destination, and a more descriptive one where the label is ambiguous: set an `aria-label` that includes the label, such as Music library for an item labeled Library.
+- For an item with no label, set an `aria-label`.
+- A selected item reports it with `aria-pressed`.
+
+## Props
+
+### NavigationBar
+
+<PropsTable {...barApi} />
+
+### NavigationBarItem
+
+<PropsTable {...itemApi} />

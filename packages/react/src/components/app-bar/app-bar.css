@@ -1,0 +1,273 @@
+/* App bar (app-bar.tsx): a <header> that stays at the top of what scrolls under it, above the
+ * content. app-bar.tsx sets --app-bar-top as that scrolls: how far above the top the bar is let go,
+ * which is all of a small bar and all under the row of a flexible one, and less once a scroll back
+ * up has brought it back. The bar is one grid, which places its children by their slots: the row,
+ * 64dp at least, holds what leads in the first column, a small bar's text or the search bar in the
+ * second and what trails in the columns after; a flexible bar's text sits under it, in the two
+ * rows after, across every column. */
+@utility app-bar {
+  @apply sticky z-app-bar box-border grid px-space-50 font-plain text-on-surface;
+  top: var(--app-bar-top, 0px);
+  grid-template-columns:
+    var(--app-bar-leading-cell) minmax(0, 1fr)
+    var(--app-bar-trailing-cells);
+  grid-template-rows: minmax(var(--spacing-space-800), auto) auto auto;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(var(--spacing-space-600), auto);
+
+  /* What leads is in a 48dp cell, what trails in one each, up to three, so that 40dp icon buttons
+   * are 8dp from the bar's edge and apart and a 32dp avatar or a 24dp icon sits in the middle of
+   * its own; a side with nothing at it keeps 8dp, so the text is 16dp from that edge. The sides, as
+   * the search bar reckons with them: each cell and the 8dp between it and the search bar. */
+  --app-bar-leading-cell: minmax(var(--spacing-space-600), auto);
+  --app-bar-leading-side: calc(var(--spacing-space-600) + var(--spacing-space-100));
+  --app-bar-trailing-cells: minmax(var(--spacing-space-100), auto);
+  --app-bar-trailing-side: calc(var(--spacing-space-100) + var(--spacing-space-50));
+  &:not(:has(> [slot='leading'])) {
+    --app-bar-leading-cell: var(--spacing-space-100);
+    --app-bar-leading-side: calc(var(--spacing-space-100) + var(--spacing-space-50));
+  }
+  &:has(> [slot='trailing']) {
+    --app-bar-trailing-cells: minmax(var(--spacing-space-600), auto);
+    --app-bar-trailing-side: calc(var(--spacing-space-600) + var(--spacing-space-100));
+  }
+  &:has(> :nth-child(2 of [slot='trailing'])) {
+    --app-bar-trailing-cells: repeat(2, minmax(var(--spacing-space-600), auto));
+    --app-bar-trailing-side: calc(2 * var(--spacing-space-600) + var(--spacing-space-100));
+  }
+  &:has(> :nth-child(3 of [slot='trailing'])) {
+    --app-bar-trailing-cells: repeat(3, minmax(var(--spacing-space-600), auto));
+    --app-bar-trailing-side: calc(3 * var(--spacing-space-600) + var(--spacing-space-100));
+  }
+
+  /* A pseudo-element across the row, which draws nothing until the bar compresses. */
+  &::before {
+    content: '';
+    grid-area: 1 / 1 / 2 / -1;
+  }
+
+  & > [slot='leading'] {
+    grid-column: 1;
+    grid-row: 1;
+    place-self: center;
+  }
+  & > [slot='trailing'] {
+    grid-row: 1;
+    place-self: center;
+  }
+  & > :nth-child(1 of [slot='trailing']) {
+    grid-column: 3;
+  }
+  & > :nth-child(2 of [slot='trailing']) {
+    grid-column: 4;
+  }
+  & > :nth-child(3 of [slot='trailing']) {
+    grid-column: 5;
+  }
+  /* An icon at either side is 24dp; what trails is on-surface-variant, under a color of its own,
+   * and what leads on-surface, the bar's. */
+  :where(& > :is([slot='leading'], [slot='trailing'])) {
+    @apply icon-24;
+  }
+  :where(& > [slot='trailing']) {
+    @apply text-on-surface-variant;
+  }
+
+  /* The search bar, React Aria's Button or Link in the `search` slot: a 56dp pill in the row, in
+   * the room between the sides. It fills that room up to 312dp, then stays centered on the bar
+   * itself, as near its center as the wider side lets it be, and past 624dp of room takes half of
+   * it. Its hinted text is on-surface-variant, as is an icon after it; one before it is on-surface,
+   * each in a 48dp cell 4dp from the pill's end, so a 24dp icon is 16dp from it. With no icon the
+   * text keeps 24dp from the end. The ripple's host (app-bar.tsx). */
+  & > [slot='search'] {
+    @apply relative m-0 box-border grid h-14 cursor-pointer touch-manipulation appearance-none items-center rounded-shape-full border-0 bg-surface-container px-space-300 py-0 font-plain text-body-lg text-on-surface-variant no-underline outline-none select-none;
+    @apply focus-ring transition-app-bar;
+    @apply disabled:cursor-default;
+    @apply forced-colors:container-border;
+    grid-column: 1 / -1;
+    grid-row: 1;
+    align-self: center;
+    justify-self: start;
+    --app-bar-search-room: calc(100% - var(--app-bar-leading-side) - var(--app-bar-trailing-side));
+    --app-bar-search-width: min(
+      var(--app-bar-search-room),
+      max(calc(var(--spacing) * 78), var(--app-bar-search-room) / 2)
+    );
+    width: var(--app-bar-search-width);
+    margin-inline-start: clamp(
+      var(--app-bar-leading-side),
+      calc((100% - var(--app-bar-search-width)) / 2),
+      calc(100% - var(--app-bar-trailing-side) - var(--app-bar-search-width))
+    );
+    --app-bar-search-trailing: ;
+    grid-template-columns: minmax(0, 1fr) var(--app-bar-search-trailing);
+    column-gap: var(--spacing-space-50);
+    white-space: nowrap;
+    &:has(> [slot='leading']) {
+      grid-template-columns:
+        minmax(var(--spacing-space-600), auto) minmax(0, 1fr)
+        var(--app-bar-search-trailing);
+      padding-inline-start: var(--spacing-space-50);
+    }
+    &:has(> [slot='trailing']) {
+      --app-bar-search-trailing: minmax(var(--spacing-space-600), auto);
+      padding-inline-end: var(--spacing-space-50);
+    }
+    & > [slot='leading'] {
+      @apply text-on-surface icon-24;
+      grid-column: 1;
+      place-self: center;
+    }
+    & > [slot='trailing'] {
+      @apply icon-24;
+      grid-column: -2;
+      place-self: center;
+    }
+    /* Its state layer and ripple are on-surface, as the Ripple it is given has the ripple. */
+    & > .state-layer {
+      @apply text-on-surface;
+    }
+  }
+  /* A button's text is centered by the browser; the hint starts at the leading edge, under a
+   * text-center of yours. */
+  :where(& > [slot='search']) {
+    text-align: start;
+  }
+  &[data-scrolled] > [slot='search'] {
+    @apply bg-surface-container-highest;
+  }
+}
+
+/* An icon button that leads an app bar is on-surface where the rest are on-surface-variant
+ * (icon-button.tsx). */
+@custom-variant app-bar-leading (:where(.app-bar) > &[slot='leading']);
+
+/* A small bar's text, in its row: the headline over the subtitle, on one line each, 4dp from
+ * what leads and trails, which with their own 12dp is 16dp from an edge nothing is at. Each is
+ * in the middle of the row, and moved past the other's middle when both are there. */
+@utility app-bar-small {
+  & > [slot='headline'] {
+    @apply m-0 min-w-0 truncate px-space-50 text-title-lg;
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+  }
+  &:has(> [slot='subtitle']) > [slot='headline'] {
+    translate: 0 calc(var(--text-label-md--line-height) / -2);
+  }
+  & > [slot='subtitle'] {
+    @apply min-w-0 truncate px-space-50 text-label-md text-on-surface-variant;
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    translate: 0 calc(var(--text-title-lg--line-height) / 2);
+  }
+}
+
+/* A flexible bar's text, under its row: 16dp from each edge, 12dp from the bottom, the headline
+ * wrapping to two lines at most, the subtitle under it, 4dp under a medium bar's and 8dp under a
+ * large one's: what the container heights with a subtitle leave it. */
+@utility app-bar-flexible {
+  @apply pb-space-150;
+  & > [slot='headline'] {
+    @apply m-0 line-clamp-2 min-w-0 px-space-150;
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  & > [slot='subtitle'] {
+    @apply min-w-0 px-space-150 text-on-surface-variant;
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
+}
+
+@utility app-bar-medium-flexible {
+  & > [slot='headline'] {
+    @apply text-headline-md;
+  }
+  & > [slot='subtitle'] {
+    @apply mt-space-50 text-label-lg;
+  }
+}
+
+@utility app-bar-large-flexible {
+  & > [slot='headline'] {
+    @apply text-display-sm;
+  }
+  & > [slot='subtitle'] {
+    @apply mt-space-100 text-title-md;
+  }
+}
+
+/* A bar that compresses is drawn by how far it has, --app-bar-collapse from 0 to 1, as Compose
+ * draws its own: the headline fades out evenly, the small title in the row fades in late, and
+ * the fill comes slowly at first. A paused animation stands where the var is along its easing.
+ * The row stays at the top as the headline scrolls away behind it: its pseudo-element, which
+ * takes the bar's fill, and each of its parts stick there, kept at the row's top edge, which
+ * they stick by, and moved down to the middle of the 64dp row. */
+@utility app-bar-compress {
+  &::before {
+    @apply sticky top-0 z-raised;
+    background-color: inherit;
+  }
+  & > :is([slot='leading'], [slot='trailing']) {
+    @apply sticky top-0 z-raised;
+    align-self: start;
+    translate: 0 calc((var(--spacing-space-800) - 100%) / 2);
+  }
+  & > :is([slot='headline'], [slot='subtitle']) {
+    opacity: calc(1 - var(--app-bar-collapse, 0));
+  }
+}
+
+/* The small title of a bar that compresses (app-bar.tsx draws its headline and subtitle again in
+ * the row): where a small bar has its two lines, each moved down to the middle of the row, and
+ * on past the other's middle when both are there. */
+@utility app-bar-collapsed-headline {
+  @apply sticky top-0 z-raised m-0 min-w-0 truncate px-space-50 text-title-lg;
+  grid-column: 2;
+  grid-row: 1;
+  align-self: start;
+  translate: 0 calc((var(--spacing-space-800) - 100%) / 2);
+  :where(:has(> .app-bar-collapsed-subtitle)) > & {
+    translate: 0 calc((var(--spacing-space-800) - 100%) / 2 - var(--text-label-md--line-height) / 2);
+  }
+  animation: app-bar-title 1s cubic-bezier(0.8, 0, 0.8, 0.15) both paused;
+  animation-delay: calc(var(--app-bar-collapse, 0) * -1s);
+}
+
+@utility app-bar-collapsed-subtitle {
+  @apply sticky top-0 z-raised min-w-0 truncate px-space-50 text-label-md text-on-surface-variant;
+  grid-column: 2;
+  grid-row: 1;
+  align-self: start;
+  translate: 0 calc((var(--spacing-space-800) - 100%) / 2 + var(--text-title-lg--line-height) / 2);
+  animation: app-bar-title 1s cubic-bezier(0.8, 0, 0.8, 0.15) both paused;
+  animation-delay: calc(var(--app-bar-collapse, 0) * -1s);
+}
+
+@utility app-bar-fill {
+  animation: app-bar-fill 1s cubic-bezier(0.4, 0, 1, 1) both paused;
+  animation-delay: calc(var(--app-bar-collapse, 0) * -1s);
+}
+
+@keyframes app-bar-title {
+  from {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes app-bar-fill {
+  to {
+    background-color: var(--color-surface-container);
+  }
+}
+
+/* The container's fill on scroll of a bar that keeps its size, linear over a short-4 as the
+ * guideline videos have it. */
+@utility transition-app-bar {
+  transition-property: background-color;
+  transition-duration: var(--md-sys-motion-duration-short4);
+  transition-timing-function: linear;
+}

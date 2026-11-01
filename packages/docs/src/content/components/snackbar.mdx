@@ -1,0 +1,288 @@
+import snackbarApi from 'virtual:api/Snackbar'
+import { SnackbarContentSlots } from '../../slot-pictures/snackbar.tsx'
+import snackbarActionApi from 'virtual:api/SnackbarAction'
+import snackbarCloseButtonApi from 'virtual:api/SnackbarCloseButton'
+import snackbarContentApi from 'virtual:api/SnackbarContent'
+import snackbarRegionApi from 'virtual:api/SnackbarRegion'
+import * as aligned from '../../examples/snackbar/aligned.tsx?example'
+import * as basic from '../../examples/snackbar/basic.tsx?example'
+import * as configurations from '../../examples/snackbar/configurations.tsx?example'
+import * as consecutive from '../../examples/snackbar/consecutive.tsx?example'
+import * as custom from '../../examples/snackbar/custom.tsx?example'
+import * as description from '../../examples/snackbar/description.tsx?example'
+import * as dialog from '../../examples/snackbar/dialog.tsx?example'
+import * as position from '../../examples/snackbar/position.tsx?example'
+import * as timeout from '../../examples/snackbar/timeout.tsx?example'
+
+Snackbars show short updates about app processes at the bottom of the screen. They inform people of a process that the app has performed or will perform, such as archiving an email or saving a draft.
+
+- A snackbar does not interrupt: people can keep using the page without responding to it.
+- One snackbar shows at a time.
+- A snackbar can have a single action, such as Undo. Do not make a snackbar the only way to reach something the app needs to be usable.
+
+To interrupt people with a message that needs a response, use a [dialog](/components/dialog) instead.
+
+```tsx
+import {
+  Snackbar,
+  SnackbarAction,
+  SnackbarCloseButton,
+  SnackbarContent,
+  SnackbarQueue,
+  SnackbarRegion,
+} from '@material-web/react'
+import { Text } from 'react-aria-components'
+```
+
+## Basic snackbar
+
+A snackbar appears for a short time towards the bottom of the window, in front of the page. This one has a text, an action and a close button.
+
+<Example {...basic} isWindow />
+
+Create a `SnackbarQueue`, render a `SnackbarRegion` for it once, and call the queue's `add` from anywhere in the app to show a snackbar. The region's children are a function that renders each snackbar: a `Snackbar` with its text in a `SnackbarContent`, then its action, a `SnackbarAction`, and its close button, a `SnackbarCloseButton`. Use these two parts for a snackbar's buttons, not a `Button` or an `IconButton`.
+
+The queue, the region and the snackbar work as the parts of React Aria's [Toast](https://react-aria.adobe.com/Toast) do.
+
+> **Note:** The snackbar's API may change in a later version.
+
+## Composition
+
+A snackbar is composed of these parts:
+
+```tsx
+<SnackbarRegion queue={snackbars}>
+  {({ toast }) => (
+    <Snackbar toast={toast}>
+      <SnackbarContent>
+        <Text slot="title" />
+        <Text slot="description" />
+      </SnackbarContent>
+      <SnackbarAction />
+      <SnackbarCloseButton />
+    </Snackbar>
+  )}
+</SnackbarRegion>
+```
+
+These are the parts, where each goes, and what it takes:
+
+| Part                  | In                      | Use                                                                                                                                                                                                                                                   |
+| --------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SnackbarQueue`       | Your app, created once  | The queue of snackbars to show. It takes two options: `maxVisibleToasts`, the number of snackbars shown at a time, which is 1 (the default), and `wrapUpdate`, a function that runs each change to the queue.                                         |
+| `SnackbarRegion`      | Your app, rendered once | Shows the queue's snackbars. It takes the `queue` and, as its children, a function that renders each `toast`. Its `className` and `style` can be functions of `visibleToasts`, `isHovered`, `isFocused` and `isFocusVisible`.                         |
+| `Snackbar`            | The region's function   | One snackbar. It takes the `toast` to show. Its `className`, `style` and children can be functions of `toast`, `isFocused` and `isFocusVisible`.                                                                                                      |
+| `SnackbarContent`     | `Snackbar`              | Holds the snackbar's text                                                                                                                                                                                                                             |
+| `SnackbarAction`      | `Snackbar`              | The action, after the `SnackbarContent`. It takes `onPress` and the other press props of a [button](/components/button#handling-presses). Its children can be a function of `isHovered`, `isPressed`, `isFocused`, `isFocusVisible` and `isDisabled`. |
+| `SnackbarCloseButton` | `Snackbar`              | The close button, last. It takes the same props as a `SnackbarAction`.                                                                                                                                                                                |
+
+### Queue and region
+
+Create one queue for the app, render one region, and add to the queue from anywhere:
+
+```tsx
+const snackbars = new SnackbarQueue<{ text: string; action?: string }>()
+
+function Snackbars() {
+  return (
+    <SnackbarRegion queue={snackbars}>
+      {({ toast }) => (
+        <Snackbar toast={toast}>
+          <SnackbarContent>
+            <Text slot="title">{toast.content.text}</Text>
+          </SnackbarContent>
+          {toast.content.action && (
+            <SnackbarAction
+              onPress={() => {
+                undo()
+                snackbars.close(toast.key)
+              }}
+            >
+              {toast.content.action}
+            </SnackbarAction>
+          )}
+          <SnackbarCloseButton>
+            <Icon name="close" />
+          </SnackbarCloseButton>
+        </Snackbar>
+      )}
+    </SnackbarRegion>
+  )
+}
+
+snackbars.add({ text: 'Email archived', action: 'Undo' })
+snackbars.add({ text: 'All changes saved' }, { timeout: 5000 })
+```
+
+The content of a snackbar is yours to shape: a string, or an object as above. Type it on the queue, and read it as `toast.content` in the region's function.
+
+> **Note:** Each example on this page has its own queue and region. All but the one with a [dialog](#snackbar-with-dialog) show their snackbars in the example's frame, which stands in for the window.
+
+## Content
+
+Put the snackbar's text in a `SnackbarContent`. After it, write the action as a `SnackbarAction` with its label as its children, and the close button as a `SnackbarCloseButton` with an icon as its child. Both buttons are optional.
+
+An action that is wider than 128dp together with the close button moves below the text, at the end, and the close button moves with it. The text then takes the whole row. A label wider than that row wraps.
+
+In this example, the region has `className="max-w-86"`, which limits its width to 344dp, so that the longer text takes two lines.
+
+<Example {...configurations} isFlush isWindow />
+
+## Slots
+
+<SnackbarContentSlots showLegend />
+
+| Slot          | Child    | Use                                |
+| ------------- | -------- | ---------------------------------- |
+| `title`       | A `Text` | The text, which names the snackbar |
+| `description` | A `Text` | Describes the snackbar             |
+
+Each takes a separate line.
+
+<Example {...description} isWindow />
+
+## Showing and closing
+
+The queue shows one snackbar at a time. Its `maxVisibleToasts` option sets how many.
+
+- Call `add(content, options)` to show a snackbar at once. It returns the snackbar's key.
+- Call `close(key)` to close a snackbar, and `clear()` to close them all.
+- An action does not close its snackbar. Call `close(toast.key)` in its `onPress`.
+- A close button closes its snackbar when pressed.
+
+For the queue's other methods, see React Aria's [`ToastQueue`](https://react-aria.adobe.com/Toast#toastqueue).
+
+## Dismissal
+
+Pass a `timeout` in milliseconds in the options of `add` to close a snackbar automatically, and an `onClose` to be called when it closes. Without a timeout, a snackbar stays until it is closed.
+
+- Give a snackbar with an action no timeout.
+- For a snackbar with no action, use a timeout of at least 5 seconds and at most 10, and show inline feedback as well.
+- The timer pauses while the pointer is on the snackbar or the focus is in it.
+
+In this example, the button's label changes to Saved as the inline feedback, and the snackbar closes after 5 seconds.
+
+<Example {...timeout} isWindow />
+
+## Consecutive snackbars
+
+A snackbar added while another shows takes its place, and the earlier one comes back once the newer one has closed. To replace a snackbar for good, close it before you add the next.
+
+<Example {...consecutive} isWindow />
+
+## Placement
+
+The region is fixed to the bottom of the window, centered, 12dp from its edges and up to 600dp wide. It is in front of the page, at [`z-snackbar`](/theme/layout#stacking-order). Set a `className` on the `SnackbarRegion` to move it:
+
+- `bottom-22` places it above a FAB that is 16dp from the corner. See [Snackbar with FAB](#snackbar-with-fab).
+- `mx-0` aligns it to the window's start.
+- `static` keeps it inside a container that you render it into with `UNSAFE_PortalProvider`.
+
+In a wide window, a snackbar can be centered or aligned to the start, as long as it always shows in the same place. Avoid placing it in front of navigation or other frequently used targets.
+
+In this example, the region has `className="mx-0 max-w-86"`: it is aligned to the start, and up to 344dp wide.
+
+<Example {...aligned} isWindow />
+
+## Snackbar with FAB
+
+Show a snackbar above a [FAB](/components/fab), not in front of it. Set `className="bottom-22"` on the `SnackbarRegion` to place it above a FAB that is 16dp from the corner.
+
+<Example {...position} isFlush isWindow />
+
+## Snackbar with dialog
+
+A snackbar shows in front of an open [dialog](/components/dialog), and can be used while the dialog is open. Add it from inside the dialog as from anywhere else.
+
+- A press on the snackbar does not close the dialog.
+- Escape closes the snackbar while the focus is in it, and the dialog otherwise.
+- F6 moves the focus from the dialog to the snackbar.
+
+<Example {...dialog} />
+
+## Customization
+
+Pass classes in `className` to restyle a part of a snackbar. A class of yours replaces the part's own class for the same property. See [Styling](/get-started/styling) for the classes, the states and the theme.
+
+In this example, the snackbar of a failed upload takes the `error` [color roles](/theme/color#color-roles). The close button has a color of its own, so it takes the on-color too.
+
+<Example {...custom} isWindow />
+
+- **Color:** Pass a container color and the on-color of that container to the `Snackbar`, as in `bg-error text-on-error`. Pass a text color to a `SnackbarAction` and a `SnackbarCloseButton` as well: their hover, focus and press states follow it.
+- **Functions:** On every part but the `SnackbarContent`, `className` and `style` can be functions of the part's state. See [Composition](#composition) for the state of each part, and [Children as a function](/get-started/composition#children-as-a-function).
+- **Ancestors:** The region is rendered at the end of the page, not inside the element it is written in. A class or a `data-theme` on an element around it does not reach the snackbars. Set it on the `SnackbarRegion` itself, or on the root element.
+- **Every snackbar:** To restyle all the snackbars at once, change the [theme](/get-started/styling#theme).
+
+### Transitions
+
+The queue runs each change in a view transition. Pass a `wrapUpdate` function in the queue's options to run the changes yourself. A view transition that you start there animates the snackbars only if it has the type `snackbar`.
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/snackbar/accessibility#cb59e07c-a63a-4230-b5f6-6ebd0e0004d9) what people should be able to do with assistive technology:
+
+- Be alerted, but not disrupted, when a snackbar appears
+- Move focus to an actionable snackbar
+- Take action on a snackbar using assistive technology
+
+### Interaction and style
+
+- **States:** The action and the close button show a state layer on hover and a ripple on a press, in their own colors. Keyboard focus shows a [focus ring](/theme/accessibility#focus-ring) around the snackbar and around each button, and a press with a mouse or touch does not.
+- **Touch target:** The action and the close button each have a [touch target](/theme/accessibility#touch-targets) of at least 48dp.
+- **Color contrast:** A snackbar uses the inverse colors, which stand out from the page. Material [advises](https://m3.material.io/components/snackbar/accessibility#be58081b-a688-411f-83a7-f77e4873bd7d) keeping the default colors, to avoid color conflicts. The text and the action have 4.5:1 contrast or more with the snackbar, and the close icon and the focus rings 3:1, in light and dark schemes at every [contrast level](/theme/color#contrast).
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), a snackbar shows and hides at once.
+- **Forced colors:** A snackbar keeps an edge in [forced colors](/theme/accessibility#forced-colors).
+- **Auto-dismiss:** On the web, Material [requires](https://m3.material.io/components/snackbar/accessibility#127f5547-7068-4d5d-a6bd-ff97096d1139) that the message of a snackbar that closes by itself also show inline, near the action that triggered it, such as a Save button's label changing to Saved. Otherwise, give the snackbar an action and no `timeout`: a snackbar with an action should not close by itself. See [Dismissal](#dismissal). The timer pauses while the pointer is on the snackbar or the focus is in it.
+
+### Focus
+
+- A snackbar appears without moving the focus, and does not keep it.
+- F6 moves the focus to the region from anywhere in the page, and Shift+F6 moves it back. Material [advises](https://m3.material.io/components/snackbar/accessibility#5adb7a10-b94a-47b0-94df-72daf42bf884) a shortcut like this on the web: tell people about it, such as in a help article.
+- Tab reaches the snackbar after the rest of the page, then its action and close button, and then moves on.
+- Escape closes the snackbar while the focus is in it. The focus then returns to where it was before.
+
+### Keyboard navigation
+
+| Keys           | Actions                                                             |
+| -------------- | ------------------------------------------------------------------- |
+| F6             | Move the focus to the snackbar region                               |
+| Shift+F6       | Move the focus back                                                 |
+| Tab            | Move the focus to the snackbar, then to its action and close button |
+| Space or Enter | Press the focused action or close button                            |
+| Escape         | Close the snackbar while the focus is in it                         |
+
+### Labeling elements
+
+- A snackbar has the `alertdialog` role. Name it with a `Text` with `slot="title"` in its `SnackbarContent`, and describe it with one with `slot="description"`.
+- Its text is in the `alert` role. Assistive technology announces a snackbar's text at once as it appears.
+- The region is a landmark, named by the number of snackbars it shows.
+- The action is named by its label. The close button is named Close, in the app's locale, unless you set an `aria-label`.
+
+## Props
+
+### SnackbarRegion
+
+<PropsTable {...snackbarRegionApi} />
+
+### Snackbar
+
+<PropsTable {...snackbarApi} />
+
+### SnackbarContent
+
+`SnackbarContent` accepts the props of a `<div>`, and a `ref` to it.
+
+<PropsTable
+  {...snackbarContentApi}
+  inherited={snackbarContentApi.inherited.filter((prop) => prop.name !== 'ref')}
+/>
+
+### SnackbarAction
+
+<PropsTable {...snackbarActionApi} />
+
+### SnackbarCloseButton
+
+<PropsTable {...snackbarCloseButtonApi} />

@@ -1,0 +1,36 @@
+/* The components' own CSS, each in its component's folder: the utilities, variants,
+ * properties and tokens named after one component. */
+@import './app-bar/app-bar.css';
+@import './bottom-sheet/bottom-sheet.css';
+@import './button/button.css';
+@import './calendar/calendar.css';
+@import './card/card.css';
+@import './checkbox/checkbox.css';
+@import './chip/chip.css';
+@import './date-field/date-field.css';
+@import './date-picker/date-picker.css';
+@import './dialog/dialog.css';
+@import './divider/divider.css';
+@import './fab/fab.css';
+@import './fab-menu/fab-menu.css';
+@import './icon/icon.css';
+@import './icon-button/icon-button.css';
+@import './list/list.css';
+@import './loading-indicator/loading-indicator-shapes.css';
+@import './loading-indicator/loading-indicator.css';
+@import './menu/menu.css';
+@import './navigation-bar/navigation-bar.css';
+@import './navigation-rail/navigation-rail.css';
+@import './progress-indicator/progress-indicator.css';
+@import './radio/radio.css';
+@import './ripple/ripple.css';
+@import './search/search.css';
+@import './side-sheet/side-sheet.css';
+@import './slider/slider.css';
+@import './snackbar/snackbar.css';
+@import './switch/switch.css';
+@import './tabs/tabs.css';
+@import './text-field/text-field.css';
+@import './time-picker/time-picker.css';
+@import './toolbar/toolbar.css';
+@import './tooltip/tooltip.css';

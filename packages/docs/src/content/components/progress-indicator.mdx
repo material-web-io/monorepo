@@ -1,0 +1,233 @@
+import circularApi from 'virtual:api/CircularProgressIndicator'
+import linearApi from 'virtual:api/LinearProgressIndicator'
+import * as basic from '../../examples/progress-indicator/basic.tsx?example'
+import * as circularColor from '../../examples/progress-indicator/circular-color.tsx?example'
+import * as circularCustomScale from '../../examples/progress-indicator/circular-custom-scale.tsx?example'
+import * as circularDeterminate from '../../examples/progress-indicator/circular-determinate.tsx?example'
+import * as circularIndeterminate from '../../examples/progress-indicator/circular-indeterminate.tsx?example'
+import * as circularTrack from '../../examples/progress-indicator/circular-track.tsx?example'
+import * as delay from '../../examples/progress-indicator/delay.tsx?example'
+import * as inButton from '../../examples/progress-indicator/in-button.tsx?example'
+import * as linearColor from '../../examples/progress-indicator/linear-color.tsx?example'
+import * as linearDeterminate from '../../examples/progress-indicator/linear-determinate.tsx?example'
+import * as linearIndeterminate from '../../examples/progress-indicator/linear-indeterminate.tsx?example'
+import * as linearValueText from '../../examples/progress-indicator/linear-value-text.tsx?example'
+import * as linearWithLabel from '../../examples/progress-indicator/linear-with-label.tsx?example'
+import * as onContainer from '../../examples/progress-indicator/on-container.tsx?example'
+import * as rightToLeft from '../../examples/progress-indicator/right-to-left.tsx?example'
+import * as shapes from '../../examples/progress-indicator/shapes.tsx?example'
+import * as sizes from '../../examples/progress-indicator/sizes.tsx?example'
+import * as stopAndTrack from '../../examples/progress-indicator/stop-and-track.tsx?example'
+import * as thickness from '../../examples/progress-indicator/thickness.tsx?example'
+import * as toDeterminate from '../../examples/progress-indicator/to-determinate.tsx?example'
+import * as valueText from '../../examples/progress-indicator/value-text.tsx?example'
+import * as wave from '../../examples/progress-indicator/wave.tsx?example'
+
+Progress indicators show the status of an ongoing process, such as loading an app, submitting a form or saving updates.
+
+- **Determinate** indicators show known progress, and fill from 0% to 100%.
+- **Indeterminate** indicators show that a process is happening while the wait time is unknown.
+
+When several items are loading, use a single progress indicator for the group. For a short wait, between 200ms and 5s, prefer a [loading indicator](/components/loading-indicator).
+
+A progress indicator comes as one of two components:
+
+| Part                        | Use                                                                   |
+| --------------------------- | --------------------------------------------------------------------- |
+| `LinearProgressIndicator`   | A bar, as wide as its container. Place it on the edge of a container. |
+| `CircularProgressIndicator` | A ring, in an inline box of its size. Center it in an element.        |
+
+```tsx
+import { CircularProgressIndicator, LinearProgressIndicator } from '@material-web/react'
+```
+
+## Basic progress indicator
+
+Use a `LinearProgressIndicator` or a `CircularProgressIndicator` to show the progress of a process, and name it with an `aria-label`.
+
+<Example {...basic} />
+
+An indicator is determinate unless `isIndeterminate` is set, and its `value` is 0 by default.
+
+## Label
+
+Children are rendered inside the indicator. To show the value in the ring of a circular indicator, pass a function as children and center the text it returns over the indicator, as with `absolute inset-0` in this example. The function receives `percentage`, `valueText` and `isIndeterminate`. See [Children as a function](/get-started/composition#children-as-a-function).
+
+<Example {...valueText} />
+
+To show a label or the value beside a linear indicator, write them next to it, and name the indicator by its visible label with `aria-labelledby`. A linear indicator is as wide as its container, so in a row, put it in an element that takes the room that is left.
+
+<Example {...linearWithLabel} />
+
+### Value text
+
+`valueText` is the text that the indicator reports for its value. An indicator reports its value to assistive technology as a percentage, such as `40%`. Where the progress is not a percentage, set `valueLabel` to the text to report, or set `formatOptions` to format the value as another kind of number, as with React Aria's [ProgressBar](https://react-aria.adobe.com/ProgressBar#value). A circular indicator takes both props too.
+
+<Example {...linearValueText} />
+
+## Determinate
+
+Set `value` to the progress made. A determinate indicator must accurately represent the progress of what it measures.
+
+<Example {...circularDeterminate} />
+
+<Example {...linearDeterminate} />
+
+### Custom scale
+
+A `value` is kept between `minValue` and `maxValue`, which are 0 and 100 by default. Set them to measure the progress on another scale. The indicator fills by the share of the range that the value has reached: step 2 of 5 fills 40% of the ring. A linear indicator takes `minValue` and `maxValue` too.
+
+<Example {...circularCustomScale} />
+
+## Indeterminate
+
+Set `isIndeterminate` to show that a process is happening while the wait time is unknown.
+
+<Example {...circularIndeterminate} />
+
+<Example {...linearIndeterminate} />
+
+## Indeterminate to determinate
+
+As more about a process becomes known, change the indicator from indeterminate to determinate: clear `isIndeterminate` and set a `value`.
+
+<Example {...toDeterminate} />
+
+## Color
+
+The active indicator takes the text color, which is `primary` by default. To use another [color role](/theme/color#color-roles), pass its text color class in `className`. The track keeps its `secondary-container` color. On a linear indicator, the stop indicator takes the same color as the active indicator.
+
+<Example {...circularColor} />
+
+<Example {...linearColor} />
+
+## Sizes
+
+Set `size` on a circular indicator to its size in dp, from 24 to 240. A size outside the range is brought back to its nearest end. The stroke and the wave scale with the size.
+
+Without `size`, a circular indicator is 48dp at the default thickness, and a thicker stroke adds to it.
+
+<Example {...sizes} />
+
+## Shapes
+
+Set `shape` to `flat` (the default) or `wavy`, which gives the active indicator a wave. The wavy shape can make a longer process feel less static, and suits a more expressive style.
+
+A wavy linear indicator is as tall as its wave. On a wavy circular indicator, the crests of the wave reach past the indicator's size by the amplitude.
+
+<Example {...shapes} />
+
+On a determinate indicator, the wave shows while the progress is above 10% and below 95%. To change the wave, see [Amplitude and wavelength](#amplitude-and-wavelength).
+
+## Track and stop indicator
+
+The track is the part of the ring or the bar that the active indicator has not reached. Set `showTrack={false}` to remove it, as in a button.
+
+<Example {...circularTrack} />
+
+A determinate linear indicator ends in a stop indicator. Set `showStopIndicator={false}` to remove it, only where the track has a contrast of at least 3:1 with the surfaces around it. An indeterminate or a circular indicator has no stop indicator.
+
+<Example {...stopAndTrack} />
+
+## Placement
+
+Place a linear indicator on the edge of a container, and center a circular one in an element. In this example, a linear indicator runs along the top edge of a container that is loading, inset 4dp from its sides.
+
+<Example {...onContainer} />
+
+## Right to left
+
+In a right-to-left layout, a linear indicator fills from the right. A circular indicator still fills clockwise.
+
+<Example {...rightToLeft} />
+
+## In a button
+
+In a button, remove the track with `showTrack={false}` and give the indicator the label's color with `className="text-current"`. In a very small button, use the flat shape, since the wave is not as visible at that size.
+
+When the button's label already says what is happening, hide the indicator from assistive technology by wrapping it in an element with `aria-hidden`, and still give the indicator an `aria-label`.
+
+> **Note:** An `aria-hidden` set on the indicator itself is not applied.
+
+<Example {...inButton} />
+
+While the button's action is in progress, set its `isPending` instead: a pending button shows a loading indicator of its own, alone, and ignores presses. See [Loading](/components/button#loading).
+
+## Delaying appearance
+
+To keep an indicator from flashing on a process that ends at once, render it only after the process has run for a moment. In this example, the indicator appears after one second: stop the loading before that, and it is never shown.
+
+<Example {...delay} />
+
+## Customization
+
+Pass classes in `className` to restyle one indicator. A class of yours replaces the indicator's own class for the same property. See [Styling](/get-started/styling) for the classes and the theme.
+
+- **Width:** A linear indicator is as wide as its container. Pass a width class, such as `w-48`, to set its width.
+- **Color:** Pass a text color class for the active indicator, as in [Color](#color).
+- **Track color:** The track is not reached by `className`. To change its color, set the `secondary-container` color role on the indicator. See [Theme](/get-started/styling#theme).
+- **Functions:** `children`, `className` and `style` can be functions of `percentage`, `valueText` and `isIndeterminate`. See [Children as a function](/get-started/composition#children-as-a-function).
+- **Every indicator:** To restyle all the indicators at once, change the [theme](/get-started/styling#theme).
+
+### Thickness
+
+Set `thickness` to the thickness of the stroke in dp. The default is 4.
+
+<Example {...thickness} />
+
+### Amplitude and wavelength
+
+On a wavy indicator, set `amplitude` and `wavelength` in dp. The amplitude is measured from the center of the resting position to the center of the peak, and the wavelength between two adjacent peaks.
+
+| Indicator             | Amplitude | Wavelength |
+| --------------------- | --------- | ---------- |
+| Linear, determinate   | 3         | 40         |
+| Linear, indeterminate | 3         | 20         |
+| Circular              | 1.6       | 15         |
+
+These are the defaults. A wavelength shorter than 8dp, or shorter than the thickness, is raised to that length.
+
+<Example {...wave} />
+
+## Limitations
+
+### Hidden indicators
+
+An indicator does not apply an `aria-hidden` of its own. To hide it from assistive technology, set `aria-hidden` on an element around it, as [in a button](#in-a-button).
+
+### Server rendering
+
+A progress indicator is drawn by script. On a server-rendered page, a linear indicator stays empty and a circular one stands still until the page has hydrated. Where an indicator must move before that, use a [loading indicator](/components/loading-indicator), which does not wait for the script.
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/progress-indicators/accessibility#4f0c3b38-9d61-4c27-99c0-47631a80aedd) what people should be able to do with assistive technology:
+
+- Navigate to the progress indicator
+- Understand what progress the indicator is communicating
+
+### Interaction and style
+
+- **Color contrast:** The active indicator and the stop indicator [need](https://m3.material.io/components/progress-indicators/accessibility#a8aa593a-1982-430e-ad34-c8766f05a278) 3:1 contrast with the surface behind them. Keep that contrast when you change their [color](#color). In a button, give the indicator the label's color and remove the track, as [in a button](#in-a-button).
+- **Stop indicator:** Remove the stop indicator only where the track has at least 3:1 contrast with the surfaces around it, so that the end of the track stays easy to see. See [Track and stop indicator](#track-and-stop-indicator).
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), a determinate indicator jumps to a new value, and an indeterminate one keeps moving.
+- **Forced colors:** In [forced colors](/theme/accessibility#forced-colors), the active indicator and the stop indicator are drawn in the system's text color, and the track in its disabled text color.
+- **Right to left:** A linear indicator fills from the right in a [right-to-left](#right-to-left) layout. A circular indicator still fills clockwise.
+
+### Labeling elements
+
+- An indicator has the `progressbar` role, and is not a tab stop. It reports its value as text, `40%` unless `formatOptions` or `valueLabel` change it. An indeterminate indicator reports no value.
+- Name the indicator with `aria-label` or `aria-labelledby`, or with a `Label` from `react-aria-components` among its children. As Material [advises](https://m3.material.io/components/progress-indicators/accessibility#dbe2eaa6-17a8-449b-84d9-45c9fee63058), include the process and the affected content in the label, such as Loading news article or Refreshing page.
+- To hide an indicator from assistive technology, set `aria-hidden` on an element around it.
+
+## Props
+
+### LinearProgressIndicator
+
+<PropsTable {...linearApi} />
+
+### CircularProgressIndicator
+
+<PropsTable {...circularApi} />

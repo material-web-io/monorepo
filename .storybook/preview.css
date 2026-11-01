@@ -1,0 +1,19 @@
+/* Tailwind without its preflight, its layers in order as its full entry point declares them,
+ * then the library's stylesheet. */
+@layer theme, base, utilities;
+
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities) source(none);
+@import '../packages/react/src/tailwind.css';
+/* The tonal palettes, which the theme leaves out by default: the token stories use them. */
+@import '../packages/tailwind/src/palettes.css';
+
+/* Also generate utilities used by stories and docs. */
+@source '../packages/tailwind/src';
+@source '../packages/react/src';
+
+body {
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  font-family: var(--md-ref-typeface-plain);
+}

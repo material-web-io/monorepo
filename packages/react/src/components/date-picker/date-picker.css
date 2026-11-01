@@ -1,0 +1,152 @@
+/* Date pickers (date-picker.tsx, date-range-picker.tsx, their parts, date-picker-dialog.tsx), of
+ * the calendar's parts (calendar.css) and DateField. The motion is Compose's, whose picker it is.
+ * Times are steps of short1 (50ms) or the spring tokens: reduced motion skips them. */
+
+/* The picker, DatePicker or DateRangePicker: the header over the calendar or the input, body-large
+ * on-surface with no background, which its dialog draws; 360dp wide in both modes (date-picker.tsx).
+ * A range picker fills the height given, its months scrolling in it. */
+@utility date-picker {
+  @apply flex min-h-0 max-w-full min-w-0 flex-col text-start font-plain text-body-lg text-on-surface;
+}
+@utility date-range-picker {
+  @apply flex-1;
+}
+
+/* DatePickerDialog's actions: its buttons at the end, 8dp apart, 4dp above them and 12dp below,
+ * 10dp from the end, where Compose's, 58dp wide at least, put their text; the clear button at the
+ * start; under a range picker's months, past a divider, as the spec's range anatomy draws them. */
+@utility date-picker-actions {
+  @apply flex shrink-0 flex-wrap justify-end gap-space-100 ps-space-150 pe-space-125 pt-space-50 pb-space-150;
+  .date-range-picker:has(> .date-range-picker-modes) + & {
+    @apply border-t border-outline-variant;
+  }
+}
+@utility date-picker-actions-start {
+  @apply me-auto flex;
+}
+
+/* DatePickerDialog's container: a basic dialog's (dialog.css), as wide as the picker in it, past
+ * the layer's padding when that is narrower, as Compose's required 360dp is; nothing above or
+ * below what it holds, and its text body-large on-surface. */
+@utility date-picker-modal {
+  @apply dialog-modal-basic dialog-modal;
+  @apply shrink-0 text-body-lg text-on-surface;
+
+  :where(&) > * {
+    padding-block: 0;
+  }
+}
+
+/* DatePickerHeader, a date's or a range's, in both modes: the title, the caller's label-large
+ * on-surface-variant heading in the `title` slot, 16dp from the top and 24dp in, 36dp over the
+ * headline and the mode toggle; 12dp under the headline, the divider in the last pixel. */
+@utility date-picker-header {
+  @apply relative grid shrink-0 items-center gap-y-space-450 ps-space-300 pe-space-200 pt-space-200 pb-space-150;
+  @apply after:absolute after:inset-x-0 after:bottom-0 after:border-b after:border-outline-variant;
+  grid-template-columns: minmax(0, 1fr) auto;
+  :where(& > [slot='title']) {
+    @apply col-span-full m-0 text-label-lg text-on-surface-variant;
+  }
+}
+/* The headline: headline-large on-surface-variant. */
+@utility date-picker-headline {
+  @apply col-start-1 row-start-2 truncate text-headline-lg text-on-surface-variant;
+}
+/* The mode toggle, 16dp from the end: its 40dp box centered on the headline, a line or two, and
+ * the row no taller for it than a range's 28dp line, which it passes by 6dp into the padding. */
+@utility date-picker-mode-toggle {
+  @apply col-start-2 row-start-2;
+  margin-block: calc((var(--text-title-lg--line-height) - var(--spacing-space-500)) / 2);
+}
+
+/* The calendar and the input swapped as Compose's AnimatedContent does, in their clipped room of
+ * 392dp or 106dp (resized by date-picker-content.tsx), less in a short layer: the input rises,
+ * fading in on the default effects spring, as the calendar fades out 48dp up on the fast one. */
+@utility date-picker-modes {
+  @apply relative grid h-98 min-h-0 overflow-clip;
+  overflow-clip-margin: var(--spacing-space-100);
+}
+@utility date-picker-modes-input {
+  @apply date-picker-modes h-26.5;
+}
+@utility date-picker-pane {
+  @apply col-start-1 row-start-1 min-w-0;
+  translate: 0 0;
+  opacity: 1;
+  /* Inherited, not visible, so that an ancestor hidden hides it with it. */
+  visibility: inherit;
+  transition-property: translate, opacity, visibility;
+  transition-duration:
+    var(--md-sys-motion-spring-default-spatial-duration),
+    var(--md-sys-motion-spring-default-effects-duration), 0s;
+  transition-timing-function:
+    var(--md-sys-motion-spring-default-spatial-easing),
+    var(--md-sys-motion-spring-default-effects-easing), linear;
+}
+@utility date-picker-pane-in {
+  translate: 0 0;
+}
+/* A pane away: faded on the fast effects spring, and hidden once it has moved off. */
+@utility date-picker-pane-away {
+  opacity: 0;
+  visibility: hidden;
+  transition-duration:
+    var(--md-sys-motion-spring-default-spatial-duration),
+    var(--md-sys-motion-spring-fast-effects-duration), 0s;
+  transition-timing-function:
+    var(--md-sys-motion-spring-default-spatial-easing),
+    var(--md-sys-motion-spring-fast-effects-easing), linear;
+  transition-delay: 0s, 0s, var(--md-sys-motion-spring-default-spatial-duration);
+}
+@utility date-picker-pane-above {
+  @apply date-picker-pane-away;
+  translate: 0 calc(var(--spacing-space-600) * -1);
+}
+@utility date-picker-pane-below {
+  @apply date-picker-pane-away;
+  translate: 0 100%;
+}
+
+/* The input's field, React Aria's DateField: 24dp in from the sides, its outline 18dp under the
+ * divider, its error text under it, in the 32dp Compose keeps above the actions for one; a range's
+ * two side by side, 8dp apart, each with Compose's 16dp under it, which its error text grows past. */
+@utility date-picker-input-field {
+  @apply box-border min-h-26.5 w-full px-space-300 pt-4.5;
+}
+@utility date-range-picker-input-fields {
+  @apply flex gap-space-100 px-space-300 pt-4.5;
+}
+@utility date-range-picker-input-field {
+  @apply min-h-18 min-w-0 flex-1;
+}
+
+/* The range's headline: title-large on-surface-variant, 16dp from the mode toggle; the start with
+ * what follows it on one line, spaces kept, and the end on a line of its own when they don't fit. */
+@utility date-range-picker-headline {
+  @apply col-start-1 row-start-2 flex min-w-0 flex-wrap items-center pe-space-200 text-title-lg text-on-surface-variant;
+  & > * {
+    white-space: pre;
+  }
+}
+
+/* The range picker's months fill the column under the header, as tall as they are, as much of that
+ * as the picker is given (a dialog's, the layer's), and its inputs take their height, 90dp without
+ * an error. The pane of the months fills the room; away, it is sized as if empty. */
+@utility date-range-picker-modes {
+  /* Clipped right at its edges, unlike a date's room: the months' spring passes its bottom by under
+   * a pixel, which a clip margin lets out past the page's or a dialog's edge, and Chrome keeps the
+   * scrollbar it shows for that once the months settle. */
+  @apply relative grid min-h-0 grow grid-rows-1 overflow-clip;
+}
+@utility date-range-picker-modes-input {
+  @apply date-range-picker-modes flex-none;
+}
+@utility date-picker-pane-fill {
+  @apply flex min-h-0 flex-col self-stretch;
+  &:not(.date-picker-pane-in) {
+    @apply contain-size;
+  }
+}
+@utility date-picker-pane-top {
+  @apply self-start;
+}

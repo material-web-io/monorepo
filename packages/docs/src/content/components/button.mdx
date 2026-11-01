@@ -1,0 +1,272 @@
+import api from 'virtual:api/Button'
+import * as basic from '../../examples/button/basic.tsx?example'
+import * as colors from '../../examples/button/colors.tsx?example'
+import * as complex from '../../examples/button/complex.tsx?example'
+import * as custom from '../../examples/button/custom.tsx?example'
+import * as elevated from '../../examples/button/elevated.tsx?example'
+import * as fileUpload from '../../examples/button/file-upload.tsx?example'
+import * as filled from '../../examples/button/filled.tsx?example'
+import * as icon from '../../examples/button/icon.tsx?example'
+import * as link from '../../examples/button/link.tsx?example'
+import * as loading from '../../examples/button/loading.tsx?example'
+import * as outlined from '../../examples/button/outlined.tsx?example'
+import * as press from '../../examples/button/press.tsx?example'
+import * as shapes from '../../examples/button/shapes.tsx?example'
+import * as sizes from '../../examples/button/sizes.tsx?example'
+import * as text from '../../examples/button/text.tsx?example'
+import * as toggle from '../../examples/button/toggle.tsx?example'
+import * as tonal from '../../examples/button/tonal.tsx?example'
+import * as variants from '../../examples/button/variants.tsx?example'
+
+Buttons communicate actions that people can take. They are typically placed throughout the UI, in places like:
+
+- [Dialogs](/components/dialog#headline-content-and-actions)
+- [Forms](/get-started/react-aria#forms)
+- [Cards](/components/card)
+- [Toolbars](/components/toolbar)
+
+Compared with the other buttons:
+
+- **Icon button:** For a button with an icon and no label, use an [icon button](/components/icon-button). It has no visible text, so it needs an `aria-label`.
+- **FAB:** For the most important action on a screen, use a [FAB](/components/fab).
+- **Split button:** For an action with a menu of related options, use a [split button](/components/split-button).
+- **Button group:** To select one of several options, or to group related actions, use a [button group](/components/button-group).
+
+```tsx
+import { Button } from '@material-web/react'
+```
+
+## Basic button
+
+Write the label as the button's children.
+
+<Example {...basic} />
+
+The `Button` comes in five variants: `elevated`, `filled` (the default), `tonal`, `outlined` and `text`.
+
+<Example {...variants} />
+
+Each variant is shown below enabled, disabled with `isDisabled`, and as a [link](#links) with `elementType="a"`. A disabled button cannot be pressed or focused.
+
+### Elevated button
+
+An elevated button is a tonal button with a shadow. To avoid overusing shadows, use it only when the button needs visual separation from a visually prominent background.
+
+<Example {...elevated} />
+
+### Filled button
+
+A filled button has the most visual impact after the [FAB](/components/fab). Use it for important, final actions that complete a flow, such as Save, Join now or Confirm.
+
+<Example {...filled} />
+
+### Tonal button
+
+A tonal button suits a lower-priority action that needs slightly more emphasis than an outline gives, such as Next in an onboarding flow.
+
+<Example {...tonal} />
+
+### Outlined button
+
+An outlined button is for medium-emphasis actions: ones that are important, but are not the primary action in a product.
+
+<Example {...outlined} />
+
+### Text button
+
+A text button is for the lowest-priority actions, especially when presenting several options, such as the actions of a [dialog](/components/dialog#headline-content-and-actions). It has no container, and it cannot be a [toggle](#toggle-button).
+
+<Example {...text} />
+
+## Icons
+
+Write an icon as a child, before or after the label. An [`Icon`](/components/icon) is sized to the button and is decorative, so the label still names the button.
+
+<Example {...icon} />
+
+Any icon works: `Icon`, an icon from an SVG library, or your own component. Give an icon that is not an `Icon` the size listed under [Sizes](#sizes). See [Composition](/get-started/composition#icons).
+
+## Handling presses
+
+Handle a press with `onPress`, in place of `onClick`. It is called for a press with a mouse, a touch, the keyboard or assistive technology, and receives an event whose `pointerType` tells them apart.
+
+<Example {...press} />
+
+The button takes the rest of React Aria's [press events](https://react-aria.adobe.com/Button#events) too, such as `onPressStart` and `onPressEnd`. The Props tab lists them under React Aria props.
+
+## Toggle button
+
+Set `isSelectable` to make a toggle button. Control its selection with `isSelected` and `onChange`, or set its initial state with `defaultSelected`. A selected button changes its colors and swaps its shape: a round button becomes square, and a square one round.
+
+<Example {...toggle} />
+
+- Without `isSelectable`, `isSelected`, `defaultSelected` and `onChange` are type errors.
+- A `text` button cannot be a toggle.
+- To let people choose among several toggle buttons, put them in a [button group](/components/button-group).
+
+## Loading
+
+Set `isPending` while the button's action is in progress, as with React Aria's [pending](https://react-aria.adobe.com/Button#pending) buttons. A pending button shows a [loading indicator](/components/loading-indicator) in place of its label and icons, sized to the button. It keeps its size and colors, so the layout around it does not shift.
+
+A [toggle button](#toggle-button) can be pending too, such as while a change to its selection is saved. In this example, Follow is pending after a press, and shows its new state once the change is saved.
+
+<Example {...loading} />
+
+- **Presses:** A pending button ignores presses and shows no hover. As a submit button, it does not submit its form, and as a [link](#links), it does not navigate.
+- **Selection:** A pending toggle button keeps its selection, and the colors and shape that show it. Pressing it does not toggle it.
+- **Focus:** It keeps the focus, so a keyboard user stays on it while the action runs.
+- **Children:** Its children are hidden while it is pending. See [Pending content](#pending-content).
+
+## Color
+
+A variant sets the button's colors. To use other [color roles](/theme/color#color-roles), pass their classes in `className`: a container color, and the on-color of that container for the label. They replace the variant's own colors, and the hover, focus and press states follow the label color.
+
+<Example {...colors} />
+
+## Sizes
+
+For larger or smaller buttons, set `size` to `xs`, `s` (the default), `m`, `l` or `xl`. The label, the padding and an `Icon` child grow with the button.
+
+| Size | Height | Icon |
+| ---- | ------ | ---- |
+| `xs` | 32dp   | 20dp |
+| `s`  | 40dp   | 20dp |
+| `m`  | 56dp   | 24dp |
+| `l`  | 96dp   | 32dp |
+| `xl` | 136dp  | 40dp |
+
+<Example {...sizes} />
+
+## Shapes
+
+Set `shape` to `round` (the default) or `square`. With `hasShapeMorph`, the corners tighten while the button is pressed. Press and hold the last two buttons to see it.
+
+<Example {...shapes} />
+
+## Rendering non-native buttons
+
+Set `elementType` to render the button as an element other than a `<button>`. The element gets the `button` role and a tab stop, and Space or Enter presses it as on a native button.
+
+```tsx
+<Button elementType="div" onPress={save}>
+  Save
+</Button>
+```
+
+### Links
+
+Set `elementType="a"` to render the button as a link, with `href`, `target` and `rel`. The browser follows it as a native link, without a client-side router. To follow it through a router, see [Third-party routing library](#third-party-routing-library).
+
+<Example {...link} />
+
+## Third-party routing library
+
+The browser follows a [link](#links) button with a full page load. To navigate with a client-side router instead, call the router in `onClick`, which receives the browser's click event. Leave a click that opens a new tab or window to the browser. With React Router:
+
+```tsx
+import { Button } from '@material-web/react'
+import type { ReactNode } from 'react'
+import { useHref, useNavigate } from 'react-router'
+
+function ButtonLink({ to, children }: { to: string; children: ReactNode }) {
+  const navigate = useNavigate()
+  return (
+    <Button
+      elementType="a"
+      href={useHref(to)}
+      onClick={(event) => {
+        // A click with a modifier key, or with another mouse button, stays the browser's.
+        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+          return
+        event.preventDefault()
+        navigate(to)
+      }}
+    >
+      {children}
+    </Button>
+  )
+}
+```
+
+> **Note:** `RouterProvider` does not route a button's `href`. It routes the links of items, such as a `ListItem` or a `Tab`. See [Routing](/get-started/react-aria#routing).
+
+## File upload
+
+To choose files with a button, wrap it in React Aria's [`FileTrigger`](https://react-aria.adobe.com/FileTrigger), which opens the browser's file picker on a press. Read the chosen files in `onSelect`. Set `allowsMultiple` to accept several files, and `acceptedFileTypes` to limit their types.
+
+<Example {...fileUpload} />
+
+## Customization
+
+Pass classes in `className` to restyle one button. A class of yours replaces the button's own class for the same property. See [Styling](/get-started/styling) for the classes, the states and the theme.
+
+<Example {...custom} />
+
+- **Density:** Add `density-1`, `density-2` or `density-3` to the button, or to an element around it. Each step makes the button 4dp shorter. See [Density](/get-started/styling#density).
+- **States:** Style a state with its variant, such as `hover:`, `pressed:` or `selected:`. See [States](/get-started/styling#states).
+- **Functions:** `className`, `style` and the children can be functions of the button's state: `isHovered`, `isPressed`, `isFocused`, `isFocusVisible`, `isDisabled` and `isPending`. A toggle also has `isSelected`. See [Children as a function](/get-started/composition#children-as-a-function).
+- **Every button:** To restyle all the buttons at once, change the [theme](/get-started/styling#theme).
+
+### Complex button
+
+For a button that the variants do not cover, build your own from React Aria's [`Button`](https://react-aria.adobe.com/Button). Position it with `relative` and add a [`Ripple`](/components/ripple) as its direct child, for the hover and focus layer and the press ripple. Add the [`focus-ring`](/theme/state#focus-ring) class for the focus indicator.
+
+<Example {...complex} />
+
+To give another element the look of a `Button`, call the exported `buttonStyles` with a `variant`, a `size` and a `shape`. See [Custom components](/get-started/styling#custom-components).
+
+## Limitations
+
+### Link role
+
+A button rendered as an `<a>` keeps the `button` role, so assistive technology announces it as a button and not as a link. A disabled one has no `href`. Where the role matters, render a link of your own and give it the look of a button with `buttonStyles`. See [Custom components](/get-started/styling#custom-components).
+
+### Disabled buttons
+
+A disabled button cannot be focused and reports no hover, so it shows no [tooltip](/components/tooltip#opening-and-closing).
+
+### Pending content
+
+A pending button shows only its loading indicator. Children written for the pending state, such as a Saving… label, are hidden too. For a button that shows other content while pending, build a [complex button](#complex-button).
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/buttons/accessibility#cd56063f-369f-4af3-8ac5-e0c5db6dca95) what people should be able to do with assistive technology:
+
+- Use a button to perform an action
+- Navigate to and activate a button
+
+### Interaction and style
+
+- **States:** Hovering shows a state layer, and a press shows a ripple. Keyboard focus shows a [focus ring](/theme/accessibility#focus-ring), and a press with a mouse or touch does not.
+- **Touch target:** Every size has a [touch target](/theme/accessibility#touch-targets) of at least 48dp, an extra small button included.
+- **Color contrast:** An enabled button [needs](https://m3.material.io/components/buttons/accessibility#6f9555e3-e887-4f98-90fc-1bf76159f9a3) 3:1 contrast with the background: its container for the `elevated`, `filled` and `tonal` variants, and its label for `outlined` and `text`. Keep that contrast when you change its [colors](#color).
+- **Text size:** A label stays on one line, and the button grows wider with it. Keep labels concise, so that buttons still fit when people [enlarge the text](https://m3.material.io/components/buttons/accessibility#179aecad-138e-435c-b1dc-105d3ccc3e04).
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), the changes of shape and color are instant.
+- **Forced colors:** In [forced colors](/theme/accessibility#forced-colors), every variant but `text` keeps an edge, and a selected toggle button is filled with the system's highlight color.
+
+### Focus
+
+- A disabled button cannot be focused.
+- A pending button keeps the focus, so a keyboard user stays on it while the action runs.
+
+### Keyboard navigation
+
+| Keys           | Actions                                                         |
+| -------------- | --------------------------------------------------------------- |
+| Tab            | Move the focus to a button                                      |
+| Space or Enter | Press the focused button, or select or deselect a toggle button |
+
+### Labeling elements
+
+- The label names the button. Material [advises](https://m3.material.io/components/buttons/accessibility#9a713bc7-4de9-4e18-ab0b-1ab2ce3561b7) a name that matches the visible text, such as Done, Send or Reply. To add context, set an `aria-label` that includes the visible text.
+- For a button with an icon alone, use an [icon button](/components/icon-button) with an `aria-label`.
+- A toggle button reports whether it is selected with `aria-pressed`.
+- A pending button reports that it is unavailable with `aria-disabled`. Its loading indicator is hidden from assistive technology, so the label still names the button.
+- When a focused button becomes pending, or stops being pending, screen readers announce it.
+
+## Props
+
+<PropsTable {...api} />

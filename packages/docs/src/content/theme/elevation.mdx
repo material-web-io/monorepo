@@ -1,0 +1,88 @@
+import * as levels from '../../examples/theme/elevation-levels.tsx?example'
+
+Use `shadow-elevation-0` to `shadow-elevation-5` for the shadows of the six Material 3 [elevation](https://m3.material.io/styles/elevation/overview) levels. Each level is also a custom property, such as `var(--md-sys-elevation-level2)`, and all of them take their color from one color role.
+
+## Elevation levels
+
+The theme's shadows follow Material's [elevation levels](https://m3.material.io/styles/elevation/tokens): six levels, each a distance above the surface behind it. A higher level has a larger and softer shadow.
+
+<Example {...levels} showCode={false} />
+
+| Class and token                                       | Height | Resting level of                                                              |
+| ----------------------------------------------------- | ------ | ----------------------------------------------------------------------------- |
+| `shadow-elevation-0`<br />`--md-sys-elevation-level0` | 0dp    | Filled, tonal and outlined buttons, filled and outlined cards, lists and tabs |
+| `shadow-elevation-1`<br />`--md-sys-elevation-level1` | 1dp    | Elevated buttons, cards and chips, and modal sheets                           |
+| `shadow-elevation-2`<br />`--md-sys-elevation-level2` | 3dp    | Menus, rich tooltips, toolbars and scrolled app bars                          |
+| `shadow-elevation-3`<br />`--md-sys-elevation-level3` | 6dp    | FABs, dialogs, search, and date and time pickers                              |
+| `shadow-elevation-4`<br />`--md-sys-elevation-level4` | 8dp    | Not a resting level                                                           |
+| `shadow-elevation-5`<br />`--md-sys-elevation-level5` | 12dp   | Not a resting level                                                           |
+
+Material [keeps an element's resting state](https://m3.material.io/styles/elevation/applying-elevation#874e225d-20d0-4fa3-8ffc-916ce4c148b6) on levels 0 to 3, and reserves levels 4 and 5 for states such as hover and dragged.
+
+An elevation class is one of Tailwind's [box shadow utilities](https://tailwindcss.com/docs/box-shadow), and is used like any other:
+
+- **Surface color:** Material [shows elevation with color first](https://m3.material.io/styles/elevation/applying-elevation#8b0ddbc5-201f-441e-93e7-ea9daf260da1): surfaces are told apart by their tone. Give a raised surface a [surface container role](/theme/color#surface-roles), and add a shadow where it needs more separation from what is behind it, or to encourage interaction.
+- **States:** Add a [state variant](/theme/state#state-variants) for another level in a state, as in `hover:shadow-elevation-2`. Material usually [raises a component by one level](https://m3.material.io/styles/elevation/tokens#df721a00-888e-4c5e-bfe1-5d905f167aaa) when it is hovered or focused.
+- **Transitions:** To animate the change, add a [transition preset](/theme/motion#transition-presets), such as `transition-color-shadow`, or Tailwind's [`transition-shadow`](https://tailwindcss.com/docs/transition-property) with one of the theme's [durations and easings](/theme/motion#easing-and-duration).
+- **Tailwind's shadows:** Tailwind's own shadows, such as `shadow-md`, are unchanged. Use them next to the levels.
+- **Shadow color:** Tailwind's [shadow color](https://tailwindcss.com/docs/box-shadow#setting-the-shadow-color) classes, such as `shadow-primary`, do not re-color a level. To re-color the levels, see [Shadow color](/theme/elevation#shadow-color).
+- **Your own CSS:** Apply a level with Tailwind's [`@apply`](https://tailwindcss.com/docs/functions-and-directives#apply-directive), as in `@apply shadow-elevation-2`, or use its custom property, as in `box-shadow: var(--md-sys-elevation-level2)`.
+- **Merged classes:** [tailwind-merge](https://github.com/dcastil/tailwind-merge) does not know the levels, and keeps a level next to one of Tailwind's shadows, such as `shadow-none`. To merge them, use the [`tv` or the `twMerge`](/get-started/styling#custom-components) that `@material-web/react` exports, where the later class replaces the earlier one.
+
+## Forced colors
+
+In forced colors mode the browser drops shadows, and fills with them, which leaves an elevated container with no edge. Add `forced-colors:container-border` to give it one:
+
+```html
+<div class="bg-surface-container-low shadow-elevation-1 forced-colors:container-border"></div>
+```
+
+See [Accessibility](/theme/accessibility#forced-colors).
+
+## Custom elevation
+
+Every level, and the color of its shadows, is a custom property, so your own CSS can set it after the import. A value set before the import is replaced by the theme's.
+
+| Token and theme variable                                | Default                                                         | Components that use it, such as                                 |
+| ------------------------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------------------- |
+| `--md-sys-color-shadow`<br />`--color-shadow`           | Black, the neutral palette's [tone 0](/theme/color#role-tokens) | Every component with a shadow                                   |
+| `--md-sys-elevation-level0`<br />`--shadow-elevation-0` | `none`                                                          | None                                                            |
+| `--md-sys-elevation-level1`<br />`--shadow-elevation-1` | `0 1px 2px 0`, `0 1px 3px 1px`                                  | Elevated button, card and chip, bottom sheet, modal side sheet  |
+| `--md-sys-elevation-level2`<br />`--shadow-elevation-2` | `0 1px 2px 0`, `0 2px 6px 2px`                                  | Menu, rich tooltip, floating toolbar, a hovered elevated button |
+| `--md-sys-elevation-level3`<br />`--shadow-elevation-3` | `0 1px 3px 0`, `0 4px 8px 3px`                                  | FAB, FAB menu, snackbar                                         |
+| `--md-sys-elevation-level4`<br />`--shadow-elevation-4` | `0 2px 3px 0`, `0 6px 10px 4px`                                 | A hovered FAB, a dragged list item                              |
+| `--md-sys-elevation-level5`<br />`--shadow-elevation-5` | `0 4px 4px 0`, `0 8px 12px 6px`                                 | None                                                            |
+
+Under each token is its Tailwind [theme variable](https://tailwindcss.com/docs/theme), which gives the token its classes. In your own CSS, read the token, as in `var(--md-sys-elevation-level2)`: a theme variable has the root's value, and does not follow a token set on an element.
+
+### Shadow color
+
+A level's shadows are in the [`shadow` color role](/theme/color#other-roles). Set `--md-sys-color-shadow` on the root to re-color the shadows of every level:
+
+```css
+@import 'tailwindcss';
+@import '@material-web/tailwind';
+
+:root {
+  --md-sys-color-shadow: #1a237e;
+}
+```
+
+Set the color on the root. A color set on another element does not reach the levels.
+
+### Level tokens
+
+Each level is two shadows in the shadow color, a key shadow at 30% and an ambient shadow at 15%. The [table above](/theme/elevation#custom-elevation) lists the offsets, the blur and the spread of both. To change a level, set its token to any `box-shadow` value:
+
+```css
+:root {
+  --md-sys-elevation-level1: 0 1px 2px
+    color-mix(in srgb, var(--md-sys-color-shadow) 20%, transparent);
+}
+```
+
+A level you set changes every class and every component that uses it.
+
+- **One part of the page:** Set a level token on an element, in place of the root, to change the shadows inside it only.
+- **One component:** Pass an elevation class in the component's [`className`](/get-started/styling#classes), as in `<Card className="shadow-elevation-2">`.
+- **Default levels:** Material [advises against](https://m3.material.io/styles/elevation/overview#6d651ba6-b8e4-4f37-9224-49fabf16731a) changing the default elevation of its components, and [recommends](https://m3.material.io/styles/elevation/applying-elevation#93fa8972-65fe-4073-9f03-7de12d47db8d) a small number of levels in a product.

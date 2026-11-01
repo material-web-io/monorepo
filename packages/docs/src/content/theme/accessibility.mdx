@@ -1,0 +1,83 @@
+import * as touchTarget from '../../examples/theme/touch-target.tsx?example'
+
+Use the theme's accessibility classes for a target large enough to press, an edge and a selection that survive forced colors, and color pairs that hold at raised contrast. The theme's motion stops when asked with no class at all, and one class shows the focus ring.
+
+| For                                                 | Use                                                                    |
+| --------------------------------------------------- | ---------------------------------------------------------------------- |
+| A 48dp target on a smaller control                  | [`touch-target`](/theme/accessibility#touch-targets)                   |
+| An edge for a container in forced colors            | [`forced-colors:container-border`](/theme/accessibility#forced-colors) |
+| A fill for a selected control in forced colors      | [`forced-colors:selected-fill`](/theme/accessibility#forced-colors)    |
+| A color pair that holds at medium and high contrast | [`contrast-raised:`](/theme/accessibility#raised-contrast)             |
+| Motion that stops when asked                        | The theme's [durations](/theme/accessibility#reduced-motion)           |
+| A visible keyboard focus                            | [`focus-ring`](/theme/accessibility#focus-ring)                        |
+
+## Touch targets
+
+`touch-target` extends a small control's hit area to the 48dp [Material minimum](https://m3.material.io/foundations/designing/structure#b421e522-35a6-47cd-bfc6-bf94cbacf7bb) without changing its visual size. Put it on a positioned element, `relative touch-target`. A control already 48dp or larger is unaffected.
+
+The 24dp button below can be pressed from anywhere in the dashed circle, which is shown here to mark the target.
+
+<Example {...touchTarget} />
+
+- **Spacing:** The targets of two small controls overlap where the controls are less than 48dp apart, center to center. Material [recommends](https://m3.material.io/foundations/designing/structure) 8dp or more of space between targets.
+- **Clipping:** The target reaches past the control's edge, so `overflow-hidden` on the control cuts it back to the control's size.
+- **Pseudo-element:** The target is the control's `::after`. For a decoration of your own on the same control, use `before:`.
+- **Density:** The target stays 48dp on a control made smaller by a [density](/theme/spacing#density).
+- **Components:** The library's small controls, such as a `Checkbox`, a `Switch` or an extra small `IconButton`, have the class already.
+
+## Forced colors
+
+In forced colors mode, Windows' contrast themes, the browser drops backgrounds and shadows and paints in the system colors. Use two utilities to keep what would be lost, each with Tailwind's [`forced-colors:` variant](https://tailwindcss.com/docs/hover-focus-and-other-states#forced-colors).
+
+| Class                            | Use                                                                           | Draws                                                                   |
+| -------------------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `forced-colors:container-border` | A container, which has no edge left without its fill and shadow               | A 1dp border in the system's button text color, gray text when disabled |
+| `forced-colors:selected-fill`    | A selected toggle, or a checkbox's box, which would otherwise look unselected | A fill in the system highlight colors, the gray ones when disabled      |
+
+```html
+<div class="bg-surface-container-low shadow-elevation-1 forced-colors:container-border"></div>
+<button
+  aria-pressed="true"
+  class="aria-pressed:bg-secondary-container forced-colors:aria-pressed:selected-fill"
+></button>
+```
+
+- **Border width:** The border of `container-border` takes room, 1dp on each side of the container.
+- **Disabled:** Both classes follow the element's `disabled:` variant, which matches a disabled [React Aria](https://react-aria.adobe.com/) component with [React Aria's plugin](/theme/state#state-variants).
+
+### System colors
+
+Use the system colors as colors too, for an element that keeps a border or a fill in that mode and only needs it recolored, as in `forced-colors:border-gray-text`. Each is a Tailwind [theme variable](https://tailwindcss.com/docs/theme), so its name works after any color utility. See [Color](/theme/color#forced-colors).
+
+| Color and theme variable                       | System color    | Use                                |
+| ---------------------------------------------- | --------------- | ---------------------------------- |
+| `canvas`<br />`--color-canvas`                 | `Canvas`        | The background of the page         |
+| `canvas-text`<br />`--color-canvas-text`       | `CanvasText`    | Text on the page                   |
+| `gray-text`<br />`--color-gray-text`           | `GrayText`      | Disabled text                      |
+| `highlight`<br />`--color-highlight`           | `Highlight`     | The background of what is selected |
+| `highlight-text`<br />`--color-highlight-text` | `HighlightText` | The text of what is selected       |
+
+These five are the only tokens of the theme's accessibility classes. The focus ring's are under [State](/theme/state#custom-states), and the durations that reduced motion sets under [Motion](/theme/motion#custom-motion).
+
+## Raised contrast
+
+Set `data-contrast="medium"` or `"high"` to raise the contrast of every color role. See [Color](/theme/color#contrast). Use the `contrast-raised:` variant to style an element inside such a scope, for a role pair that holds 3:1 at standard contrast only, such as a primary icon on secondary-container: `contrast-raised:text-on-secondary-container`.
+
+```html
+<span
+  class="bg-secondary-container text-primary contrast-raised:text-on-secondary-container"
+></span>
+```
+
+- **Scope:** The variant matches the element that has `data-contrast`, and every element inside it.
+- **System setting:** The contrast level comes from the attribute alone. To style for the system's contrast setting, use Tailwind's [`contrast-more:` variant](https://tailwindcss.com/docs/hover-focus-and-other-states#prefers-contrast).
+
+## Reduced motion
+
+With `prefers-reduced-motion`, every duration token, a spring's too, is next to nothing. Whatever runs on the theme's [motion](/theme/motion) tokens is instant, with no extra class.
+
+A transition on one of Tailwind's own [durations](https://tailwindcss.com/docs/transition-duration) still runs, and so does a custom duration set outside the media query. See [Motion](/theme/motion#reduced-motion).
+
+## Focus ring
+
+Add `focus-ring` to show the Material [focus indicator](https://m3.material.io/foundations/interaction/states/applying-states#9edb181a-ed5e-4961-b3d0-cae33125a4a9) for keyboard focus alone. See [State](/theme/state#focus-ring).

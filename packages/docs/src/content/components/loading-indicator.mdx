@@ -1,0 +1,122 @@
+import api from 'virtual:api/LoadingIndicator'
+import * as basic from '../../examples/loading-indicator/basic.tsx?example'
+import * as centered from '../../examples/loading-indicator/centered.tsx?example'
+import * as color from '../../examples/loading-indicator/color.tsx?example'
+import * as contained from '../../examples/loading-indicator/contained.tsx?example'
+import * as delay from '../../examples/loading-indicator/delay.tsx?example'
+import * as inButton from '../../examples/loading-indicator/in-button.tsx?example'
+import * as labelled from '../../examples/loading-indicator/labelled.tsx?example'
+import * as overContent from '../../examples/loading-indicator/over-content.tsx?example'
+import * as sizes from '../../examples/loading-indicator/sizes.tsx?example'
+
+Loading indicators show that an activity is in progress during a short wait. Use one when progress cannot be detected, or when the length of the activity does not need to be shown. For a short process, between 200ms and 5s, prefer it to a circular [progress indicator](/components/progress-indicator).
+
+```tsx
+import { LoadingIndicator } from '@material-web/react'
+```
+
+## Basic loading indicator
+
+The indicator animates for as long as it is rendered: render it while the activity is in progress, and remove it when the activity ends. Name it with an `aria-label`.
+
+<Example {...basic} />
+
+It is always indeterminate, so it takes no `value`, `minValue`, `maxValue`, `isIndeterminate`, `formatOptions` or `valueLabel`. To show how far a process has come, use a [progress indicator](/components/progress-indicator).
+
+The `LoadingIndicator` comes in two configurations. Without a container (the default), it is for use directly on a surface. Set `isContained` to show the indicator in a round container, for use over other content.
+
+<Example {...contained} />
+
+### Uncontained loading indicator
+
+While a page or a container loads, center the indicator on it. Directly on a surface, the indicator needs no container.
+
+<Example {...centered} />
+
+### Contained loading indicator
+
+Over other content, such as content that is being refreshed, set `isContained` so that the indicator stands out from the content behind it. Use the container with pull-to-refresh.
+
+<Example {...overContent} />
+
+## Label
+
+Name the indicator with `aria-label` or `aria-labelledby`, or with a `Label` from `react-aria-components` among its children. Write a label that describes its purpose, such as Loading news article or Refreshing page.
+
+Children are rendered inside the indicator, which cuts off what reaches past its box. To show a label, write it beside the indicator and name the indicator by it with `aria-labelledby`.
+
+<Example {...labelled} />
+
+## Color
+
+The indicator takes the text color: `primary`, or `on-primary-container` in its `primary-container` container. To use other [color roles](/theme/color#color-roles), pass their classes in `className`: a text color for the indicator, and a background color for the container.
+
+<Example {...color} />
+
+## Sizes
+
+Set `size` in dp, from 24 to 240. The default is 48, and a size outside the range is brought back to its nearest end. The container scales with the indicator. The size does not grow or shrink with the text size around it.
+
+To size the indicators inside an element, leave `size` out and set the `--loading-indicator-size` custom property, a plain number, on that element.
+
+<Example {...sizes} />
+
+## In a button
+
+In a button whose action takes a few seconds, give the indicator the label's color with `className="text-current"`.
+
+The button's label already says what is happening, so hide the indicator from assistive technology by wrapping it in an element with `aria-hidden`, and still give the indicator an `aria-label`.
+
+> **Note:** An `aria-hidden` set on the indicator itself is not applied.
+
+<Example {...inButton} />
+
+While the button's action is in progress, set its `isPending` instead: a pending button shows a loading indicator of its own, alone, and ignores presses. See [Loading](/components/button#loading).
+
+## Delaying appearance
+
+A loading indicator is for a wait of 200ms or more. To keep it from flashing on an activity that ends sooner, render it only once the activity has run for that long. In this example, the indicator appears 200ms after a load starts, so the shorter load never shows it.
+
+<Example {...delay} />
+
+## Customization
+
+Pass classes in `className` to restyle one indicator. A class of yours replaces the indicator's own class for the same property. See [Styling](/get-started/styling) for the classes and the theme.
+
+- **Size:** Set `size`, or the `--loading-indicator-size` custom property on an element around the indicators, as in [Sizes](#sizes).
+- **Color:** Pass a text color class, and a background color class on a contained indicator, as in [Color](#color).
+- **Functions:** `className`, `style` and `children` can be functions of the indicator's state, in which `isIndeterminate` is `true` and `percentage` and `valueText` are undefined. See [Children as a function](/get-started/composition#children-as-a-function).
+- **Every indicator:** To restyle all the indicators at once, change the [theme](/get-started/styling#theme).
+
+## Limitations
+
+### Hidden indicators
+
+The indicator does not apply an `aria-hidden` of its own. To hide it from assistive technology, set `aria-hidden` on an element around it, as [in a button](#in-a-button).
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/loading-indicator/accessibility#aa327ba8-f71a-44bb-a318-32990dd05fc3) what people should be able to do with assistive technology:
+
+- Navigate to the loading indicator
+- Understand what progress the indicator is communicating
+- Initiate a content refresh without relying on a gesture
+
+### Interaction and style
+
+- **Color contrast:** The indicator [needs](https://m3.material.io/components/loading-indicator/accessibility#91356d89-a3c0-4c88-8af9-dbf582b2bb0d) 3:1 contrast with the surface behind it, and the container does not. Keep that contrast when you change its [colors](#color), and against the button's container when it is [in a button](#in-a-button).
+- **Motion:** The indicator keeps moving with [reduced motion](/theme/accessibility#reduced-motion), as its motion is the only sign of the activity.
+- **Forced colors:** In [forced colors](/theme/accessibility#forced-colors), the indicator is drawn in the system's text color.
+- **Refreshing:** A swipe alone, such as a pull to refresh, is not accessible. Give people a way to refresh with a single pointer too, such as a refresh button in the [app bar](/components/app-bar), in a menu or beside the content.
+
+### Labeling elements
+
+- The indicator has the `progressbar` role. It is not a tab stop, and it reports no value.
+- The indicator needs a name: set `aria-label` or `aria-labelledby`, or put a `Label` among its children. Material [advises](https://m3.material.io/components/loading-indicator/accessibility#ea6606cf-2ccf-4388-ad2e-38f64d846673) a name that says what is loading, such as Loading news article or Refreshing page.
+- To hide the indicator from assistive technology, set `aria-hidden` on an element around it.
+
+## Props
+
+<PropsTable {...api} />

@@ -1,0 +1,345 @@
+import timePickerApi from 'virtual:api/TimePicker'
+import { TimePickerDialogSlots, TimePickerHeaderSlots } from '../../slot-pictures/time-picker.tsx'
+import timePickerContentApi from 'virtual:api/TimePickerContent'
+import timePickerDialApi from 'virtual:api/TimePickerDial'
+import timePickerDialogApi from 'virtual:api/TimePickerDialog'
+import timePickerHeaderApi from 'virtual:api/TimePickerHeader'
+import timePickerInputApi from 'virtual:api/TimePickerInput'
+import timePickerModeToggleApi from 'virtual:api/TimePickerModeToggle'
+import timePickerPeriodSelectorApi from 'virtual:api/TimePickerPeriodSelector'
+import * as basic from '../../examples/time-picker/basic.tsx?example'
+import * as controlled from '../../examples/time-picker/controlled.tsx?example'
+import * as empty from '../../examples/time-picker/empty.tsx?example'
+import * as formProps from '../../examples/time-picker/form-props.tsx?example'
+import * as horizontal from '../../examples/time-picker/horizontal.tsx?example'
+import * as input from '../../examples/time-picker/input.tsx?example'
+import * as twentyFourHour from '../../examples/time-picker/twenty-four-hour.tsx?example'
+
+Time pickers let people select a time, on a dial or by typing it. Compose a `TimePicker` from its parts. The picker has no built-in text, apart from what the locale provides: write the text of each part yourself, in your language.
+
+For a time typed without a dial, use the [time input](#time-input) alone.
+
+```tsx
+import {
+  DialogTrigger,
+  TimePicker,
+  TimePickerContent,
+  TimePickerDial,
+  TimePickerDialog,
+  TimePickerHeader,
+  TimePickerInput,
+  TimePickerModeToggle,
+  TimePickerPeriodSelector,
+} from '@material-web/react'
+import { Time } from '@internationalized/date'
+import { Heading } from 'react-aria-components'
+```
+
+## Basic time picker
+
+Write the parts of a `TimePicker` as its children, with their text, and name the picker with an `aria-label`. A picker is shown where it is written, and does not open on its own: this one is in a `TimePickerDialog`, as a [modal time picker](#modal-time-picker).
+
+<Example {...basic} />
+
+A `TimePicker` is shown where it is written, as the [controlled picker](#controlled) is, or in a dialog. It has two variants, the dial and the [input](#time-input): show both with a mode toggle between them, or the input alone.
+
+## Composition
+
+A `TimePicker` is composed of these parts. It holds a `TimePickerHeader` and, under it, a `TimePickerContent`, which hold the others:
+
+| Part                          | In                  | Use                                                |
+| ----------------------------- | ------------------- | -------------------------------------------------- |
+| `TimePickerHeader`            | `TimePicker`        | The header                                         |
+| `Heading` with `slot="title"` | `TimePickerHeader`  | The title, which names the dialog the picker is in |
+| `TimePickerContent`           | `TimePicker`        | The content, under the header                      |
+| `TimePickerInput`             | `TimePickerContent` | The [hour and the minute](#hour-and-minute)        |
+| `TimePickerPeriodSelector`    | `TimePickerContent` | [AM and PM](#period-selector)                      |
+| `TimePickerDial`              | `TimePickerContent` | The [dial](#dial)                                  |
+
+Leave out a part to do without it. Pass a function as the picker's children to write text that follows the display mode and the selection, such as the title. It is called with `{ displayMode, selection }`.
+
+```tsx
+const parts = ({ displayMode, selection }: TimePickerRenderProps) => (
+  <>
+    <TimePickerHeader>
+      <Heading slot="title">{displayMode === 'picker' ? 'Select time' : 'Enter time'}</Heading>
+    </TimePickerHeader>
+    <TimePickerContent>
+      <TimePickerInput hourLabel="Hour" minuteLabel="Minute" />
+      <TimePickerPeriodSelector aria-label="Select AM or PM" />
+      <TimePickerDial aria-label={selection === 'hour' ? 'Select hour' : 'Select minute'} />
+    </TimePickerContent>
+  </>
+)
+```
+
+Set the picker's props on the `TimePicker`. They are those of React Aria's [TimeField](https://react-aria.adobe.com/TimeField#api), except `minValue`, `maxValue` and `granularity`: a picker sets the hour and the minute.
+
+## Modal time picker
+
+To show the picker in a dialog, put it in a `TimePickerDialog`. Pass the dialog's buttons as `confirmButton` and `dismissButton`, and a `TimePickerModeToggle` as `modeToggle`, which the dialog places at the start of its buttons.
+
+Hold the display mode in your own state. Pass it as `displayMode` to the picker and to the mode toggle, and switch it in the toggle's `onPress`. The toggle shows a keyboard icon in `picker` mode and a clock icon in `input` mode.
+
+The picker reports every change through `onChange`. To keep the time unchanged until it is confirmed, hold the picked time in your own state and save it in the confirm button's `onPress`.
+
+```tsx
+const [time, setTime] = useState<TimeValue | null>(new Time(7, 0))
+const [picked, setPicked] = useState(time)
+const [displayMode, setDisplayMode] = useState<TimePickerDisplayMode>('picker')
+
+<DialogTrigger onOpenChange={(isOpen) => isOpen && setPicked(time)}>
+  <Button variant="outlined">Pick a time</Button>
+  <TimePickerDialog
+    modeToggle={
+      <TimePickerModeToggle
+        displayMode={displayMode}
+        onPress={() => setDisplayMode(displayMode === 'picker' ? 'input' : 'picker')}
+        aria-label={displayMode === 'picker' ? 'Switch to text input mode' : 'Switch to touch input mode'}
+      />
+    }
+    dismissButton={<Button variant="text" slot="close">Cancel</Button>}
+    confirmButton={
+      <Button variant="text" slot="close" isDisabled={!picked} onPress={() => setTime(picked)}>
+        OK
+      </Button>
+    }
+  >
+    <TimePicker aria-label="Time" value={picked} onChange={setPicked} displayMode={displayMode}>
+      {parts}
+    </TimePicker>
+  </TimePickerDialog>
+</DialogTrigger>
+```
+
+- As in a [date picker](/components/date-picker#modal-date-picker)'s dialog, a button with `slot="close"` closes the dialog after its own `onPress`. Escape and a press outside the dialog close it too. Set `isDismissable={false}` to keep a press outside from closing it, and `isKeyboardDismissDisabled` to keep Escape from closing it.
+- The dialog is laid out in the locale's direction. The hour is on the left of the minute in either direction.
+- In a window too short for the picker, such as a phone in landscape with the horizontal layout, the picker scrolls inside the dialog and the buttons stay under it.
+
+## Time input
+
+For a time that does not need a dial, show the input alone: use input mode and leave out the dial and the mode toggle.
+
+<Example {...input} />
+
+## Slots
+
+### Header
+
+<TimePickerHeaderSlots showLegend />
+
+| Slot    | Child       | Use                                                               |
+| ------- | ----------- | ----------------------------------------------------------------- |
+| `title` | A `Heading` | The picker's title. In a `TimePickerDialog`, it names the dialog. |
+
+### Dialog
+
+<TimePickerDialogSlots showLegend />
+
+| Slot    | Child                                               | Use                                                                         |
+| ------- | --------------------------------------------------- | --------------------------------------------------------------------------- |
+| `close` | Any button, such as the confirm and dismiss buttons | Closes the [`TimePickerDialog`](#modal-time-picker) after its own `onPress` |
+
+## Hour and minute
+
+`TimePickerInput` shows the hour and the minute, with the locale's separator between them.
+
+- A press focuses the hour or the minute. The arrow keys step it, digits type it and move on to the next when it is full, and Backspace clears it.
+- Clearing the hour or the minute leaves the value as it was until the whole time is cleared. While one is cleared, a selection on the dial fills it back and keeps the other as typed. On a 12-hour clock the period is never cleared, so the value stays.
+- The hour is written with two digits, as in `07`. Set `shouldForceLeadingZeros={false}` on the picker to write it as the locale does.
+
+### Input mode
+
+In input mode, the hour and the minute are text inputs. Set `hourLabel` and `minuteLabel` to label them. Without a label, an input is named with the locale's name for the field. The inputs are marked as required or invalid, and described, as the picker is.
+
+The inputs are edited as any text input, with these rules:
+
+- An input takes digits only, two at most: the decimal digits of any script, and the Han numerals of `hanidec`. A digit typed into a full input starts it over. Pasted text is taken whole.
+- Each number typed sets the time at once. A digit that would take the number past the clock's range is refused, and the text and the caret stay as they were.
+- The focus moves from the hour to the minute once the hour has two digits, or one digit from 2 to 9 on a 12-hour clock. Enter in the hour moves the focus to the minute too, and does not submit a form around the picker. Enter in the minute submits the form.
+- A cleared hour is midnight, or noon in the afternoon, and a cleared minute is zero.
+
+A time set by the dial or the period selector is written in the inputs in the locale's digits. Switching to input mode moves the focus to the input of the selection.
+
+## Dial
+
+`TimePickerDial` sets the hour or the minute, whichever is the [selection](#selection):
+
+- A press anywhere on the dial, on a number or off it, selects the nearest hour, or the nearest five minutes.
+- A drag follows the pointer and selects the hour, or the exact minute.
+- After the pointer selects an hour, the dial moves on to the minutes. After the keyboard selects one, the dial stays on the hours.
+
+With the keyboard, Tab moves the focus to the numbers, the arrow keys move along them, and Enter or Space selects one. Selecting the number that is already selected sets a time from the placeholder, or fills a cleared hour or minute back. Tab lands on the first number or the one last focused, not on the selected one.
+
+## Period selector
+
+`TimePickerPeriodSelector` selects AM or PM, written as the locale writes them. Selecting one moves the time forward or back by twelve hours. It shows nothing on a 24-hour clock.
+
+## Selection
+
+The selection is the part of the time that the dial sets: `hour` (the default) or `minute`. Focusing the hour or the minute selects it. Set the initial selection with `defaultSelection`, or control it with `selection` and `onSelectionChange`.
+
+## Controlled
+
+Pass times as [`Time`](https://react-aria.adobe.com/internationalized/date/Time) objects from [`@internationalized/date`](https://react-aria.adobe.com/internationalized/date/), in `value`, `defaultValue` and `placeholderValue`. A [`CalendarDateTime`](https://react-aria.adobe.com/internationalized/date/CalendarDateTime) or a [`ZonedDateTime`](https://react-aria.adobe.com/internationalized/date/ZonedDateTime) works too, and keeps its date. Set the initial time with `defaultValue`, or control it with `value` and `onChange`. `onChange` is called with the time when the dial is turned, the period is selected or a time is typed.
+
+This picker is controlled, and so is its [selection](#selection). Both are written under it.
+
+<Example {...controlled} />
+
+### No time
+
+With no time, the dial shows `placeholderValue`, which is midnight by default, and the hour and the minute show their placeholders. The first selection on the dial takes the rest of the time from `placeholderValue`, keeps an hour or a minute typed meanwhile, and calls `onChange` with the whole time. Typing calls `onChange` once both the hour and the minute are typed.
+
+<Example {...empty} />
+
+## Display mode
+
+The display mode is `picker` (the default), which shows the dial, or `input`, which hides the dial and shows the hour and the minute as text inputs, with `hourLabel` and `minuteLabel` under them. Set it with `displayMode`.
+
+A picker does not switch its display mode itself. To let people switch it, hold it in your own state and add a `TimePickerModeToggle`, as in the [modal time picker](#modal-time-picker).
+
+## Horizontal layout
+
+Set `layout` to `vertical` (the default) to put the dial under the time, or to `horizontal` to put it beside the time, as on a phone in landscape.
+
+<Example {...horizontal} />
+
+## Form props
+
+Set `isDisabled` to disable a picker: the time, the period selector and the dial are dimmed, and cannot be pressed, typed in or focused. Set `isReadOnly` to keep the time as it is: the hour and the minute can be focused, but typing and the period selector change nothing, and the numbers of the dial are dimmed and cannot be selected.
+
+<Example {...formProps} />
+
+- **Form:** Set `name` to include the picker in a form. The time is submitted as a string such as `07:30:00`. See [Forms](/get-started/react-aria#forms).
+- **Focus:** Set `autoFocus` to focus the hour when the picker is shown.
+
+## Validation
+
+Set `isRequired` to require a time, or pass a `validate` function for a rule of your own, as with React Aria's [TimeField](https://react-aria.adobe.com/TimeField#forms). A picker that fails either one blocks its form from being submitted, and is then marked as invalid. With `validationBehavior` set to `aria`, it is marked as invalid at once and the form is submitted. Set `isInvalid` to mark a picker as invalid yourself.
+
+> **Note:** An invalid picker is reported to assistive technology, and looks the same as a valid one. A picker has no `minValue` and no `maxValue`: check the time in `validate`.
+
+## 12-hour and 24-hour clocks
+
+The clock is the locale's, 12-hour or 24-hour. Set `hourCycle` to `12` or `24` to choose one yourself.
+
+Set `hourCycle={24}` for a 24-hour clock, which is the default in a locale that uses one. The dial then shows the hours 0 to 11 on the outer ring and 12 to 23 on the inner ring, and a press or a drag selects from one ring or the other by its distance from the center. The period selector shows nothing.
+
+<Example {...twentyFourHour} />
+
+## Text and locale
+
+Write the picker's text in the parts: the title, the labels under the inputs, and the `aria-label` of the dial, the period selector and the mode toggle. The rest follows the locale. To set a locale, wrap the picker in an [`I18nProvider`](https://react-aria.adobe.com/I18nProvider) from `react-aria-components`.
+
+- The clock is the locale's, 12 or 24 hours, unless you set `hourCycle`. So is the separator between the hour and the minute.
+- AM and PM are written as the locale writes them.
+- The dial's numbers are written in the locale's digits, with zero as `00`, and each is named as the locale counts hours and minutes, such as `7 hours`. In a locale that counts a 12-hour clock from 0, such as Japanese, the top number is 0, written `00`.
+
+## Customization
+
+Pass classes in `className` to restyle a picker, or one of its parts: a `TimePickerHeader`, a `TimePickerContent`, a `TimePickerPeriodSelector`, a `TimePickerDial` and a `TimePickerDialog` take `className` too. A `TimePickerInput` takes none. See [Styling](/get-started/styling) for the classes, the states and the theme.
+
+- **Parts:** Leave out a part to do without it, such as the dial and the mode toggle for a [time input](#time-input).
+- **Mode toggle:** A `TimePickerModeToggle` takes the props of an [icon button](/components/icon-button), such as its `variant`.
+- **Text:** Write the text of each part yourself. See [Text and locale](#text-and-locale).
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/time-pickers/accessibility#ae17466e-2011-4b8f-8f17-01fe8acd7c93) what people should be able to do with assistive technology:
+
+- Select or enter hours, minutes, seconds, or milliseconds
+- Choose between 12-hour or 24-hour clock format
+- Enter time selection directly using input fields
+
+### Interaction and style
+
+- **States:** The hour and minute boxes show a state layer on hover and on a press, and the period options a state layer on hover and a ripple on a press. Keyboard focus shows a [focus ring](/theme/accessibility#focus-ring) on the hour or the minute over the dial, on a period option and on a number of the dial, and a press on the hour or the minute does not. In input mode, the focused box is outlined 2dp instead.
+- **Touch target:** The mode toggle has a 48dp [touch target](/theme/accessibility#touch-targets), as Material [requires](https://m3.material.io/components/time-pickers/accessibility#11910b76-0544-4265-96d4-dd120873bc2b). The dial takes a press anywhere on its face, and selects the nearest number.
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), the display modes swap and the hand turns at once.
+- **Forced colors:** In [forced colors](/theme/accessibility#forced-colors), the hand, the selected period and the selected hour or minute are filled with the system's highlight color, and the dial and the hour and minute boxes keep an edge.
+- **Right to left:** In a right-to-left locale, the dialog is laid out right to left, with the period selector first, but the hour stays before the minute.
+- **Text input:** Material [requires](https://m3.material.io/components/time-pickers/accessibility#f254905e-e23a-4a2a-a120-dab68f07f6c3) a way to type the time as well as the dial. Pass a `TimePickerModeToggle` as the dialog's `modeToggle`, as in [Modal time picker](#modal-time-picker), or show the [time input](#time-input) alone.
+
+### Focus
+
+- Set `autoFocus` on the picker to focus the hour when it is shown, as Material [advises](https://m3.material.io/components/time-pickers/accessibility#6f98e5b4-e634-4094-92b0-44f4a10ff02b).
+- The dialog keeps the focus inside it while it is open, and gives it back to the button that opened it when it closes.
+- Tab moves through the hour, the minute, the period selector and the dial, in the order they are written. The period selector is one tab stop, on the selected period. The numbers of the dial are one tab stop too: Tab lands on the first number, at the top of the dial, or on the one last focused, not on the selected one.
+- Focusing the hour or the minute selects it, and the dial shows its numbers. Switching to input mode moves the focus to the input of the selection, and the dial cannot be reached while it is hidden.
+- The time, the period selector and the dial of a disabled picker cannot be focused. The hour and the minute of a read-only picker can.
+
+### Keyboard navigation
+
+| Keys                | Actions                                                                                                     |
+| ------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Tab                 | Move the focus to the next part of the picker                                                               |
+| Shift+Tab           | Move the focus to the previous part of the picker                                                           |
+| Up or Down arrow    | Step the focused hour or minute, over the dial                                                              |
+| Left or Right arrow | Move the focus between the hour and the minute over the dial, or to the previous or next number of the dial |
+| Arrow keys          | Select AM or PM in the period selector                                                                      |
+| Digits              | Type the focused hour or minute, and move on to the next once it is full                                    |
+| Backspace           | Clear the focused hour or minute                                                                            |
+| Space or Enter      | Select the focused number of the dial                                                                       |
+| Escape              | Close the dialog                                                                                            |
+
+- After the keyboard selects an hour, the dial stays on the hours.
+- Set `isKeyboardDismissDisabled` on the `TimePickerDialog` to keep Escape from closing it.
+- In input mode, the arrow keys move the caret, as in any text input. Enter in the hour moves the focus to the minute, and Enter in the minute submits the form around the picker.
+
+### Labeling elements
+
+- Name the picker with an `aria-label` or `aria-labelledby`.
+- The picker's title names the dialog. To name it otherwise, set an `aria-label` on the `TimePickerDialog`.
+- In picker mode, the hour and the minute are spin buttons named in the locale. In input mode, they are text inputs, as Material [advises](https://m3.material.io/components/time-pickers/accessibility#aa616098-3b1a-49a9-a6f0-ab195d58285b), named by `hourLabel` and `minuteLabel`, or by the locale's name for the field without a label. Both are marked as required or invalid, and described, as the picker is.
+- Name the dial with an `aria-label` that follows the selection, such as Select hour. Its numbers are a group of radio buttons: each is named as the locale counts it, such as 7 hours, and the selected one is checked.
+- Name the period selector with an `aria-label`. It is a group of radio buttons, AM and PM, named as the locale writes them.
+- Name the mode toggle, an [icon button](/components/icon-button), with an `aria-label` that follows the display mode, such as Switch to text input mode over the dial.
+
+## Props
+
+### TimePicker
+
+Does not take `minValue`, `maxValue` or `granularity`.
+
+<PropsTable {...timePickerApi} />
+
+### TimePickerDialog
+
+<PropsTable {...timePickerDialogApi} />
+
+### TimePickerHeader
+
+Takes `className`, `style` and children.
+
+<PropsTable {...timePickerHeaderApi} />
+
+### TimePickerContent
+
+Takes `className`, `style` and children.
+
+<PropsTable {...timePickerContentApi} />
+
+### TimePickerInput
+
+<PropsTable {...timePickerInputApi} />
+
+### TimePickerPeriodSelector
+
+Name it with `aria-label` or `aria-labelledby`. Its value comes from the picker, so it takes no value props and no children.
+
+<PropsTable {...timePickerPeriodSelectorApi} />
+
+### TimePickerDial
+
+Name it with `aria-label` or `aria-labelledby`. It also takes `className` and `style`.
+
+<PropsTable {...timePickerDialApi} />
+
+### TimePickerModeToggle
+
+Takes the props of an [icon button](/components/icon-button), except `children`, and the `displayMode` it switches from, which selects its icon.
+
+<PropsTable {...timePickerModeToggleApi} />

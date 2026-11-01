@@ -1,0 +1,39 @@
+/* Loading indicator (loading-indicator.tsx). 48dp across, or --loading-indicator-size
+ * of them, a plain number, from 24 to 240. Drawn in px: the shapes are px paths, so
+ * the 48dp box they are drawn in is laid out at its default size and scaled to this one. */
+@utility loading-indicator {
+  /* The active indicator's box turns between rounds: cut off here, its corners must not
+   * scroll a page. */
+  @apply relative inline-block shrink-0 overflow-hidden align-middle;
+  --loading-indicator-scale: calc(clamp(24, var(--loading-indicator-size, 48), 240) / 48);
+  width: calc(var(--loading-indicator-scale) * 48px);
+  height: calc(var(--loading-indicator-scale) * 48px);
+}
+
+/* A fill clipped to the video's outline, a keyframe to a frame at 60 a second: the turning
+ * and the changes of shape and size within a round are all in the paths. A 38dp circle
+ * should nothing animate it. Reduced motion keeps it, the activity's only sign. */
+@utility loading-indicator-active {
+  /* Forced colors would take the fill for a background and drop it, so there it is the
+   * system's text color. */
+  @apply bg-current forced-colors:bg-canvas-text forced-colors:forced-color-adjust-none;
+  position: absolute;
+  top: calc(50% - 24px);
+  left: calc(50% - 24px);
+  width: 48px;
+  height: 48px;
+  scale: var(--loading-indicator-scale);
+  clip-path: circle(19px);
+  animation:
+    loading-indicator-morph 4.65s linear infinite,
+    loading-indicator-turn 23.25s steps(5) infinite;
+}
+
+/* The video ends on its first shape turned 72 degrees. So a round of 279 frames ends
+ * there, and the next is played turned that much further: no jump where they meet, and
+ * after five rounds, a whole turn, the loop is back where it began. */
+@keyframes loading-indicator-turn {
+  to {
+    rotate: 1turn;
+  }
+}

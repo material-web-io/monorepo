@@ -1,0 +1,121 @@
+import * as focusRing from '../../examples/theme/focus-ring.tsx?example'
+import * as layers from '../../examples/theme/state-layers.tsx?example'
+
+Show an element's state with the Material 3 [state layer](https://m3.material.io/foundations/interaction/states/overview) opacities, the disabled opacities and the focus ring. Each opacity works as a class and as the opacity of any color, a focus ring is one class, and Tailwind's [state variants](https://tailwindcss.com/docs/hover-focus-and-other-states) pick the state.
+
+## State layers
+
+The theme's states follow Material's [state layers](https://m3.material.io/foundations/interaction/states/state-layers). A state layer shows an element's state, hovered, focused, pressed or dragged, as its content color over it at a fixed opacity. Use each opacity as a class, as in `opacity-state-hover`, or as a color's [opacity modifier](https://tailwindcss.com/docs/colors#adjusting-opacity), as in `bg-on-surface/state-hover`.
+
+<Example {...layers} showCode={false} />
+
+| Name and token                                                        | Opacity | Use                                                  |
+| --------------------------------------------------------------------- | ------- | ---------------------------------------------------- |
+| `state-hover`<br />`--md-sys-state-hover-state-layer-opacity`         | 8%      | A cursor is placed above the element                 |
+| `state-focus`<br />`--md-sys-state-focus-state-layer-opacity`         | 10%     | The element is highlighted, with a keyboard or voice |
+| `state-pressed`<br />`--md-sys-state-pressed-state-layer-opacity`     | 10%     | The element is tapped or clicked                     |
+| `state-dragged`<br />`--md-sys-state-dragged-state-layer-opacity`     | 16%     | The element is pressed and moved                     |
+| `disabled-content`<br />`--md-sys-state-disabled-content-opacity`     | 38%     | The text and icons of a disabled element             |
+| `disabled-container`<br />`--md-sys-state-disabled-container-opacity` | 12%     | The container of a disabled element                  |
+
+An opacity is one of Tailwind's [opacity](https://tailwindcss.com/docs/opacity) values, and is used like any other:
+
+- **Layer color:** A state layer takes the color of the element's content. On `bg-secondary-container text-on-secondary-container`, the layer is `on-secondary-container`.
+- **Without a fill:** On an element with no container color, such as a text button, set the layer as the background in the state, as in `text-primary hover:bg-primary/state-hover`.
+- **Over a fill:** On a filled element, draw the layer over the fill, in the content color. A pseudo-element with `bg-current` does so:
+
+  ```html
+  <button
+    class="relative bg-secondary-container text-on-secondary-container before:absolute before:inset-0 before:rounded-inherit before:bg-current before:opacity-0 hover:before:opacity-state-hover focus-visible:before:opacity-state-focus active:before:opacity-state-pressed"
+  >
+    Save
+  </button>
+  ```
+
+- **Disabled:** For a disabled element, set its content to on-surface at 38% with `text-on-surface/disabled-content`, and its container to on-surface at 12% with `bg-on-surface/disabled-container`. A disabled element shows no state layer.
+- **Merged classes:** [tailwind-merge](https://github.com/dcastil/tailwind-merge) does not know the opacities, and keeps both of two opacity classes. To merge them, use the [`tv` or the `twMerge`](/get-started/styling#custom-components) that `@material-web/react` exports, where the later class replaces the earlier one.
+
+To add a state layer and a press ripple to a component of your own, use the [Ripple](/components/ripple) component.
+
+## Focus ring
+
+Add `focus-ring` to show the Material [focus indicator](https://m3.material.io/foundations/interaction/states/applying-states#9edb181a-ed5e-4961-b3d0-cae33125a4a9) while the element has keyboard focus: a 3dp outline in the secondary color, 2dp outside the element. Use `focus-ring-inset` to show it 3dp inside, for an element whose edge is clipped by its container. Tab to the buttons below.
+
+<Example {...focusRing} />
+
+| Class                   | Shown                                | Ring                                          |
+| ----------------------- | ------------------------------------ | --------------------------------------------- |
+| `focus-ring`            | While the element has keyboard focus | 2dp outside the element                       |
+| `focus-ring-inset`      | While the element has keyboard focus | 3dp inside the element                        |
+| `focus-ring-icon`       | While the element has keyboard focus | Across the element's edge, 2dp in and 1dp out |
+| `focus-indicator`       | Always                               | 2dp outside the element                       |
+| `focus-indicator-inset` | Always                               | 3dp inside the element                        |
+
+- **Keyboard focus:** [`focus-visible:`](https://tailwindcss.com/docs/hover-focus-and-other-states#focus-visible) matches keyboard focus: the browser's `:focus-visible`, or, with React Aria's [Tailwind plugin](https://react-aria.adobe.com/styling#tailwind-css), the `data-focus-visible` of a React Aria component. The ring follows it, so a pointer press shows no ring.
+- **A part of an element:** Use `focus-indicator` and `focus-indicator-inset` for the ring alone, with no condition, on a part that shows the keyboard focus of the element it is in, as in `group-focus-visible:focus-indicator` on a part of a [`group`](https://tailwindcss.com/docs/hover-focus-and-other-states#styling-based-on-parent-state).
+- **Icon targets:** Use `focus-ring-icon` for the ring of a 24dp round icon target inside a component, such as a chip's remove button. It straddles the target's edge, 2dp in and 1dp out.
+- **Stacking:** A ringed element is raised over its siblings (`z-focus-ring`), so that nothing next to it covers its ring. See [Stacking order](/theme/layout#stacking-order).
+
+## State variants
+
+The theme's state variants are [Tailwind's own](https://tailwindcss.com/docs/hover-focus-and-other-states). To style [React Aria](https://react-aria.adobe.com/) components, which report an element's state as a data attribute, load React Aria's [Tailwind plugin](https://react-aria.adobe.com/styling#tailwind-css), `tailwindcss-react-aria-components`, after the theme. The theme's utilities then follow its variants too. `@material-web/react` already loads the plugin.
+
+```css
+@import 'tailwindcss';
+@import '@material-web/tailwind';
+@plugin 'tailwindcss-react-aria-components';
+```
+
+With the plugin, a variant matches a data attribute on a React Aria component (`data-rac`). On any other element, it matches its pseudo-class, as Tailwind's own variants do.
+
+| Variant                               | On a React Aria component                                                            | On any other element |
+| ------------------------------------- | ------------------------------------------------------------------------------------ | -------------------- |
+| `hover:`                              | `data-hovered`                                                                       | `:hover`             |
+| `focus:`                              | `data-focused`, which is any focus                                                   | `:focus`             |
+| `focus-visible:`                      | `data-focus-visible`                                                                 | `:focus-visible`     |
+| `focus-within:`                       | `data-focus-within`                                                                  | `:focus-within`      |
+| `disabled:`                           | `data-disabled`                                                                      | `:disabled`          |
+| `indeterminate:`, `invalid:`, `open:` | `data-indeterminate`, `data-invalid`, `data-open`                                    | Tailwind's own       |
+| `pressed:`                            | `data-pressed`                                                                       | `data-pressed`       |
+| `selected:`                           | `data-selected`                                                                      | `data-selected`      |
+| `dragging:`                           | `data-dragging`                                                                      | `data-dragging`      |
+| `entering:`, `exiting:`               | `data-entering` and `data-exiting`, on an overlay that is about to show or is hiding | The same attributes  |
+
+- **Attribute variants:** `pressed:`, `selected:`, `dragging:`, `entering:` and `exiting:` match the attribute alone, as the plugin's other variants do (`expanded:`, `placement-top:`, ...).
+- **Order:** Tailwind sorts the attribute variants after its own variants, `disabled:` included. For a style that must win over a `selected:` one, name both, as in `selected:disabled:`.
+- **`active:`, `checked:` and `enabled:`:** `active:` matches the plugin's `data-active`, and `checked:` and `enabled:` match Tailwind's own pseudo-classes. On a React Aria component, use `selected:` and `not-disabled:` instead.
+
+See [Styling](/get-started/styling#variants) for examples.
+
+## Custom states
+
+Every opacity, and each measure of the focus ring, is a custom property, so your own CSS can set it after the import. A value set before the import is replaced by the theme's.
+
+```css
+@import 'tailwindcss';
+@import '@material-web/tailwind';
+
+:root {
+  --md-sys-state-hover-state-layer-opacity: 0.1;
+  --md-sys-state-focus-indicator-thickness: 2px;
+  --md-sys-state-focus-indicator-inner-offset: -2px;
+}
+```
+
+| Token and theme variable                                                        | Default | Sets                                                               |
+| ------------------------------------------------------------------------------- | ------- | ------------------------------------------------------------------ |
+| `--md-sys-state-hover-state-layer-opacity`<br />`--opacity-state-hover`         | `0.08`  | The hover layer of the components, and `state-hover`               |
+| `--md-sys-state-focus-state-layer-opacity`<br />`--opacity-state-focus`         | `0.1`   | The focus layer of the components, and `state-focus`               |
+| `--md-sys-state-pressed-state-layer-opacity`<br />`--opacity-state-pressed`     | `0.1`   | The pressed layer of the components, and `state-pressed`           |
+| `--md-sys-state-dragged-state-layer-opacity`<br />`--opacity-state-dragged`     | `0.16`  | The dragged layer of the components, and `state-dragged`           |
+| `--md-sys-state-disabled-content-opacity`<br />`--opacity-disabled-content`     | `0.38`  | The text and icons of a disabled component, and `disabled-content` |
+| `--md-sys-state-disabled-container-opacity`<br />`--opacity-disabled-container` | `0.12`  | The container of a disabled component, and `disabled-container`    |
+| `--md-sys-state-focus-indicator-thickness`                                      | `3px`   | The width of every focus ring                                      |
+| `--md-sys-state-focus-indicator-outer-offset`                                   | `2px`   | The gap between an element and its `focus-ring`                    |
+| `--md-sys-state-focus-indicator-inner-offset`                                   | `-3px`  | The place of a `focus-ring-inset`, inside the element's edge       |
+
+- **Theme variables:** Under each opacity token is its Tailwind [theme variable](https://tailwindcss.com/docs/theme), which gives the token its classes: the token as a percentage. In your own CSS, read the token, as in `var(--md-sys-state-hover-state-layer-opacity)`: a theme variable has the root's value, and does not follow a token set on an element. The focus ring's tokens have no theme variable.
+- **Opacity values:** Set an opacity as a number from 0 to 1, not as a percentage.
+- **Inset rings:** For an inset ring against the element's edge, set the inner offset to the thickness, as a negative length.
+- **Ring color:** A focus ring is in the [`secondary`](/theme/color#accent-roles) color role.
+- **One part of the page:** Set a token on an element, in place of the root, to change the states inside it only.

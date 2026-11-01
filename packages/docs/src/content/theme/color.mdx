@@ -1,0 +1,294 @@
+import * as roles from '../../examples/theme/color-roles.tsx?example'
+import * as nestedThemes from '../../examples/theme/nested-themes.tsx?example'
+import * as palettes from '../../examples/theme/tonal-palettes.tsx?example'
+
+Use a Material 3 [color role](https://m3.material.io/styles/color/roles) with any of Tailwind's [color utilities](https://tailwindcss.com/docs/colors#using-color-utilities), such as `bg-primary` or `text-on-surface`. The roles follow the light or the dark scheme and the contrast level, and every one of them comes from a single seed color, Material's [baseline](https://m3.material.io/styles/color/static/baseline) or your own.
+
+## Color system
+
+The theme's colors follow Material's [color system](https://m3.material.io/styles/color/system/how-the-system-works), which derives every color from one seed color:
+
+1. **[Seed color](/theme/color#seed-color):** The one color the theme starts from. The default is the Material 3 [baseline color](https://m3.material.io/styles/color/static/baseline#690f18cd-d40f-4158-a358-4cfdb3a32768), `#6750A4`.
+2. **[Color palettes](/theme/color#color-palettes):** The seed makes six tonal palettes, each a range of tones from black to white.
+3. **[Color roles](/theme/color#color-roles):** Each role, such as `primary` or `surface`, takes a tone of a palette for the light and the dark scheme at every contrast level.
+
+### Seed color
+
+To use a seed of your own, run the theme's command in your project, with the seed as a hex color and the file to write:
+
+```sh
+npx @material-web/tailwind --seed "#0b6a5b" --out src/theme.css
+```
+
+The file holds every palette and role for the seed. Import it after the theme, where it replaces the default colors:
+
+```css
+@import 'tailwindcss';
+@import '@material-web/tailwind';
+@import './theme.css';
+```
+
+To change the seed, run the command again. The error palette is Material's baseline one for every seed. To change single palettes or roles instead, see [Custom colors](/theme/color#custom-colors).
+
+## Color palettes
+
+The six [tonal palettes](https://m3.material.io/styles/color/system/how-the-system-works#3ce9da92-a118-4692-8b2c-c5c52a413fa6) hold the colors the roles are drawn from. Each has the tones 0, 10 to 90 by tens, 95, 99 and 100, from black at 0 to white at 100. The neutral palette has more tones between these, which the surface roles take.
+
+<Example {...palettes} showCode={false} />
+
+| Palette           | Roles it colors                                                                                                                                     |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `primary`         | The primary roles and their fixed roles, `inverse-primary` and `surface-tint`                                                                       |
+| `secondary`       | The secondary roles and their fixed roles                                                                                                           |
+| `tertiary`        | The tertiary roles and their fixed roles                                                                                                            |
+| `error`           | The error roles                                                                                                                                     |
+| `neutral`         | The surfaces and the surface containers, `on-surface`, `inverse-surface`, `inverse-on-surface`, `background`, `on-background`, `scrim` and `shadow` |
+| `neutral-variant` | `on-surface-variant`, `outline`, `outline-variant` and `surface-variant`                                                                            |
+
+Each tone is a custom property, such as `var(--md-ref-palette-primary40)`: see [Palette tokens](/theme/color#palette-tokens) for all of them. To use the tones as classes too, such as `bg-primary-40` or `text-neutral-variant-30`, import the palettes file as well. The main import does not include it. The classes are of the thirteen tones above, in every palette.
+
+```css
+@import 'tailwindcss';
+@import '@material-web/tailwind';
+@import '@material-web/tailwind/palettes.css';
+```
+
+A tone is the same color in the light and the dark scheme and at every contrast level. For a color that follows them, use a [color role](/theme/color#color-roles).
+
+> **Note:** With the palettes imported, `neutral-50` and `neutral-100` are Material's tones 50 and 100, like `neutral-0`, `neutral-10` and the rest of the palette's tones. `neutral-200` to `neutral-950` are still Tailwind's [neutral grays](https://tailwindcss.com/docs/colors#default-color-palette-reference).
+
+## Color roles
+
+A [color role](https://m3.material.io/styles/color/roles) is a color named after its use, such as `primary` or `on-surface`. Use a role with any of Tailwind's [color utilities](https://tailwindcss.com/docs/colors#using-color-utilities), such as `bg-primary`, `text-on-surface`, `border-outline-variant`, `ring-outline` or `fill-primary`, and with an [opacity modifier](https://tailwindcss.com/docs/colors#adjusting-opacity), as in `bg-primary/50`. Each role is also a custom property, such as `var(--md-sys-color-primary)`.
+
+The roles change with the scheme, light or dark, and with the contrast level, so a class needs no [`dark:` variant](https://tailwindcss.com/docs/dark-mode).
+
+<Example {...roles} isFlush showCode={false} />
+
+Use the roles in their pairs, as in `bg-primary text-on-primary`. A pair stays legible in both schemes and at every contrast level. A role's name tells its part in a pair:
+
+- **On:** The color of the text and icons on the role it names, such as `on-primary` on `primary`.
+- **Container:** A fill for an element such as a button, not a color for text or icons.
+- **Variant:** A lower-emphasis alternative to the role it names, such as `outline-variant` to `outline`.
+
+The theme does not color the page. Add the page's roles to the `body`:
+
+```html
+<body class="bg-surface text-on-surface"></body>
+```
+
+The tables below list every role with the class it is most used in, its token and its use in Material. A role's name works after any other color utility too, as in `border-primary` or `fill-on-surface`.
+
+### Accent roles
+
+Use `primary` for the most prominent elements, `secondary` for less prominent ones, `tertiary` for contrasting accents and `error` for error states. Each has its `on-` role, its container and the container's `on-` role.
+
+| Class and token                                                            | Use                                                                                     |
+| -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `bg-primary`<br />`--md-sys-color-primary`                                 | High-emphasis fills, texts, and icons against surface                                   |
+| `text-on-primary`<br />`--md-sys-color-on-primary`                         | Text and icons against primary                                                          |
+| `bg-primary-container`<br />`--md-sys-color-primary-container`             | Standout fill color against surface, for key components like FAB                        |
+| `text-on-primary-container`<br />`--md-sys-color-on-primary-container`     | Text and icons against primary container                                                |
+| `bg-secondary`<br />`--md-sys-color-secondary`                             | Less prominent fills, text, and icons against surface                                   |
+| `text-on-secondary`<br />`--md-sys-color-on-secondary`                     | Text and icons against secondary                                                        |
+| `bg-secondary-container`<br />`--md-sys-color-secondary-container`         | Less prominent fill color against surface, for recessive components like tonal buttons  |
+| `text-on-secondary-container`<br />`--md-sys-color-on-secondary-container` | Text and icons against secondary container                                              |
+| `bg-tertiary`<br />`--md-sys-color-tertiary`                               | Complementary fills, text, and icons against surface                                    |
+| `text-on-tertiary`<br />`--md-sys-color-on-tertiary`                       | Text and icons against tertiary                                                         |
+| `bg-tertiary-container`<br />`--md-sys-color-tertiary-container`           | Complementary container color against surface, for components like input fields         |
+| `text-on-tertiary-container`<br />`--md-sys-color-on-tertiary-container`   | Text and icons against tertiary container                                               |
+| `bg-error`<br />`--md-sys-color-error`                                     | Attention-grabbing color against surface for fills, icons, and text, indicating urgency |
+| `text-on-error`<br />`--md-sys-color-on-error`                             | Text and icons against error                                                            |
+| `bg-error-container`<br />`--md-sys-color-error-container`                 | Attention-grabbing fill color against surface                                           |
+| `text-on-error-container`<br />`--md-sys-color-on-error-container`         | Text and icons against error container                                                  |
+
+### Surface roles
+
+Use `surface` for backgrounds and the surface containers for components such as cards, sheets and dialogs, with `on-surface` and `on-surface-variant` for the text and icons on any of them. The outline roles draw boundaries against a surface. The inverse roles color an element that contrasts with the surface around it, such as a snackbar.
+
+| Class and token                                                                | Use                                                                                    |
+| ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------- |
+| `bg-surface`<br />`--md-sys-color-surface`                                     | Default color for backgrounds                                                          |
+| `bg-surface-dim`<br />`--md-sys-color-surface-dim`                             | Dimmest surface color in light and dark themes                                         |
+| `bg-surface-bright`<br />`--md-sys-color-surface-bright`                       | Brightest surface color in light and dark themes                                       |
+| `bg-surface-container-lowest`<br />`--md-sys-color-surface-container-lowest`   | Lowest-emphasis container color                                                        |
+| `bg-surface-container-low`<br />`--md-sys-color-surface-container-low`         | Low-emphasis container color                                                           |
+| `bg-surface-container`<br />`--md-sys-color-surface-container`                 | Default container color                                                                |
+| `bg-surface-container-high`<br />`--md-sys-color-surface-container-high`       | High-emphasis container color                                                          |
+| `bg-surface-container-highest`<br />`--md-sys-color-surface-container-highest` | Highest-emphasis container color                                                       |
+| `text-on-surface`<br />`--md-sys-color-on-surface`                             | Text and icons against any surface or surface container color                          |
+| `text-on-surface-variant`<br />`--md-sys-color-on-surface-variant`             | Lower-emphasis color for text and icons against any surface or surface container color |
+| `border-outline`<br />`--md-sys-color-outline`                                 | Important boundaries, such as a text field outline                                     |
+| `border-outline-variant`<br />`--md-sys-color-outline-variant`                 | Decorative elements, such as dividers, and when other elements provide 4.5:1 contrast  |
+| `bg-inverse-surface`<br />`--md-sys-color-inverse-surface`                     | Background fills for elements which contrast against surface                           |
+| `text-inverse-on-surface`<br />`--md-sys-color-inverse-on-surface`             | Text and icons against inverse surface                                                 |
+| `text-inverse-primary`<br />`--md-sys-color-inverse-primary`                   | Actionable elements, such as text buttons, against inverse surface                     |
+
+### Fixed roles
+
+The fixed roles keep the same tone in light and dark, where a container role changes tone. A fixed color can lack contrast in one of the schemes, so use the accent roles where contrast is needed.
+
+| Class and token                                                                    | Use                                                         |
+| ---------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| `bg-primary-fixed`<br />`--md-sys-color-primary-fixed`                             | Fill color against surface, the same tone in light and dark |
+| `bg-primary-fixed-dim`<br />`--md-sys-color-primary-fixed-dim`                     | A stronger, more emphasized tone of primary fixed           |
+| `text-on-primary-fixed`<br />`--md-sys-color-on-primary-fixed`                     | Text and icons against primary fixed                        |
+| `text-on-primary-fixed-variant`<br />`--md-sys-color-on-primary-fixed-variant`     | Lower-emphasis text and icons against primary fixed         |
+| `bg-secondary-fixed`<br />`--md-sys-color-secondary-fixed`                         | Fill color against surface, the same tone in light and dark |
+| `bg-secondary-fixed-dim`<br />`--md-sys-color-secondary-fixed-dim`                 | A stronger, more emphasized tone of secondary fixed         |
+| `text-on-secondary-fixed`<br />`--md-sys-color-on-secondary-fixed`                 | Text and icons against secondary fixed                      |
+| `text-on-secondary-fixed-variant`<br />`--md-sys-color-on-secondary-fixed-variant` | Lower-emphasis text and icons against secondary fixed       |
+| `bg-tertiary-fixed`<br />`--md-sys-color-tertiary-fixed`                           | Fill color against surface, the same tone in light and dark |
+| `bg-tertiary-fixed-dim`<br />`--md-sys-color-tertiary-fixed-dim`                   | A stronger, more emphasized tone of tertiary fixed          |
+| `text-on-tertiary-fixed`<br />`--md-sys-color-on-tertiary-fixed`                   | Text and icons against tertiary fixed                       |
+| `text-on-tertiary-fixed-variant`<br />`--md-sys-color-on-tertiary-fixed-variant`   | Lower-emphasis text and icons against tertiary fixed        |
+
+### Other roles
+
+The scrim and shadow colors, and the remaining surface roles.
+
+| Class and token                                            | Use                                       |
+| ---------------------------------------------------------- | ----------------------------------------- |
+| `bg-scrim`<br />`--md-sys-color-scrim`                     | The scrim behind a modal surface          |
+| `bg-shadow`<br />`--md-sys-color-shadow`                   | The [elevation](/theme/elevation) shadows |
+| `bg-surface-variant`<br />`--md-sys-color-surface-variant` | An alternative surface color              |
+| `bg-surface-tint`<br />`--md-sys-color-surface-tint`       | The tint over an elevated surface         |
+| `bg-background`<br />`--md-sys-color-background`           | The same color as surface                 |
+| `text-on-background`<br />`--md-sys-color-on-background`   | Text and icons against background         |
+
+## Color schemes
+
+Every role has a color for the light and for the dark scheme, each at three [contrast levels](https://m3.material.io/styles/color/system/how-the-system-works#0207ef40-7f0d-4da8-9280-f062aa6b3e04). Two data attributes pick among them, `data-theme` and `data-contrast`. To try them on this page, use the menu in this site's app bar. The motion scheme has an attribute of its own: see [Motion](/theme/motion#motion-scheme).
+
+### Light and dark
+
+Set `data-theme="light"` or `"dark"` on the root, or on any element for what is inside it. Without it, the scheme follows the system's, through `prefers-color-scheme`. The browser's own controls and scrollbars match the scheme.
+
+```html
+<html data-theme="dark"></html>
+```
+
+An element with `data-theme` re-themes its content: every color role inside it is that scheme's.
+
+<Example {...nestedThemes} />
+
+### Contrast
+
+Set `data-contrast="medium"` or `"high"` on the root, or on or around an element that has `data-theme`. It raises the contrast of the scheme in effect, the system's or the `data-theme`'s. Without the attribute, the contrast is standard.
+
+```html
+<html data-contrast="high"></html>
+```
+
+Use the `contrast-raised:` variant to style an element inside a medium or high contrast scope, for a color pair that holds only at standard contrast. See [Accessibility](/theme/accessibility#raised-contrast).
+
+## Forced colors
+
+In forced colors mode the browser paints in the system's colors. Use them as colors too, with Tailwind's [`forced-colors:` variant](https://tailwindcss.com/docs/hover-focus-and-other-states#forced-colors), as in `forced-colors:border-gray-text`, for an element that keeps a border or a fill in that mode and only needs it recolored.
+
+| Color and theme variable                       | System color    | Use                                |
+| ---------------------------------------------- | --------------- | ---------------------------------- |
+| `canvas`<br />`--color-canvas`                 | `Canvas`        | The background of the page         |
+| `canvas-text`<br />`--color-canvas-text`       | `CanvasText`    | Text on the page                   |
+| `gray-text`<br />`--color-gray-text`           | `GrayText`      | Disabled text                      |
+| `highlight`<br />`--color-highlight`           | `Highlight`     | The background of what is selected |
+| `highlight-text`<br />`--color-highlight-text` | `HighlightText` | The text of what is selected       |
+
+For a container's edge and a selected control's fill in that mode, see [Accessibility](/theme/accessibility#forced-colors).
+
+## Custom colors
+
+Every color token is a custom property, so your own CSS can set it after the import. The tokens are of two kinds: the tones of the palettes, and the roles that take them.
+
+To change every color at once, generate the theme from a [seed color](/theme/color#seed-color).
+
+### Palette tokens
+
+To change some of the colors, set a palette's tones on the root. Each tone re-colors the [roles that take it](/theme/color#role-tokens), in the light and the dark scheme:
+
+```css
+@import 'tailwindcss';
+@import '@material-web/tailwind';
+
+:root {
+  --md-ref-palette-primary40: #006a6a;
+  --md-ref-palette-primary80: #4cdada;
+  --md-ref-palette-primary90: #6ff7f6;
+  /* ... */
+}
+```
+
+A tone's token is the palette's name and the tone after `--md-ref-palette-`, as in `--md-ref-palette-neutral-variant30`. Under it is the Tailwind [theme variable](https://tailwindcss.com/docs/theme) of the tone's classes, as in `--color-neutral-variant-30`.
+
+| Token and theme variable                                                       | Tones                                                                                                                                       |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--md-ref-palette-primary<tone>`<br />`--color-primary-<tone>`                 | 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99, 100                                                                                          |
+| `--md-ref-palette-secondary<tone>`<br />`--color-secondary-<tone>`             | 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99, 100                                                                                          |
+| `--md-ref-palette-tertiary<tone>`<br />`--color-tertiary-<tone>`               | 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99, 100                                                                                          |
+| `--md-ref-palette-error<tone>`<br />`--color-error-<tone>`                     | 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99, 100                                                                                          |
+| `--md-ref-palette-neutral<tone>`<br />`--color-neutral-<tone>`                 | 0, 2, 4, 6, 10, 11, 12, 16, 17, 20, 21, 22, 24, 25, 26, 29, 30, 34, 40, 50, 60, 70, 75, 80, 84, 85, 87, 88, 90, 92, 94, 95, 96, 98, 99, 100 |
+| `--md-ref-palette-neutral-variant<tone>`<br />`--color-neutral-variant-<tone>` | 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99, 100                                                                                          |
+
+The theme variables come with the [palettes file](/theme/color#color-palettes), for the thirteen tones 0, 10 to 90 by tens, 95, 99 and 100 of each palette.
+
+At medium and high contrast, some roles have colors of their own in place of a palette's tones, and keep them. To re-color every contrast level, generate the theme from a seed.
+
+### Role tokens
+
+At standard contrast, each role takes one tone in the light scheme and one in the dark. The table names a tone by the end of its token: `primary40` is `--md-ref-palette-primary40`. Under each role's token is its Tailwind [theme variable](https://tailwindcss.com/docs/theme), which gives the role its classes.
+
+| Token and theme variable                                                              | Light               | Dark                |
+| ------------------------------------------------------------------------------------- | ------------------- | ------------------- |
+| `--md-sys-color-primary`<br />`--color-primary`                                       | `primary40`         | `primary80`         |
+| `--md-sys-color-on-primary`<br />`--color-on-primary`                                 | `primary100`        | `primary20`         |
+| `--md-sys-color-primary-container`<br />`--color-primary-container`                   | `primary90`         | `primary30`         |
+| `--md-sys-color-on-primary-container`<br />`--color-on-primary-container`             | `primary30`         | `primary90`         |
+| `--md-sys-color-secondary`<br />`--color-secondary`                                   | `secondary40`       | `secondary80`       |
+| `--md-sys-color-on-secondary`<br />`--color-on-secondary`                             | `secondary100`      | `secondary20`       |
+| `--md-sys-color-secondary-container`<br />`--color-secondary-container`               | `secondary90`       | `secondary30`       |
+| `--md-sys-color-on-secondary-container`<br />`--color-on-secondary-container`         | `secondary30`       | `secondary90`       |
+| `--md-sys-color-tertiary`<br />`--color-tertiary`                                     | `tertiary40`        | `tertiary80`        |
+| `--md-sys-color-on-tertiary`<br />`--color-on-tertiary`                               | `tertiary100`       | `tertiary20`        |
+| `--md-sys-color-tertiary-container`<br />`--color-tertiary-container`                 | `tertiary90`        | `tertiary30`        |
+| `--md-sys-color-on-tertiary-container`<br />`--color-on-tertiary-container`           | `tertiary30`        | `tertiary90`        |
+| `--md-sys-color-error`<br />`--color-error`                                           | `error40`           | `error80`           |
+| `--md-sys-color-on-error`<br />`--color-on-error`                                     | `error100`          | `error20`           |
+| `--md-sys-color-error-container`<br />`--color-error-container`                       | `error90`           | `error30`           |
+| `--md-sys-color-on-error-container`<br />`--color-on-error-container`                 | `error30`           | `error90`           |
+| `--md-sys-color-surface`<br />`--color-surface`                                       | `neutral98`         | `neutral6`          |
+| `--md-sys-color-surface-dim`<br />`--color-surface-dim`                               | `neutral87`         | `neutral6`          |
+| `--md-sys-color-surface-bright`<br />`--color-surface-bright`                         | `neutral98`         | `neutral24`         |
+| `--md-sys-color-surface-container-lowest`<br />`--color-surface-container-lowest`     | `neutral100`        | `neutral4`          |
+| `--md-sys-color-surface-container-low`<br />`--color-surface-container-low`           | `neutral96`         | `neutral10`         |
+| `--md-sys-color-surface-container`<br />`--color-surface-container`                   | `neutral94`         | `neutral12`         |
+| `--md-sys-color-surface-container-high`<br />`--color-surface-container-high`         | `neutral92`         | `neutral17`         |
+| `--md-sys-color-surface-container-highest`<br />`--color-surface-container-highest`   | `neutral90`         | `neutral22`         |
+| `--md-sys-color-on-surface`<br />`--color-on-surface`                                 | `neutral10`         | `neutral90`         |
+| `--md-sys-color-on-surface-variant`<br />`--color-on-surface-variant`                 | `neutral-variant30` | `neutral-variant80` |
+| `--md-sys-color-outline`<br />`--color-outline`                                       | `neutral-variant50` | `neutral-variant60` |
+| `--md-sys-color-outline-variant`<br />`--color-outline-variant`                       | `neutral-variant80` | `neutral-variant30` |
+| `--md-sys-color-inverse-surface`<br />`--color-inverse-surface`                       | `neutral20`         | `neutral90`         |
+| `--md-sys-color-inverse-on-surface`<br />`--color-inverse-on-surface`                 | `neutral95`         | `neutral20`         |
+| `--md-sys-color-inverse-primary`<br />`--color-inverse-primary`                       | `primary80`         | `primary40`         |
+| `--md-sys-color-primary-fixed`<br />`--color-primary-fixed`                           | `primary90`         | `primary90`         |
+| `--md-sys-color-primary-fixed-dim`<br />`--color-primary-fixed-dim`                   | `primary80`         | `primary80`         |
+| `--md-sys-color-on-primary-fixed`<br />`--color-on-primary-fixed`                     | `primary10`         | `primary10`         |
+| `--md-sys-color-on-primary-fixed-variant`<br />`--color-on-primary-fixed-variant`     | `primary30`         | `primary30`         |
+| `--md-sys-color-secondary-fixed`<br />`--color-secondary-fixed`                       | `secondary90`       | `secondary90`       |
+| `--md-sys-color-secondary-fixed-dim`<br />`--color-secondary-fixed-dim`               | `secondary80`       | `secondary80`       |
+| `--md-sys-color-on-secondary-fixed`<br />`--color-on-secondary-fixed`                 | `secondary10`       | `secondary10`       |
+| `--md-sys-color-on-secondary-fixed-variant`<br />`--color-on-secondary-fixed-variant` | `secondary30`       | `secondary30`       |
+| `--md-sys-color-tertiary-fixed`<br />`--color-tertiary-fixed`                         | `tertiary90`        | `tertiary90`        |
+| `--md-sys-color-tertiary-fixed-dim`<br />`--color-tertiary-fixed-dim`                 | `tertiary80`        | `tertiary80`        |
+| `--md-sys-color-on-tertiary-fixed`<br />`--color-on-tertiary-fixed`                   | `tertiary10`        | `tertiary10`        |
+| `--md-sys-color-on-tertiary-fixed-variant`<br />`--color-on-tertiary-fixed-variant`   | `tertiary30`        | `tertiary30`        |
+| `--md-sys-color-scrim`<br />`--color-scrim`                                           | `neutral0`          | `neutral0`          |
+| `--md-sys-color-shadow`<br />`--color-shadow`                                         | `neutral0`          | `neutral0`          |
+| `--md-sys-color-surface-variant`<br />`--color-surface-variant`                       | `neutral-variant90` | `neutral-variant30` |
+| `--md-sys-color-surface-tint`<br />`--color-surface-tint`                             | `primary40`         | `primary80`         |
+| `--md-sys-color-background`<br />`--color-background`                                 | `neutral98`         | `neutral6`          |
+| `--md-sys-color-on-background`<br />`--color-on-background`                           | `neutral10`         | `neutral90`         |
+
+In your own CSS, read a role's token, as in `var(--md-sys-color-primary)`. Its theme variable has the root's color, and does not follow a `data-theme` set on an element inside the page.
+
+A role can be set on the root as well, where it then has one color in both schemes and at every contrast level. To re-color the elevation shadows, set `--md-sys-color-shadow` on the root, and on `[data-theme]` for the elements with a scheme of their own.

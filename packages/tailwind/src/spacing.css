@@ -1,0 +1,58 @@
+@theme {
+  --spacing: 0.25rem;
+}
+
+/* Material 3 spacing tokens ("Space 0" ... "Space 900"), 1dp = 1px, for every
+ * spacing utility: p-space-100, gap-space-300, size-space-500, -mt-space-50, ...
+ * `p-space-100` is 8px; a bare number is Tailwind's own, `p-4` 1rem. */
+@theme inline {
+  --spacing-space-0: 0px;
+  --spacing-space-25: 2px;
+  --spacing-space-50: 4px;
+  --spacing-space-75: 6px;
+  --spacing-space-100: 8px;
+  --spacing-space-125: 10px;
+  --spacing-space-150: 12px;
+  --spacing-space-175: 14px;
+  --spacing-space-200: 16px;
+  --spacing-space-250: 20px;
+  --spacing-space-300: 24px;
+  --spacing-space-400: 32px;
+  --spacing-space-450: 36px;
+  --spacing-space-500: 40px;
+  --spacing-space-600: 48px;
+  --spacing-space-700: 56px;
+  --spacing-space-800: 64px;
+  --spacing-space-900: 72px;
+}
+
+/* The density spacing, space-<n>-variable, for any spacing utility (py-space-125-variable,
+ * mt-space-300-variable): Space <n> less half of --density, so a box padded with it is a density
+ * step shorter. Inline: the box's own density is read. */
+@theme inline {
+  --spacing-space-0-variable: calc(0px + var(--density, 0px) / 2);
+  --spacing-space-25-variable: calc(2px + var(--density, 0px) / 2);
+  --spacing-space-50-variable: calc(4px + var(--density, 0px) / 2);
+  --spacing-space-75-variable: calc(6px + var(--density, 0px) / 2);
+  --spacing-space-100-variable: calc(8px + var(--density, 0px) / 2);
+  --spacing-space-125-variable: calc(10px + var(--density, 0px) / 2);
+  --spacing-space-150-variable: calc(12px + var(--density, 0px) / 2);
+  --spacing-space-175-variable: calc(14px + var(--density, 0px) / 2);
+  --spacing-space-200-variable: calc(16px + var(--density, 0px) / 2);
+  --spacing-space-250-variable: calc(20px + var(--density, 0px) / 2);
+  --spacing-space-300-variable: calc(24px + var(--density, 0px) / 2);
+  --spacing-space-400-variable: calc(32px + var(--density, 0px) / 2);
+  --spacing-space-450-variable: calc(36px + var(--density, 0px) / 2);
+  --spacing-space-500-variable: calc(40px + var(--density, 0px) / 2);
+  --spacing-space-600-variable: calc(48px + var(--density, 0px) / 2);
+  --spacing-space-700-variable: calc(56px + var(--density, 0px) / 2);
+  --spacing-space-800-variable: calc(64px + var(--density, 0px) / 2);
+  --spacing-space-900-variable: calc(72px + var(--density, 0px) / 2);
+}
+
+/* M3 density: "Higher density is typically applied by decreasing the top and
+ * bottom padding or overall height by 4dp". The padding, via py-space-<n>-variable, above.
+ * density-1|2|3 on <html>, a container or the component itself; default is 0. */
+@utility density-* {
+  --density: calc(var(--spacing) * --value(integer) * -1);
+}

@@ -1,0 +1,328 @@
+/* Navigation rail (navigation-rail.tsx, navigation-rail-item.tsx). An expanded rail is as wide as
+ * what it holds, from 220 to 360dp: --navigation-rail-width is that width as navigation-rail.tsx
+ * measures it, since no transition runs to `max-content`; without it the rail is 220dp. */
+@utility navigation-rail-width {
+  width: var(--navigation-rail-width, calc(var(--spacing) * 55));
+}
+
+/* The rail, React Aria's Toolbar, cut at its edge. Its fill and color are classes in
+ * navigation-rail.tsx, which one of yours takes the place of. */
+@utility navigation-rail {
+  @apply box-border flex flex-none overflow-x-clip font-plain;
+}
+
+/* What the rail holds, as wide as the widest of it, from 220 to 360dp, carrying the progress. */
+@utility navigation-rail-content {
+  @apply box-border w-max max-w-90 min-w-55 flex-none transition-navigation-rail-progress;
+}
+
+/* A column: the secondary destinations of one section, under its header: title-small, in line
+ * with the items' icons, 12dp under what is over it and 8dp over its items, as Android has it.
+ * In a rail it comes in with the labels beside the icons. */
+@utility navigation-rail-list {
+  @apply flex flex-none flex-col;
+
+  & > [slot='header'] {
+    @apply mt-space-150 box-border block px-space-450 py-space-100 text-title-sm text-on-surface-variant;
+    opacity: calc((1 - var(--navigation-rail-top)) * var(--navigation-rail-label));
+  }
+}
+
+/* The top of the rail: 44dp from its top edge and 20dp from its sides, 40dp over the items. What it
+ * holds is drawn as written, from its top, each centered in a 56dp column in a row at least as tall,
+ * 4dp apart; what is wider starts at its edge. A second column is for a FAB alone (fab.tsx). */
+@utility navigation-rail-header {
+  @apply mt-11 mb-10 box-border grid flex-none content-start items-center justify-items-center-safe gap-space-50 px-space-250 text-on-surface-variant;
+  grid-template-columns: calc(var(--spacing) * 14) auto;
+  grid-auto-rows: minmax(calc(var(--spacing) * 14), auto);
+
+  & > * {
+    grid-column: 1;
+  }
+}
+
+/* From the top, what the rail holds in a column: with no header over them, the items 44dp from
+ * the rail's top edge. */
+@utility navigation-rail-top-aligned {
+  @apply flex flex-col;
+
+  &:not(:has(> [data-navigation-rail-header])) {
+    padding-top: calc(var(--spacing) * 11);
+  }
+}
+
+/* Centered, the items and the sections under them are in the middle of the whole rail: the header,
+ * at its top, and an empty box after them share the room to spare, the box from the 84dp of the
+ * header's margins, as the header's room has them; with no header, two empty boxes share it. */
+@utility navigation-rail-centered {
+  @apply flex flex-col;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1 1 0;
+  }
+
+  & > [data-navigation-rail-header] {
+    flex: 1 0 0;
+  }
+
+  &:has(> [data-navigation-rail-header]) {
+    &::before {
+      display: none;
+    }
+
+    &::after {
+      flex-basis: calc(var(--spacing) * 21);
+    }
+  }
+}
+
+/* How far the rail is from collapsed, 0, to expanded, 1: registered so that it runs on the
+ * default spatial spring, a little past either end. Everything an item draws is placed by it,
+ * the way Compose's rail places it, which the motion here follows a recording of. */
+@property --navigation-rail-progress {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+@utility navigation-rail-expanded {
+  --navigation-rail-progress: 1;
+}
+
+/* What an item and a section read of the progress. Compose holds an item's own at 0, and its
+ * indicator's padding to 1 as well, where the spring goes past, and swaps the label from under
+ * the icon to beside it halfway, when the label is clear: --navigation-rail-top is 1 until then. */
+@utility navigation-rail-moments {
+  --navigation-rail-at: max(0, var(--navigation-rail-progress));
+  --navigation-rail-at-most: min(1, var(--navigation-rail-at));
+  --navigation-rail-top: clamp(0, (0.5 - var(--navigation-rail-progress)) * 100000, 1);
+  /* An item is 64dp less 16 of the way until its 56dp indicator is all of it, from halfway;
+   * past expanded it gives way by the 24dp its label left. */
+  --navigation-rail-item-height: max(
+    calc(var(--spacing) * (16 - 4 * var(--navigation-rail-progress))),
+    calc(var(--spacing) * (14 - 6 * max(0, var(--navigation-rail-at) - 1)))
+  );
+  /* Its indicator and label are in its middle until then: 6dp from its top, none from halfway. */
+  --navigation-rail-item-inset: calc(
+    var(--spacing) * var(--navigation-rail-top) *
+      (1.5 - 2 * var(--navigation-rail-progress) - 0.5 * var(--navigation-rail-at))
+  );
+  --navigation-rail-indicator-height: calc(
+    var(--spacing) * (8 + 6 * var(--navigation-rail-at-most))
+  );
+  /* The icon is under the indicator's middle on the way, by up to 3dp halfway. */
+  --navigation-rail-icon-drop: calc(
+    var(--spacing) * (3 - 0.5 * var(--navigation-rail-top)) * var(--navigation-rail-at) *
+      (1 - var(--navigation-rail-at))
+  );
+  /* How much is left of a label: 4(p - 0.5)², of the one under the icon until halfway and of
+   * the one beside it from there. */
+  --navigation-rail-label: calc(
+    4 * (var(--navigation-rail-at) - 0.5) * (var(--navigation-rail-at) - 0.5)
+  );
+}
+
+/* An item is as wide as the rail is at the moment, which its content, laid out as an expanded
+ * rail's, goes past in a collapsed one. As a percentage it still counts for all of that content
+ * in how wide the expanded rail is. Outside a rail, the width of what holds it. */
+@utility navigation-rail-item-width {
+  width: min(100%, 100cqi);
+}
+
+/* The item (navigation-rail-item.tsx), React Aria's ToggleButton with its native styling reset,
+ * as wide as the rail is at the moment, 20dp in from its edges. */
+@utility navigation-rail-item {
+  @apply relative focus-ring-inset m-0 box-border flex navigation-rail-item-width flex-none cursor-pointer touch-manipulation appearance-none flex-col items-start justify-center rounded-shape-xs border-0 bg-transparent px-space-250 py-0 text-start font-plain text-inherit no-underline navigation-rail-moments outline-none select-none;
+  @apply disabled:cursor-default;
+}
+
+/* An item of the rail's own: as tall as the progress has it, the 4dp from the last closing. */
+@utility navigation-rail-item-primary {
+  min-height: var(--navigation-rail-item-height);
+
+  & + & {
+    margin-top: calc(var(--spacing) * (1 - var(--navigation-rail-progress)));
+  }
+}
+
+/* What the indicator of an expanded rail hugs, past the item's edge in a collapsed rail: in its
+ * first row the icon and the label beside it, 8dp apart and 16dp from its ends, in its second the
+ * label under the icon. It takes no pointer, and gives an Icon in it its size and colors. */
+@utility navigation-rail-item-content {
+  @apply pointer-events-none relative box-border grid max-w-80 min-w-14 flex-none items-center gap-x-space-100 px-space-200;
+  @apply text-on-surface-variant icon-24;
+  @apply group-selected/md-navigation-rail-item:text-on-secondary-container group-selected/md-navigation-rail-item:icon-filled;
+  @apply group-disabled/md-navigation-rail-item:text-on-surface-variant/disabled-content;
+  @apply forced-colors:group-selected/md-navigation-rail-item:text-highlight-text;
+  @apply forced-colors:group-disabled/md-navigation-rail-item:text-gray-text;
+
+  /* The first row is the indicator's box's, the area it is positioned in: its end line given, as
+   * an `auto` one is the content's edge to it. What is drawn after the box is over it. */
+  & > :not(.navigation-rail-label-below) {
+    grid-row: 1 / 2;
+  }
+
+  & > :not(.navigation-rail-item-box) {
+    position: relative;
+  }
+}
+
+/* An item of the rail's own: its first row as tall as its indicator, from 32 to 56dp, 6dp from
+ * the item's top and bottom until halfway, and its icon under the indicator's middle on the way. */
+@utility navigation-rail-item-content-primary {
+  grid-template-rows: var(--navigation-rail-indicator-height) auto;
+  margin-block: var(--navigation-rail-item-inset);
+
+  & > :not(.navigation-rail-item-box, .navigation-rail-label) {
+    translate: 0 var(--navigation-rail-icon-drop);
+  }
+}
+
+/* The indicator's box, which the state layer and ripple fill and whose text color is theirs:
+ * 56 by 32dp around the icon in a collapsed rail, all of the content in an expanded one. */
+@utility navigation-rail-item-box {
+  @apply absolute inset-y-0 start-0 rounded-full text-on-secondary-container;
+}
+
+/* An item of the rail's own: from 56dp around the icon to all of the content, from its start
+ * edge. Until halfway it is on its way to the label in label-medium, the type the one under the
+ * icon is in: narrower than the label-large one it is laid out around by about their ratio. */
+@utility navigation-rail-item-box-primary {
+  --navigation-rail-label-scale: calc(
+    1 - var(--navigation-rail-top) * (1 - tan(atan2(var(--text-label-md), var(--text-label-lg))))
+  );
+  width: calc(
+    var(--spacing) * 14 +
+      (var(--spacing) * 2 + (100% - var(--spacing) * 16) * var(--navigation-rail-label-scale)) *
+      var(--navigation-rail-at)
+  );
+}
+
+/* The active indicator: secondary-container, from the start edge of its box, with no width and
+ * clear unless its item is selected. Forced colors draw it in the system highlight. */
+@utility navigation-rail-item-indicator {
+  @apply absolute inset-y-0 start-0 w-0 rounded-inherit bg-secondary-container opacity-0 transition-navigation-rail-indicator;
+  @apply group-selected/md-navigation-rail-item:w-full group-selected/md-navigation-rail-item:opacity-100;
+  @apply forced-colors:bg-highlight forced-colors:forced-color-adjust-none;
+}
+
+/* Either label: on-surface-variant, a selected one in the color its rail's layout picks
+ * (navigation-rail-item.tsx), which fades; a disabled one at 38%, selected or not. */
+@utility navigation-rail-label {
+  @apply text-on-surface-variant transition-navigation-rail-label;
+  @apply group-disabled/md-navigation-rail-item:text-on-surface-variant/disabled-content group-selected/md-navigation-rail-item:group-disabled/md-navigation-rail-item:text-on-surface-variant/disabled-content;
+  @apply forced-colors:group-disabled/md-navigation-rail-item:text-gray-text forced-colors:group-selected/md-navigation-rail-item:group-disabled/md-navigation-rail-item:text-gray-text;
+}
+
+/* The label under the icon, a collapsed rail's: label-medium, centered across the 96dp rail from
+ * its edge, 36dp back, and free to wrap. Its margins leave it out of how wide the content is. */
+@utility navigation-rail-label-below {
+  @apply relative col-start-1 row-start-2 -ms-space-450 -me-15 box-border w-24 px-space-25 text-center text-label-md wrap-break-word hyphens-auto;
+  justify-self: start;
+  /* Pushed down by the indicator as that grows, up to 2.5dp further from it. Its margin under
+   * gives the item the height above whatever the label's own. */
+  --navigation-rail-label-gap: calc(
+    var(--spacing) * (1 + 2.5 * var(--navigation-rail-at) * (1 - var(--navigation-rail-at)))
+  );
+  opacity: calc(var(--navigation-rail-top) * var(--navigation-rail-label));
+  margin-top: var(--navigation-rail-label-gap);
+  margin-bottom: calc(
+    var(--navigation-rail-item-height) - 2 * var(--navigation-rail-item-inset) -
+      var(--navigation-rail-indicator-height) - var(--navigation-rail-label-gap) -
+      var(--text-label-md--line-height)
+  );
+}
+
+/* The label beside the icon, an expanded rail's: label-large, on its way from the item's edge,
+ * 68dp back, by the progress (-in, -out), and in the system highlight text in forced colors. */
+@utility navigation-rail-label-beside {
+  @apply relative min-w-0 text-label-lg;
+  opacity: calc((1 - var(--navigation-rail-top)) * var(--navigation-rail-label));
+  inset-inline-start: var(--navigation-rail-label-shift);
+  @apply forced-colors:group-selected/md-navigation-rail-item:group-not-disabled/md-navigation-rail-item:text-highlight-text;
+}
+
+/* In the middle of the item, which its indicator is not as tall as until the rail has expanded. */
+@utility navigation-rail-label-beside-level {
+  top: calc(var(--spacing) * 3 * (1 - var(--navigation-rail-at)));
+}
+
+/* Expanding, it starts 20dp nearer the edge still, which it makes up on the way. */
+@utility navigation-rail-label-beside-in {
+  --navigation-rail-label-shift: calc(
+    var(--spacing) * ((12 + 5 * var(--navigation-rail-at)) * var(--navigation-rail-at) - 17)
+  );
+}
+
+@utility navigation-rail-label-beside-out {
+  --navigation-rail-label-shift: calc(var(--spacing) * 17 * (var(--navigation-rail-at) - 1));
+}
+
+/* A section keeps its icons 56dp under the last of the rail's own, as far as in the expanded
+ * rail, while that item turns: 14dp nearer it in a collapsed rail. */
+@utility navigation-rail-section {
+  translate: 0
+    calc(
+      var(--navigation-rail-item-inset) + var(--navigation-rail-indicator-height) / 2 +
+        var(--navigation-rail-icon-drop) + var(--spacing) * 7 - var(--navigation-rail-item-height)
+    );
+}
+
+/* The progress runs on the default spatial spring, as the rail's width, an item's place among
+ * the others and its indicator's box do with it. The md tokens, so a motion scope is followed. */
+@utility transition-navigation-rail-progress {
+  transition-property: --navigation-rail-progress;
+  transition-duration: var(--md-sys-motion-spring-default-spatial-duration);
+  transition-timing-function: var(--md-sys-motion-spring-default-spatial-easing);
+}
+
+/* The rail's own width, by the same spring from the same moment. */
+@utility transition-navigation-rail-width {
+  transition-property: width;
+  transition-duration: var(--md-sys-motion-spring-default-spatial-duration);
+  transition-timing-function: var(--md-sys-motion-spring-default-spatial-easing);
+}
+
+/* The active indicator grows from no width at the start edge of its box and fades in with it,
+ * both by the default spatial spring, a little past the box before it settles, and goes the
+ * same way back. */
+@utility transition-navigation-rail-indicator {
+  transition-property: width, opacity;
+  transition-duration: var(--md-sys-motion-spring-default-spatial-duration);
+  transition-timing-function: var(--md-sys-motion-spring-default-spatial-easing);
+}
+
+/* A label's color, which fades by the default effects spring: when its item is selected, and
+ * between the colors a selected label has under the icon and beside it. The icon's is at once. */
+@utility transition-navigation-rail-label {
+  transition-property: color;
+  transition-duration: var(--md-sys-motion-spring-default-effects-duration);
+  transition-timing-function: var(--md-sys-motion-spring-default-effects-easing);
+}
+
+/* Secondary destinations, which only an expanded rail shows: there with the icons from the
+ * first frame, and gone with the labels beside them, out of reach once they are. A frame is a
+ * 60th of a second under the expressive scheme: 1/26.4 of the spring's 440ms. */
+@utility transition-navigation-rail-section-in {
+  transition-property: opacity, visibility;
+  transition-duration: calc(var(--md-sys-motion-spring-default-spatial-duration) * 5 / 26.4), 0s;
+  transition-timing-function: linear;
+}
+
+@utility transition-navigation-rail-section-out {
+  transition-property: opacity, visibility;
+  transition-duration: calc(var(--md-sys-motion-spring-default-spatial-duration) * 6 / 26.4), 0s;
+  transition-delay: 0s, calc(var(--md-sys-motion-spring-default-spatial-duration) * 6 / 26.4);
+  transition-timing-function: linear(0, 0.22, 0.53, 0.77, 0.86, 0.93, 1), linear;
+}
+
+/* A rail that hides: its width runs out on the spring, as any rail's does, and it is hidden
+ * and out of reach once it has gone, when the spring has settled, not before. */
+@utility transition-navigation-rail-hidden {
+  transition-property: width, visibility;
+  transition-duration: var(--md-sys-motion-spring-default-spatial-duration), 0s;
+  transition-delay: 0s, var(--md-sys-motion-spring-default-spatial-duration);
+  transition-timing-function: var(--md-sys-motion-spring-default-spatial-easing), linear;
+}

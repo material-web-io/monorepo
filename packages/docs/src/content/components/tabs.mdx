@@ -1,0 +1,265 @@
+import tabsApi from 'virtual:api/Tabs'
+import tabListApi from 'virtual:api/TabList'
+import tabApi from 'virtual:api/Tab'
+import tabPanelApi from 'virtual:api/TabPanel'
+import * as automatic from '../../examples/tabs/automatic.tsx?example'
+import * as basic from '../../examples/tabs/basic.tsx?example'
+import * as controlled from '../../examples/tabs/controlled.tsx?example'
+import * as disabled from '../../examples/tabs/disabled.tsx?example'
+import * as fixed from '../../examples/tabs/fixed.tsx?example'
+import * as functionChildren from '../../examples/tabs/function-children.tsx?example'
+import * as iconPosition from '../../examples/tabs/icon-position.tsx?example'
+import * as icons from '../../examples/tabs/icons.tsx?example'
+import * as keepMounted from '../../examples/tabs/keep-mounted.tsx?example'
+import * as longLabels from '../../examples/tabs/long-labels.tsx?example'
+import * as nav from '../../examples/tabs/nav.tsx?example'
+import * as primary from '../../examples/tabs/primary.tsx?example'
+import * as scrollable from '../../examples/tabs/scrollable.tsx?example'
+import * as secondary from '../../examples/tabs/secondary.tsx?example'
+import * as twoLevels from '../../examples/tabs/two-levels.tsx?example'
+import * as vertical from '../../examples/tabs/vertical.tsx?example'
+
+Tabs organize groups of related content that are at the same level of hierarchy, and let people switch between them. Use tabs to group related content, not sequential content.
+
+To move between the main destinations of an app, use a [navigation bar](/components/navigation-bar) or a [navigation rail](/components/navigation-rail) instead.
+
+Tabs are composed of four parts, as with React Aria's [`Tabs`](https://react-aria.adobe.com/Tabs):
+
+| Part       | Use                                                              |
+| ---------- | ---------------------------------------------------------------- |
+| `Tabs`     | The container of the row and the panels. It holds the selection. |
+| `TabList`  | The row of tabs                                                  |
+| `Tab`      | A tab. Selecting it shows its panel.                             |
+| `TabPanel` | What a tab shows                                                 |
+
+```tsx
+import { Tab, TabList, TabPanel, Tabs } from '@material-web/react'
+```
+
+## Basic tabs
+
+Put a `TabList` of `Tab`s and a `TabPanel` for each tab in `Tabs`. Give a tab and its panel the same `id`.
+
+<Example {...basic} isFlush />
+
+To render the tabs from data, pass `items` to the `TabList` and a function as its children. See [Collections](/get-started/composition#collections).
+
+Tabs come in two variants. Set `variant` on the `Tabs` to `primary` (the default) or `secondary`.
+
+### Primary tabs
+
+Primary tabs show the main content destinations, at the top of the content pane under an [app bar](/components/app-bar). Use them when one set of tabs is needed. A selected primary tab is shown in the primary color, over an indicator as wide as its content.
+
+<Example {...primary} isFlush />
+
+### Secondary tabs
+
+Secondary tabs separate related content within a content area, and establish hierarchy. A selected secondary tab is shown over an indicator across the whole tab.
+
+<Example {...secondary} isFlush />
+
+Use secondary tabs when a screen needs more than one level of tabs, and place them below the primary tabs, such as in the panel of a primary tab.
+
+<Example {...twoLevels} isFlush />
+
+## Icons
+
+Write a tab's icon and label as its children. An `Icon` is sized and colored by the tab. Use icons on every tab of a row, or on none of them.
+
+For a tab with an icon alone, set an `aria-label`.
+
+<Example {...icons} isFlush />
+
+## Selection
+
+Set the initial selection with `defaultSelectedKey`, or control it with `selectedKey` and `onSelectionChange`, as with React Aria's [selection](https://react-aria.adobe.com/Tabs#selection). The key is the `id` of the selected tab. With neither, the first tab is selected.
+
+<Example {...controlled} isFlush />
+
+A mouse selects a tab when it is pressed, and a touch when it is released.
+
+## Keyboard activation
+
+Set `keyboardActivation` to `manual` (the default) or `automatic`. With `manual`, the arrow keys move the focus between the tabs, and Space or Enter selects the focused one. With `automatic`, the arrow keys select the tab they move to.
+
+<Example {...automatic} isFlush />
+
+## Keeping panels mounted
+
+A `TabPanel` is rendered only while its tab is selected, so what a person entered in it is lost when they switch tabs. Set `shouldForceMount` on a panel to keep it rendered. A panel whose tab is not selected is then `inert`, and it is still shown: hide it with a class such as `inert:hidden`.
+
+<Example {...keepMounted} isFlush />
+
+## Disabled
+
+Set `isDisabled` on a `Tab` to disable it, or list its `id` in the `disabledKeys` of the `Tabs`. A disabled tab cannot be selected or focused, and the arrow keys skip it. Set `isDisabled` on the `Tabs` to disable every tab.
+
+<Example {...disabled} isFlush />
+
+## Icon position
+
+The variant places the icon of a tab that has a label too:
+
+| Variant     | Icon             | Row height |
+| ----------- | ---------------- | ---------- |
+| `primary`   | Over the label   | 64dp       |
+| `secondary` | Before the label | 48dp       |
+
+A row of tabs with a label alone, or an icon alone, is 48dp tall.
+
+<Example {...iconPosition} isFlush />
+
+## Fixed tabs
+
+By default, the tabs are fixed: they show all at once and divide the row equally, whatever the length of their labels. Fixed tabs are best for switching between related content quickly, such as between transportation methods in a map.
+
+<Example {...fixed} isFlush />
+
+The row is as wide as the `Tabs`. To make it narrower than its container, set a width on the `Tabs` in `className`.
+
+## Scrollable tabs
+
+When a set of tabs cannot fit on screen, set `isScrollable` on the `TabList`. Each tab is then as wide as its label, and the row scrolls sideways. Scrollable tabs can have longer labels and a larger number of tabs, and are best for browsing on touch screens.
+
+<Example {...scrollable} isFlush />
+
+A scrollable row scrolls to the selected tab, and to a tab that the keyboard focuses. Its first and last tab are 52dp from the ends of the row.
+
+## Long labels
+
+A label wraps when its tab is too narrow for it, and the row grows with it. To limit a label to two lines, put it in an element of your own with `line-clamp-2`.
+
+<Example {...longLabels} />
+
+## Orientation
+
+Set `orientation="vertical"` on the `Tabs` to stack the tabs in a column beside their panels. Each tab is as tall as its content, and the column is as wide as its widest tab, with the divider and the active indicator at its inline end. The up and down arrow keys then move between the tabs.
+
+<Example {...vertical} isFlush />
+
+With `isScrollable` on the `TabList`, the column scrolls up and down when it is taller than the `Tabs`. Set a height on the `Tabs` in `className` to limit it.
+
+## Links
+
+Give a tab an `href` to make it a [link](https://react-aria.adobe.com/Tabs#links), for tabs that move between the pages of an app. Pressing a link tab follows its link and does not change the selection, so set `selectedKey` from the current location.
+
+<Example {...nav} isFlush />
+
+## Third-party routing library
+
+A tab's link goes through React Aria's `RouterProvider`. Wrap the app in it once to follow the links with a client-side router, in place of a full page load. See [Routing](/get-started/react-aria#routing).
+
+With React Router, read the selected tab from the location:
+
+```tsx
+import { Tab, TabList, TabPanel, Tabs } from '@material-web/react'
+import { Outlet, useLocation } from 'react-router'
+
+function SectionTabs() {
+  const { pathname } = useLocation()
+  return (
+    <Tabs selectedKey={pathname}>
+      <TabList>
+        <Tab id="/flights" href="/flights">
+          Flights
+        </Tab>
+        <Tab id="/trips" href="/trips">
+          Trips
+        </Tab>
+      </TabList>
+      <TabPanel id={pathname}>
+        <Outlet />
+      </TabPanel>
+    </Tabs>
+  )
+}
+```
+
+## Customization
+
+Each part takes its own `className`: `Tabs`, `TabList`, `Tab` and `TabPanel`. A class of yours replaces the part's own class for the same property. See [Styling](/get-started/styling) for the classes, the states and the theme.
+
+Pass a function as a tab's children to render them from its state: `isHovered`, `isPressed`, `isFocused`, `isFocusVisible`, `isSelected` and `isDisabled`. In this example, the icon of the selected tab is filled.
+
+<Example {...functionChildren} isFlush />
+
+- **Color:** The label of a selected primary tab and the active indicator of both variants use the `primary` color role. To change them together, set that role on the `Tabs`. See [Theme](/get-started/styling#theme).
+- **Density:** Add `density-1`, `density-2` or `density-3` to the `Tabs`, or to an element around it. Each step makes the row 4dp shorter. See [Density](/get-started/styling#density).
+- **States:** Style a tab's state with its variant, such as `hover:`, `selected:` or `disabled:`. See [States](/get-started/styling#states).
+- **Functions:** The children of a `TabPanel` can be a function of `isFocused`, `isFocusVisible` and `isInert`, and the children of `Tabs` a function of its `orientation`. The `className` and `style` of a `TabList` can be functions of its state. See [Children as a function](/get-started/composition#children-as-a-function).
+- **Every tab:** To restyle all the tabs at once, change the [theme](/get-started/styling#theme).
+
+## Limitations
+
+### Scroll buttons
+
+A scrollable row has no scroll buttons and shows no scrollbar. People scroll it with a swipe, a trackpad or the keyboard.
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/tabs/accessibility#c519daa6-8bbe-41c8-977d-77e12c97dffa) what people should be able to do with assistive technology:
+
+- Undertake actions or invoke navigation to a new destination with assistive tech
+- Select an action or destination from an off screen tab with assistive tech
+- Maintain access of primary actions when the content is in a scrolled state
+
+### Interaction and style
+
+- **States:** Hovering a tab shows a state layer over it, and a press shows a ripple. An inactive tab's label darkens while it is hovered or focused. Keyboard focus shows a [focus ring](/theme/accessibility#focus-ring) inside the tab, and a click does not.
+- **Touch target:** Every tab has a [touch target](/theme/accessibility#touch-targets) of at least 48dp, at every density.
+- **Color contrast:** With the default colors, the labels keep 4.5:1 contrast and the active indicator 3:1 with the surface, in the light and dark schemes at every contrast level. Keep that contrast when you change the `primary` role, as in [Customization](#customization).
+- **Text size:** A label wraps when its tab is too narrow for it, and the row grows with it. See [Long labels](#long-labels).
+- **Density:** Each [density](/get-started/styling#density) step makes the row 4dp shorter, and each tab keeps its 48dp touch target. Material [advises](https://m3.material.io/components/tabs/accessibility#97bd405b-6d5e-47d5-b11d-4f4a115b3f9b) against denser tabs by default: apply a density only when people choose one, such as a denser layout, and keep the controls that change it at least 48 by 48dp.
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), the active indicator moves at once, and a scrollable row scrolls at once.
+- **Forced colors:** In [forced colors](/theme/accessibility#forced-colors), the active indicator, the divider and the focus ring stay visible, and a disabled tab is drawn in the system's gray text color.
+- **Right to left:** In a right-to-left direction, the row starts at the right, and a vertical row's divider is on its left.
+- **Horizontal scrolling:** Set `isScrollable` when the tabs cannot fit. Material [notes](https://m3.material.io/components/tabs/accessibility#13ed756b-fb35-4bb3-ac8c-1157e49031d8) that horizontal scrolling meets accessibility requirements, since tabs widen to fit their labels. The row scrolls to the tab the keyboard focuses, and has no scroll buttons. See [Scrollable tabs](#scrollable-tabs).
+
+### Focus
+
+- The tabs are one tab stop: Tab moves the focus to the selected tab.
+- By default, the arrow keys only move the focus, and Space or Enter selects the focused tab, as Material [advises](https://m3.material.io/components/tabs/accessibility#6b65f52d-f4eb-4d5f-bfe8-01b1540afde6). See [Keyboard activation](#keyboard-activation).
+- A panel is a tab stop after the tabs when nothing in it can be focused. It shows the focus ring when the keyboard focuses it.
+- A disabled tab cannot be focused.
+
+### Keyboard navigation
+
+| Keys                | Actions                                                      |
+| ------------------- | ------------------------------------------------------------ |
+| Tab                 | Move the focus to the selected tab, then into its panel      |
+| Left or Right arrow | Move the focus to the previous or next tab                   |
+| Up or Down arrow    | Move the focus to the previous or next tab of a vertical row |
+| Home                | Move the focus to the first tab                              |
+| End                 | Move the focus to the last tab                               |
+| Space or Enter      | Select the focused tab                                       |
+
+- The arrow keys wrap around, from the last tab to the first and back, and skip a disabled tab.
+- With `keyboardActivation="automatic"`, the arrow keys select the tab they move to.
+- The left and right arrow keys are reversed in a right-to-left locale, which is set with an `I18nProvider`, not with `dir`.
+
+### Labeling elements
+
+- The `TabList` is a tab list, each `Tab` a tab, and each `TabPanel` a tab panel. To name the row, set an `aria-label` or `aria-labelledby` on the `TabList`.
+- A tab's text names it. Each panel is named by the tab with the same `id`.
+- A tab with an icon alone needs an `aria-label`. Material [advises](https://m3.material.io/components/tabs/accessibility#bc704c75-5876-476e-b636-53b6eadef773) a name that says what the tab shows, such as Video format media content for a video camera icon, and a more descriptive one wherever the visible text is ambiguous.
+- The selected tab reports it with `aria-selected`, and a disabled tab with `aria-disabled`.
+
+## Props
+
+### Tabs
+
+<PropsTable {...tabsApi} />
+
+### TabList
+
+<PropsTable {...tabListApi} />
+
+### Tab
+
+<PropsTable {...tabApi} />
+
+### TabPanel
+
+<PropsTable {...tabPanelApi} />

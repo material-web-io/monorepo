@@ -1,0 +1,72 @@
+/* Material 3 shape scale (corner radius). Utilities: rounded-shape-xs,
+ * rounded-shape-full, rounded-t-shape-lg, ... Namespaced with "shape-" so
+ * Tailwind's own rounded-sm/md/lg are left alone. */
+:root {
+  --md-sys-shape-corner-none: 0px;
+  --md-sys-shape-corner-extra-small: 4px;
+  --md-sys-shape-corner-small: 8px;
+  --md-sys-shape-corner-medium: 12px;
+  --md-sys-shape-corner-large: 16px;
+  --md-sys-shape-corner-large-increased: 20px;
+  --md-sys-shape-corner-extra-large: 28px;
+  --md-sys-shape-corner-extra-large-increased: 32px;
+  --md-sys-shape-corner-extra-extra-large: 48px;
+  --md-sys-shape-corner-full: 9999px;
+}
+
+/* rounded-inherit: an overlay that must always match its parent's current
+ * corner (Ripple's clipping layer). A plain @utility, not a theme radius, since
+ * `inherit` through a custom property re-inherits the property, not the keyword. */
+@utility rounded-inherit {
+  border-radius: inherit;
+}
+
+/* rounded-t-inherit / rounded-b-inherit: rounded-inherit on the top or the bottom
+ * corners only, for the first or the last part of a clipped container (a card's action
+ * area), so what it draws at its own corners, its focus ring, follows the container's. */
+@utility rounded-t-inherit {
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+}
+
+@utility rounded-b-inherit {
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+}
+
+/* rounded-space-<n>-variable: the round corner of a one-line box padded py-space-<n>-variable: half
+ * its height as a length (half a line and the padding, where density leaves any), so it is
+ * round at any density and a transition to a smaller corner shows throughout, as from 9999px not. */
+@theme inline {
+  --radius-space-0-variable: calc(0.5lh + max(0px, 0px + var(--density, 0px) / 2));
+  --radius-space-25-variable: calc(0.5lh + max(0px, 2px + var(--density, 0px) / 2));
+  --radius-space-50-variable: calc(0.5lh + max(0px, 4px + var(--density, 0px) / 2));
+  --radius-space-75-variable: calc(0.5lh + max(0px, 6px + var(--density, 0px) / 2));
+  --radius-space-100-variable: calc(0.5lh + max(0px, 8px + var(--density, 0px) / 2));
+  --radius-space-125-variable: calc(0.5lh + max(0px, 10px + var(--density, 0px) / 2));
+  --radius-space-150-variable: calc(0.5lh + max(0px, 12px + var(--density, 0px) / 2));
+  --radius-space-175-variable: calc(0.5lh + max(0px, 14px + var(--density, 0px) / 2));
+  --radius-space-200-variable: calc(0.5lh + max(0px, 16px + var(--density, 0px) / 2));
+  --radius-space-250-variable: calc(0.5lh + max(0px, 20px + var(--density, 0px) / 2));
+  --radius-space-300-variable: calc(0.5lh + max(0px, 24px + var(--density, 0px) / 2));
+  --radius-space-400-variable: calc(0.5lh + max(0px, 32px + var(--density, 0px) / 2));
+  --radius-space-450-variable: calc(0.5lh + max(0px, 36px + var(--density, 0px) / 2));
+  --radius-space-500-variable: calc(0.5lh + max(0px, 40px + var(--density, 0px) / 2));
+  --radius-space-600-variable: calc(0.5lh + max(0px, 48px + var(--density, 0px) / 2));
+  --radius-space-700-variable: calc(0.5lh + max(0px, 56px + var(--density, 0px) / 2));
+  --radius-space-800-variable: calc(0.5lh + max(0px, 64px + var(--density, 0px) / 2));
+  --radius-space-900-variable: calc(0.5lh + max(0px, 72px + var(--density, 0px) / 2));
+}
+
+@theme inline {
+  --radius-shape-none: var(--md-sys-shape-corner-none);
+  --radius-shape-xs: var(--md-sys-shape-corner-extra-small);
+  --radius-shape-sm: var(--md-sys-shape-corner-small);
+  --radius-shape-md: var(--md-sys-shape-corner-medium);
+  --radius-shape-lg: var(--md-sys-shape-corner-large);
+  --radius-shape-lg-inc: var(--md-sys-shape-corner-large-increased);
+  --radius-shape-xl: var(--md-sys-shape-corner-extra-large);
+  --radius-shape-xl-inc: var(--md-sys-shape-corner-extra-large-increased);
+  --radius-shape-2xl: var(--md-sys-shape-corner-extra-extra-large);
+  --radius-shape-full: var(--md-sys-shape-corner-full);
+}

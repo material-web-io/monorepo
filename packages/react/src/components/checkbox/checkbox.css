@@ -1,0 +1,84 @@
+/* Checkbox (checkbox.tsx). rounded-checkbox-container: the container's corner, 2dp in its spec,
+ * which is below the smallest step of the shape scale, so it is its own token. */
+@theme {
+  --radius-checkbox-container: 2px;
+}
+
+/* React Aria's CheckboxButton, the <label> that is pressed, with the hidden <input>; the named
+ * group its parts style from, group/md-checkbox, is on it in checkbox.tsx, since @apply takes no group. */
+@utility checkbox-button {
+  @apply inline-flex cursor-pointer items-center text-on-surface select-none;
+  @apply disabled:cursor-default disabled:text-on-surface/disabled-content disabled:forced-colors:text-gray-text;
+}
+
+/* The 40dp state layer host, with focus ring, ripple and 48dp target. Its text color is the hover
+ * and focus layer's, primary once selected or indeterminate; the press ripple's is the other one of
+ * the pair, passed to Ripple in checkbox.tsx. */
+@utility checkbox-state-layer-host {
+  @apply touch-target relative inline-flex size-10 shrink-0 touch-manipulation items-center justify-center rounded-full;
+  @apply text-on-surface group-indeterminate/md-checkbox:text-primary group-selected/md-checkbox:text-primary;
+  @apply group-invalid/md-checkbox:text-error;
+  @apply group-focus-visible/md-checkbox:focus-indicator;
+}
+
+/* The 18dp container. Selected or indeterminate, it is filled and its border transparent, so the
+ * fill shows through it in one flat color, disabled too, at the spec's 38%. Its text color is the
+ * icon's. The groups below keep this order: invalid before disabled, forced colors last. */
+@utility checkbox-container {
+  @apply relative box-border size-4.5 rounded-checkbox-container border-2 border-on-surface-variant bg-transparent text-on-primary;
+  /* Fill and border cross-fade over a short-2, as in the guideline videos. */
+  @apply transition-colors duration-short-2 ease-linear group-disabled/md-checkbox:transition-none forced-colors:transition-none;
+  @apply group-selected/md-checkbox:border-transparent group-selected/md-checkbox:bg-primary;
+  @apply group-indeterminate/md-checkbox:border-transparent group-indeterminate/md-checkbox:bg-primary;
+  /* Unselected, enabled and valid, the outline darkens to the label's color while hovered, focused
+   * or pressed, stacked on those states, so the invalid and disabled outlines need no more. */
+  @apply group-not-disabled/md-checkbox:group-not-invalid/md-checkbox:group-not-selected/md-checkbox:group-not-indeterminate/md-checkbox:group-hover/md-checkbox:border-on-surface;
+  @apply group-not-disabled/md-checkbox:group-not-invalid/md-checkbox:group-not-selected/md-checkbox:group-not-indeterminate/md-checkbox:group-focus-visible/md-checkbox:border-on-surface;
+  @apply group-not-disabled/md-checkbox:group-not-invalid/md-checkbox:group-not-selected/md-checkbox:group-not-indeterminate/md-checkbox:group-pressed/md-checkbox:border-on-surface;
+  /* Invalid, the error role. */
+  @apply group-invalid/md-checkbox:text-on-error group-invalid/md-checkbox:group-not-selected/md-checkbox:group-not-indeterminate/md-checkbox:border-error;
+  @apply group-indeterminate/md-checkbox:group-invalid/md-checkbox:bg-error group-selected/md-checkbox:group-invalid/md-checkbox:bg-error;
+  /* Disabled, on-surface at 38% and the surface color. */
+  @apply group-disabled/md-checkbox:text-surface group-disabled/md-checkbox:group-not-selected/md-checkbox:group-not-indeterminate/md-checkbox:border-on-surface/disabled-content;
+  @apply group-indeterminate/md-checkbox:group-disabled/md-checkbox:bg-on-surface/disabled-content group-selected/md-checkbox:group-disabled/md-checkbox:bg-on-surface/disabled-content;
+  /* Forced colors fill it with the system highlight, grey when disabled. */
+  @apply group-indeterminate/md-checkbox:group-not-disabled/md-checkbox:forced-colors:selected-fill group-selected/md-checkbox:group-not-disabled/md-checkbox:forced-colors:selected-fill;
+  @apply group-disabled/md-checkbox:group-not-selected/md-checkbox:group-not-indeterminate/md-checkbox:forced-colors:border-gray-text;
+  @apply group-selected/md-checkbox:group-disabled/md-checkbox:forced-colors:bg-gray-text group-selected/md-checkbox:group-disabled/md-checkbox:forced-colors:text-canvas group-selected/md-checkbox:group-disabled/md-checkbox:forced-colors:forced-color-adjust-none;
+  @apply group-indeterminate/md-checkbox:group-disabled/md-checkbox:forced-colors:bg-gray-text group-indeterminate/md-checkbox:group-disabled/md-checkbox:forced-colors:text-canvas group-indeterminate/md-checkbox:group-disabled/md-checkbox:forced-colors:forced-color-adjust-none;
+}
+
+/* The icon fades in over a short-1 and out over a short-2, staying whole while it fades. Sized as
+ * well as inset: WebKit fits an svg only inset to the container's 14dp padding box, small and
+ * off-center. Disabled, nothing animates, so no outline flashes through the transparent border. */
+@utility checkbox-icon {
+  @apply pointer-events-none absolute -inset-0.5 size-4.5 fill-current opacity-0 transition-opacity duration-short-2 ease-linear;
+  @apply group-selected/md-checkbox:opacity-100 group-selected/md-checkbox:duration-short-1;
+  @apply group-indeterminate/md-checkbox:opacity-100 group-indeterminate/md-checkbox:duration-short-1;
+  @apply group-disabled/md-checkbox:transition-none;
+}
+
+/* Each of the icon's two marks, the check's arms or the dash's halves; disabled, nothing animates.
+ * Whether it morphs or is drawn depends on the state before, which checkbox.tsx keeps. */
+@utility checkbox-mark {
+  @apply origin-top-left transform-view;
+  @apply group-disabled/md-checkbox:animate-none group-disabled/md-checkbox:transition-none;
+}
+
+/* Draws the icon's check: each mark is a rect scaled out of its own start, the short one over one
+ * short-1 and then the long one over the next, so the check is traced from its left tip through
+ * its vertex to its end. */
+@utility checkbox-mark-draw {
+  animation: checkbox-mark-draw var(--md-sys-motion-duration-short1)
+    var(--md-sys-motion-easing-standard-accelerate) both;
+  &:last-child {
+    animation-timing-function: var(--md-sys-motion-easing-standard-decelerate);
+    animation-delay: var(--md-sys-motion-duration-short1);
+  }
+}
+
+@keyframes checkbox-mark-draw {
+  from {
+    scale: 0 1;
+  }
+}

@@ -1,0 +1,7 @@
+/* Card (card.tsx): the container, a 12dp-cornered column that clips what bleeds to its edges,
+ * in the plain typeface on on-surface. Forced colors drop fills and shadows, so a system-color
+ * border marks the edge. */
+@utility card {
+  @apply box-border flex flex-col overflow-clip rounded-shape-md font-plain text-body-md text-on-surface;
+  @apply forced-colors:container-border;
+}

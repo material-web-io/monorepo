@@ -1,0 +1,3 @@
+/* A FAB showing no label: none in its label slot, React Aria's Text given slot="label" (fab.tsx),
+ * or one collapsed, hidden from assistive technology. */
+@custom-variant fab-icon-only (&:not(:has(> * > [slot='label']:not([aria-hidden]))));

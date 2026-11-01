@@ -1,0 +1,261 @@
+import dialogApi from 'virtual:api/Dialog'
+import { DialogSlots } from '../../slot-pictures/dialog.tsx'
+import dialogTriggerApi from 'virtual:api/DialogTrigger'
+import * as alert from '../../examples/dialog/alert.tsx?example'
+import * as basic from '../../examples/dialog/basic.tsx?example'
+import * as controlled from '../../examples/dialog/controlled.tsx?example'
+import * as custom from '../../examples/dialog/custom.tsx?example'
+import * as dismissal from '../../examples/dialog/dismissal.tsx?example'
+import * as form from '../../examples/dialog/form.tsx?example'
+import * as fullScreen from '../../examples/dialog/full-screen.tsx?example'
+import * as longContent from '../../examples/dialog/long-content.tsx?example'
+import * as nested from '../../examples/dialog/nested.tsx?example'
+import * as position from '../../examples/dialog/position.tsx?example'
+import * as responsive from '../../examples/dialog/responsive.tsx?example'
+import * as scrolling from '../../examples/dialog/scrolling.tsx?example'
+import * as stackedActions from '../../examples/dialog/stacked-actions.tsx?example'
+import * as transition from '../../examples/dialog/transition.tsx?example'
+
+Dialogs provide important prompts in a user flow. Use a dialog to make sure that people act on information, such as to confirm a high-risk action like deleting progress.
+
+A dialog is a modal window that appears in front of the app's content to give critical information or to ask for a decision. While it is open, the rest of the app cannot be used, and it stays on screen until it is confirmed, dismissed, or a required action has been taken. Dedicate each dialog to a single task.
+
+For a brief message that needs no response, use a [snackbar](/components/snackbar) instead.
+
+A dialog is composed of these parts:
+
+| Part                             | Use                                                                                                                                                                        |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DialogTrigger`                  | The trigger. Wraps the button that opens the dialog and the `Dialog`, with the button first. The button can be a `Button`, an `IconButton` or any other React Aria button. |
+| `Dialog`                         | The scrim and the dialog's container: a basic dialog (the default) or, with `isFullScreen`, a [full-screen dialog](#full-screen)                                           |
+| `Heading` with `slot="title"`    | The headline, which names the dialog                                                                                                                                       |
+| `Text` with `slot="description"` | The supporting text, which describes the dialog                                                                                                                            |
+| A button with `slot="close"`     | An action, which closes the dialog                                                                                                                                         |
+
+```tsx
+import { Dialog, DialogTrigger } from '@material-web/react'
+import { Heading, Text } from 'react-aria-components'
+```
+
+## Basic dialog
+
+Wrap the button that opens the dialog and the `Dialog` in a `DialogTrigger`, and write the dialog's parts as its children, each with its `slot`.
+
+<Example {...basic} />
+
+Style the headline, the supporting text and the actions with your own classes, as listed under [Headline, content and actions](#headline-content-and-actions). For where `Heading` and `Text` come from, see [Imports](/get-started/react-aria#imports).
+
+## Slots
+
+<DialogSlots showLegend />
+
+| Slot          | Child       | Use                                             |
+| ------------- | ----------- | ----------------------------------------------- |
+| `title`       | A `Heading` | The headline, which names the dialog            |
+| `description` | A `Text`    | The supporting text, which describes the dialog |
+| `close`       | Any button  | An action that closes the dialog                |
+
+## Headline, content and actions
+
+A basic dialog has 24dp of padding above and below its content and none at the sides, so a `Divider` in it spans the dialog. Lay it out in these parts:
+
+| Part     | Use                                                                                                                                                                                                          |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Headline | Optional                                                                                                                                                                                                     |
+| Content  | Add `min-h-0 grow overflow-y-auto` to scroll between the headline and the actions, as in [Scrolling long content](#scrolling-long-content). The dialog sets the type style and color of the supporting text. |
+| Actions  | Write the buttons in reading order, with the dismissing action first.                                                                                                                                        |
+| Dividers | Optional. Put a `Divider` between the parts.                                                                                                                                                                 |
+
+Style the parts with the theme's classes:
+
+```tsx
+<Dialog>
+  <Heading slot="title" className="px-space-300 pb-space-200 text-headline-sm text-on-surface">
+    …
+  </Heading>
+  <div className="px-space-300 pb-space-100">…</div>
+  <div className="flex shrink-0 flex-wrap-reverse justify-end gap-space-100 px-space-300 pt-space-200">
+    …
+  </div>
+</Dialog>
+```
+
+Buttons that do not fit side by side stack with the confirming action on top. In a right-to-left page, the actions are at the left edge.
+
+<Example {...stackedActions} />
+
+## Alerts
+
+A basic dialog has the `alertdialog` role: it interrupts the flow to give a message and to get a response. A full-screen dialog has the `dialog` role. The role follows the variant and cannot be set.
+
+The headline is optional, so an alert can ask its question in the supporting text alone. Without a title, the dialog is named by its trigger's text. Set an `aria-label` to give it a name of its own, or when it has no trigger.
+
+<Example {...alert} />
+
+## Opening and closing
+
+The `DialogTrigger` opens the dialog when its button is pressed. It keeps the open state itself unless you control it with `isOpen` and `onOpenChange`. Set `defaultOpen` to start with the dialog open. While the dialog is open, the button stays pressed, so a `Button` with `hasShapeMorph` keeps its pressed shape until the dialog closes.
+
+A button in the dialog with `slot="close"` closes it, and the button's own `onPress` is still called. To close the dialog from your own code, pass a function as the `Dialog`'s children and call `state.close()`: `{({ state }) => …}`.
+
+To open a dialog from your own code, write a `Dialog` without a trigger and control it with `isOpen` and `onOpenChange`. Without a title, such a dialog needs an `aria-label`. The `Dialog` takes these props, and `defaultOpen`, as React Aria's [Modal](https://react-aria.adobe.com/Modal#api) does.
+
+<Example {...controlled} />
+
+## Dismissal
+
+Escape and a click on the scrim close a dialog, and `onOpenChange` is called with `false`. Set `isDismissable={false}` to keep a click on the scrim from closing it, and `isKeyboardDismissDisabled` to keep Escape from closing it. In this example, only the actions close the dialog.
+
+<Example {...dismissal} />
+
+To decide for each press outside the dialog whether it closes the dialog, pass a function as `shouldCloseOnInteractOutside`. It receives the pressed element, and the dialog stays open when it returns `false`.
+
+## Forms
+
+To put a form in a dialog, wrap all of the dialog's content in a `<form>`. The parts are laid out in the form as they are in the dialog. The form is submitted by its confirming action, a button with `type="submit"`, and by Enter in a field. Close the dialog from the form's `onSubmit` with `state.close()`. In this example, the content has `pt-space-100` so that the label of the outlined field is not clipped.
+
+<Example {...form} />
+
+For the fields of a form and their validation, see [Forms](/get-started/react-aria#forms).
+
+## Size and scrolling
+
+A basic dialog is centered in the window. It is as wide as its text, between 280dp and 560dp, and as tall as its content, up to the height the window allows.
+
+The dialog is a flex item in a box that covers the window. Use the `Dialog`'s `className` to move it from the center (`ms-auto self-end`) or to narrow it (`max-w-80`).
+
+<Example {...position} />
+
+### Scrolling long content
+
+The content of a basic dialog is laid out in a column no taller than the dialog. Give the part that should scroll `min-h-0 grow overflow-y-auto`, and it scrolls between the parts above and below it. A box with a set height and no content shrinks in the column unless you give it `shrink-0`.
+
+<Example {...longContent} />
+
+> **Note:** A scrolling part clips what extends past its top edge. Give it `pt-space-100` when it starts with an outlined `TextField` or with a control that shows a focus ring.
+
+A full-screen dialog scrolls as a whole, under its app bar.
+
+## Full-screen
+
+Set `isFullScreen` for a full-screen dialog. It fills the window, up to 560dp wide, and scrolls as a whole.
+
+A full-screen dialog holds a series of tasks, such as creating a calendar entry with its title, date, location and time. Use one when the dialog has fields that take keyboard input, when changes are not saved instantly, or when its parts open other dialogs.
+
+Write its header as a small [app bar](/components/app-bar), first in the `Dialog`: the close button in the `leading` slot, the headline in the `headline` slot, and the confirming text button in the `trailing` slot. These buttons [cannot take `slot="close"`](#close-buttons-in-an-app-bar): close the dialog from each button's `onPress`. The app bar stays at the top as the dialog scrolls.
+
+Write the content after the header, with `px-space-300 pt-space-300`. It does not need to scroll on its own. Put a long headline in the content, as a `Heading` in the `title` slot at its start, and keep the header's headline short or leave it out.
+
+<Example {...fullScreen} />
+
+## Responsive
+
+Use a full-screen dialog in compact windows only. To change it into a basic dialog in wider windows, set `isFullScreen` from your own breakpoint, and write the parts of each variant: the app bar of a full-screen dialog, or the headline and the actions of a basic one.
+
+In this example, the dialog is full-screen in a window narrower than 600dp, the theme's medium [breakpoint](/theme/layout#breakpoints).
+
+<Example {...responsive} />
+
+## Confirmation dialogs
+
+For a choice that people confirm with an action, write the choices as the dialog's content. In this example, a list of choices scrolls between two dividers, while the headline and the actions stay in place. OK is disabled until a choice is made.
+
+<Example {...scrolling} />
+
+## Nested dialogs
+
+A dialog opened from another shows in front of it, and Escape closes the one in front. Write the second dialog beside the `DialogTrigger`, or give it its own `DialogTrigger`. Do the same for a modal sheet opened from a dialog. A full-screen dialog is the only dialog that another should appear over.
+
+A modal [bottom sheet](/components/bottom-sheet) or [side sheet](/components/side-sheet) stacks the same way: one opened from a dialog, or a dialog opened from one, shows in front of the other, and Escape closes the one in front. The page cannot be used or scrolled until both have closed. A [menu](/components/menu) in a dialog opens in front of it.
+
+In this example, the full-screen dialog is controlled with the `DialogTrigger`'s `isOpen`. When it is closed with changes made, by its close button, Escape or the scrim, a basic dialog opens in front of it and asks whether to discard them.
+
+<Example {...nested} />
+
+## Customization
+
+Pass classes in `className` to restyle one dialog. `className`, `style` and `ref` apply to the dialog's container, inside the scrim, and what the dialog holds is yours to lay out. See [Styling](/get-started/styling) for the classes, the states and the theme.
+
+In this example, the dialog is no wider than 400dp, its headline shares a row with a close icon button, and dividers separate its content.
+
+<Example {...custom} />
+
+- **States:** Style the dialog as it opens and closes with the `entering:` and `exiting:` variants. See [Transitions](#transitions).
+- **Functions:** `className`, `style` and `children` can be functions of the dialog's state: `isEntering`, `isExiting` and `state`. See [Children as a function](/get-started/composition#children-as-a-function).
+- **Ancestors:** A dialog is rendered at the end of the page, not inside the element it is written in. A class or a `data-theme` on an element around it does not reach it: set it on the `Dialog` itself, or on the root element. See [Theme](/get-started/styling#theme).
+
+### Transitions
+
+While a dialog opens and closes, its container has `data-entering` and `data-exiting`. Target them in your own classes with the `entering:` and `exiting:` variants: `entering:` styles what the dialog opens from, and `exiting:` what it closes to, as with React Aria's [CSS transitions](https://react-aria.adobe.com/styling#css-transitions). In this example, the dialog comes up from below as it opens, and goes back down as it closes.
+
+<Example {...transition} />
+
+To animate a dialog from your own code, such as with an animation library, set `isEntering` while the entry animation runs and `isExiting` while the exit animation runs. `isExiting` keeps a closed dialog on the page until you clear it. See React Aria's [Animation](https://react-aria.adobe.com/styling#animation) guide.
+
+## Limitations
+
+### Close buttons in an app bar
+
+The buttons in the app bar of a full-screen dialog take the app bar's slots, so they cannot also take `slot="close"`. Close the dialog from each button's `onPress`, with the `state.close()` of the `Dialog`'s children function or with your own open state.
+
+### Non-modal dialogs
+
+A `Dialog` is always modal. For a surface that leaves the page in use while it is open, use a standard [side sheet](/components/side-sheet) or [bottom sheet](/components/bottom-sheet).
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/dialogs/accessibility#10b2c693-99ca-4b4d-8cda-5ffeeada82c5) what people should be able to do with assistive technology:
+
+- Open and close a dialog
+- Provide and submit other inputs if the dialog is interactive, such as a text field or selectable list
+- Scroll the dialog to access all of its contents if that content extends beyond the container of the dialog
+
+### Interaction and style
+
+- **Color contrast:** The supporting text has 4.5:1 contrast or more with a basic dialog's container, in light and dark schemes at every [contrast level](/theme/color#contrast). Keep that contrast when you change its colors.
+- **Text size:** A basic dialog grows with its content up to the height the window allows, and breaks a word too long for it. Give the part that should scroll `min-h-0 grow overflow-y-auto`, so that it scrolls when enlarged text makes the dialog taller than the window, as in [Scrolling long content](#scrolling-long-content). Material [advises](https://m3.material.io/components/dialogs/accessibility#02c8d041-dcbf-476e-8259-46a9eebd6af3) concise text, which wraps less at 200% text size.
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), a dialog opens and closes at once.
+- **Forced colors:** A dialog keeps an edge in [forced colors](/theme/accessibility#forced-colors).
+- **Use sparingly:** A dialog interrupts the page, and the flow of people who navigate it with a screen reader. Material [advises](https://m3.material.io/components/dialogs/accessibility#cf8359bd-9531-4a66-acee-2a01896804a1) using one sparingly, for critical information only, and showing less critical information in the flow of the page.
+
+### Focus
+
+- When a dialog opens, the focus moves to the dialog itself, and Tab then moves it to the first focusable element.
+- Material [advises](https://m3.material.io/components/dialogs/accessibility#1107f8c9-b9b2-4f94-af0e-9ea6032c6c2d) that the focus land on the first interactive element as the dialog appears. To focus an element as the dialog opens, give it `autoFocus`.
+- While a dialog is open, the page behind it cannot be used or scrolled, and the focus stays in the dialog. When the dialog closes, the focus returns to where it was.
+- In a full-screen dialog, the element that the keyboard focuses is scrolled into view below the app bar.
+
+### Keyboard navigation
+
+| Keys           | Actions                                                                             |
+| -------------- | ----------------------------------------------------------------------------------- |
+| Tab            | Move the focus to the next element in the dialog, or from the last to the first     |
+| Shift+Tab      | Move the focus to the previous element in the dialog, or from the first to the last |
+| Space or Enter | Activate the focused element                                                        |
+| Escape         | Close the dialog                                                                    |
+
+- Escape closes the dialog, or the one in front when one is over another, unless `isKeyboardDismissDisabled` is set.
+- In a [form](#forms), Enter in a field submits the form.
+
+### Labeling elements
+
+- A basic dialog has the `alertdialog` role, as Material [advises](https://m3.material.io/components/dialogs/accessibility#92e220ca-509e-46fe-897a-8f07aadc239b) for the web, and a full-screen dialog the `dialog` role.
+- Name the dialog with a `Heading` in the `title` slot. It is an `<h2>` unless you set its `level`. Describe a basic dialog with a `Text` in the `description` slot.
+- Without a title, a dialog is named by its trigger's text unless you set an `aria-label`. A dialog with no title and no trigger needs an `aria-label`.
+- The trigger reports whether the dialog is open with `aria-expanded`.
+- While a dialog is open, the page behind it is hidden from assistive technology.
+- Label each component in the dialog as its own page describes, such as [buttons](/components/button#labeling-elements) and [text fields](/components/text-field#labeling-elements), as Material [advises](https://m3.material.io/components/dialogs/accessibility#d015893b-00cb-4697-83bf-4907078551d8).
+
+## Props
+
+### Dialog
+
+> **Note:** `isDismissable` is `true` by default, not `false` as the table shows.
+
+<PropsTable {...dialogApi} />
+
+### DialogTrigger
+
+<PropsTable {...dialogTriggerApi} />

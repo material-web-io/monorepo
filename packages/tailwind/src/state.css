@@ -1,0 +1,66 @@
+/* M3 state layer opacities (hover/focus/press/drag, disabled content and
+ * container): opacity-state-hover, ..., also as color modifiers
+ * (bg-on-surface/state-hover). Plus focus-ring(-inset) below. */
+:root {
+  --md-sys-state-hover-state-layer-opacity: 0.08;
+  --md-sys-state-focus-state-layer-opacity: 0.1;
+  --md-sys-state-pressed-state-layer-opacity: 0.1;
+  --md-sys-state-dragged-state-layer-opacity: 0.16;
+  --md-sys-state-disabled-content-opacity: 0.38;
+  --md-sys-state-disabled-container-opacity: 0.12;
+
+  --md-sys-state-focus-indicator-thickness: 3px;
+  --md-sys-state-focus-indicator-outer-offset: 2px;
+  --md-sys-state-focus-indicator-inner-offset: -3px;
+}
+
+/* Percentages, not the raw 0-1 numbers: Tailwind puts these straight into
+ * color-mix() for color modifiers (bg-on-surface/disabled-container), which
+ * needs a percentage. The opacity utilities accept either. */
+@theme inline {
+  --opacity-state-hover: calc(var(--md-sys-state-hover-state-layer-opacity) * 100%);
+  --opacity-state-focus: calc(var(--md-sys-state-focus-state-layer-opacity) * 100%);
+  --opacity-state-pressed: calc(var(--md-sys-state-pressed-state-layer-opacity) * 100%);
+  --opacity-state-dragged: calc(var(--md-sys-state-dragged-state-layer-opacity) * 100%);
+  --opacity-disabled-content: calc(var(--md-sys-state-disabled-content-opacity) * 100%);
+  --opacity-disabled-container: calc(var(--md-sys-state-disabled-container-opacity) * 100%);
+}
+
+/* Focus indicator: a 3dp secondary-color outline, 2dp outside (focus-indicator) or 3dp inside
+ * (focus-indicator-inset), for a part drawn under the keyboard focus of the element it is in
+ * (group-focus-visible/md-checkbox:focus-indicator), and on the element's own keyboard focus,
+ * which focus-visible: reads, as focus-ring and focus-ring-inset. Raised above siblings, below
+ * stacking.css's surfaces (z-focus-ring). */
+@utility focus-indicator {
+  @apply z-focus-ring;
+  outline: var(--md-sys-state-focus-indicator-thickness) solid var(--md-sys-color-secondary);
+  outline-offset: var(--md-sys-state-focus-indicator-outer-offset);
+}
+
+@utility focus-indicator-inset {
+  @apply z-focus-ring;
+  outline: var(--md-sys-state-focus-indicator-thickness) solid var(--md-sys-color-secondary);
+  outline-offset: var(--md-sys-state-focus-indicator-inner-offset);
+}
+
+@utility focus-ring {
+  @variant focus-visible {
+    @apply focus-indicator;
+  }
+}
+
+@utility focus-ring-inset {
+  @variant focus-visible {
+    @apply focus-indicator-inset;
+  }
+}
+
+/* focus-ring-icon: the ring of a 24dp round icon target inside a component (a
+ * chip's remove button). It straddles the target's edge, 2dp in and 1dp out, as
+ * the chips spec draws it: 26dp across outside, 20dp inside. */
+@utility focus-ring-icon {
+  @variant focus-visible {
+    outline: var(--md-sys-state-focus-indicator-thickness) solid var(--md-sys-color-secondary);
+    outline-offset: -2px;
+  }
+}

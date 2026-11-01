@@ -1,0 +1,199 @@
+import api from 'virtual:api/Fab'
+import { FabSlots } from '../../slot-pictures/fab.tsx'
+import * as basic from '../../examples/fab/basic.tsx?example'
+import * as collapse from '../../examples/fab/collapse.tsx?example'
+import * as colors from '../../examples/fab/colors.tsx?example'
+import * as disabled from '../../examples/fab/disabled.tsx?example'
+import * as extended from '../../examples/fab/extended.tsx?example'
+import * as functionChildren from '../../examples/fab/function-children.tsx?example'
+import * as labelOnly from '../../examples/fab/label-only.tsx?example'
+import * as link from '../../examples/fab/link.tsx?example'
+import * as loading from '../../examples/fab/loading.tsx?example'
+import * as sizes from '../../examples/fab/sizes.tsx?example'
+
+Use a floating action button (FAB) for the most important action on a screen. FABs come in two types:
+
+- A FAB, with an icon alone
+- An [extended FAB](#extended-fab), with a label beside the icon
+
+To open related actions from a FAB, use a [FAB menu](/components/fab-menu), whose FAB is a `FabMenuButton`. For actions of lower emphasis, use a [button](/components/button).
+
+```tsx
+import { Fab, Icon } from '@material-web/react'
+import { Text } from 'react-aria-components'
+```
+
+## Basic FAB
+
+Write the icon as the FAB's child. Add a `Text` with `slot="label"` to make an extended FAB.
+
+<Example {...basic} />
+
+Set `isDisabled` to disable the FAB. It cannot be pressed or focused.
+
+<Example {...disabled} />
+
+## Extended FAB
+
+Put a `Text` with `slot="label"` in the FAB to make an extended FAB. The label names the FAB. `size` sets the height, and the width follows the label, which stays on one line. The `baseline` size is the small extended FAB.
+
+<Example {...extended} />
+
+The icon is optional on an extended FAB.
+
+<Example {...labelOnly} />
+
+### Collapsing and extending
+
+Set `isExtended` to `false` to hide the label, and to `true` (the default) to show it. Keep the same children in both states, and change `isExtended`, such as on scroll. A collapsed FAB is not named by its label, so give a FAB that collapses an `aria-label` as well.
+
+In this example, the extended FAB collapses while the list scrolls down, and extends again once it scrolls back up.
+
+<Example {...collapse} isFlush />
+
+## Slots
+
+<FabSlots showLegend />
+
+| Slot    | Child    | Use                                                                             |
+| ------- | -------- | ------------------------------------------------------------------------------- |
+| `label` | A `Text` | Makes the FAB an extended FAB, and names it. See [Extended FAB](#extended-fab). |
+
+> **Note:** A `Text` in a FAB must have `slot="label"`. A `Text` with another slot, or with none, throws an error.
+
+## Icons
+
+Any icon works as the FAB's child: [`Icon`](/components/icon), an icon from an SVG library, or your own component. An `Icon` is sized to the FAB. Give any other icon the size listed under [Sizes](#sizes). See [Composition](/get-started/composition#icons).
+
+## Handling presses
+
+Handle a press with `onPress`, in place of `onClick`. A FAB takes the same press events as a `Button`. See [Handling presses](/components/button#handling-presses).
+
+## Loading
+
+Set `isPending` while the FAB's action is in progress, as on a [button](/components/button#loading). A pending FAB shows a [loading indicator](/components/loading-indicator) in place of its icon and label, sized to the FAB. It keeps its size and colors, so the layout around it does not shift.
+
+<Example {...loading} />
+
+- **Presses:** A pending FAB ignores presses and shows no hover. As a submit button, it does not submit its form, and as a [link](#links), it does not navigate.
+- **Focus:** It keeps the focus, so a keyboard user stays on it while the action runs.
+- **Children:** Its children are hidden while it is pending. See [Pending content](#pending-content).
+
+## Color
+
+Set `color` to one of six: `primary-container` (the default), `secondary-container`, `tertiary-container`, `primary`, `secondary` or `tertiary`. They provide the same legibility and functionality, so choose one by style alone.
+
+<Example {...colors} />
+
+## Sizes
+
+For a larger FAB, set `size` to `baseline` (the default), `medium` or `large`. An `Icon` child is sized to match. Material Design recommends `medium` the most.
+
+| Size       | Height | Icon |
+| ---------- | ------ | ---- |
+| `baseline` | 56dp   | 24dp |
+| `medium`   | 80dp   | 28dp |
+| `large`    | 96dp   | 36dp |
+
+<Example {...sizes} />
+
+## Placement
+
+A FAB does not position itself. Place it with your layout, such as `className="fixed right-space-200 bottom-space-200 z-fab"` for the corner of the window, or `absolute` in a positioned box, as in the [example](#collapsing-and-extending) above. See [Stacking order](/theme/layout#stacking-order) for `z-fab`.
+
+A FAB rests at [elevation](/theme/elevation) level 3, and rises to level 4 on hover.
+
+## Rendering non-native buttons
+
+Set `elementType` to render the FAB as an element other than a `<button>`. The element gets the `button` role and a tab stop, as on a [button](/components/button#rendering-non-native-buttons).
+
+### Links
+
+Set `elementType="a"` to render the FAB as a link, with `href`, `target` and `rel`. The browser follows it as a native link, without a client-side router. To follow it through a router, see [Third-party routing library](/components/button#third-party-routing-library).
+
+<Example {...link} />
+
+## With other components
+
+- **Navigation rail:** In the header of a [navigation rail](/components/navigation-rail), pass the rail's `isExpanded` to the `Fab` as its `isExtended`. An extended FAB widens the expanded rail.
+- **Toolbar:** Put a `Fab` beside a floating [toolbar](/components/toolbar), not in it, 8dp away (`gap-space-100`). Choose its `color`, such as `secondary-container` or `tertiary-container`.
+- **Snackbar:** Show a [snackbar](/components/snackbar) above a FAB. Set `className="bottom-22"` on the snackbar's region to put it above a FAB that is 16dp from the corner.
+- **Tooltip:** To describe a `Fab` with a [tooltip](/components/tooltip), put it first in the `TooltipTrigger`.
+
+## Customization
+
+Pass classes in `className` to restyle one FAB. A class of yours replaces the FAB's own class for the same property, so a container color and its on-color replace those of `color`. See [Styling](/get-started/styling) for the classes, the states and the theme.
+
+- **States:** Style a state with its variant, such as `hover:` or `pressed:`. In your own CSS, select the same states by their data attributes: `data-hovered`, `data-pressed`, `data-focused`, `data-focus-visible` and `data-disabled`. See [States](/get-started/styling#states).
+- **Every FAB:** To restyle all the FABs at once, change the [theme](/get-started/styling#theme).
+
+### Children as a function
+
+Pass a function as children to render them from the FAB's state: `isHovered`, `isPressed`, `isFocused`, `isFocusVisible`, `isDisabled` and `isPending`. The function must be the only child. To return several children, wrap them in a fragment. The label is still a `Text` with `slot="label"`.
+
+<Example {...functionChildren} />
+
+`className` and `style` can be functions of the same state. The state's type is exported as `FabRenderProps`. See [Children as a function](/get-started/composition#children-as-a-function).
+
+## Limitations
+
+### Link role
+
+A FAB rendered as an `<a>` keeps the `button` role, so assistive technology announces it as a button and not as a link. A disabled one has no `href`.
+
+### Disabled FABs
+
+A disabled FAB cannot be focused and reports no hover, so it shows no [tooltip](/components/tooltip#opening-and-closing).
+
+### Pending content
+
+A pending FAB shows only its loading indicator. Children written for the pending state, such as an Uploading… label, are hidden too. For a button that shows other content while pending, build a [complex button](/components/button#complex-button).
+
+## Accessibility
+
+### Use cases
+
+Material lists what people should be able to do with assistive technology, with a [FAB](https://m3.material.io/components/floating-action-button/accessibility#7b3cb4e1-b84c-43e7-add5-11e78999a9bc) and with an [extended FAB](https://m3.material.io/components/extended-fab/accessibility#f41fff24-fd89-4bc7-aa79-15fe02faf158):
+
+- Navigate to and activate the FAB
+- Perform an action with the FAB
+- Expand and minimize an extended FAB
+- Navigate to and activate the extended FAB
+
+### Interaction and style
+
+- **States:** Hovering shows a state layer, and a press shows a ripple. Keyboard focus shows a [focus ring](/theme/accessibility#focus-ring), and a press with a mouse or touch does not.
+- **Touch target:** Every size is 56dp or larger in both directions, above the 48dp minimum of a [touch target](/theme/accessibility#touch-targets), at every density.
+- **Color contrast:** The icon [needs](https://m3.material.io/components/floating-action-button/accessibility#bb9f2370-4020-4c9b-9d71-64ca5150ff10) 3:1 contrast with the container. Every `color` keeps the icon at 3:1 or more, and an extended FAB's label at 4.5:1 or more, in the light and dark schemes at every contrast level. Keep that contrast when you change its [colors](#color).
+- **Text size:** An extended FAB's label stays on one line, and the FAB grows wider with it.
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), collapsing and extending, and the changes of color and shadow, are instant.
+- **Forced colors:** In [forced colors](/theme/accessibility#forced-colors), the FAB keeps an edge.
+- **Placement:** Place the FAB with your layout, as under [Placement](#placement). Material [advises](https://m3.material.io/components/floating-action-button/accessibility#4577489f-7d4a-4300-a4cd-4862922c9338) the lower right corner of compact and medium windows, and the upper left region of expanded ones, such as the header of a [navigation rail](/components/navigation-rail), where a screen reader reaches it sooner. Don't let the FAB cover a control and its focus ring entirely: it can cover part of the control while the focus ring stays visible.
+
+### Focus
+
+- The FAB is one tab stop. An extended FAB's icon and label are one focusable element, as Material [advises](https://m3.material.io/components/extended-fab/accessibility#d54b8fc7-6254-4a89-80a7-7463938e8f96).
+- Material [advises](https://m3.material.io/components/floating-action-button/accessibility#bf6e330f-9c1a-486f-9867-8e5e0c6aac47) putting the FAB early in the focus order: on a phone, after the app bar and the navigation bar, before the rest of the content. The focus follows the order the elements are written in, wherever they are placed on the screen, so write the `Fab` there and place it with its `className`.
+- A disabled FAB cannot be focused. Material [advises](https://m3.material.io/components/floating-action-button/accessibility#bb9f2370-4020-4c9b-9d71-64ca5150ff10) against disabling a FAB: when its action is unavailable, leave the FAB out in place of setting `isDisabled`.
+- A pending FAB keeps the focus, so a keyboard user stays on it while the action runs.
+
+### Keyboard navigation
+
+| Keys           | Actions                   |
+| -------------- | ------------------------- |
+| Tab            | Move the focus to the FAB |
+| Space or Enter | Press the focused FAB     |
+
+### Labeling elements
+
+- The label names an extended FAB. The icon is hidden from assistive technology, so the label alone names it.
+- Give a FAB with an icon alone an `aria-label` or an `aria-labelledby` that describes the action it performs, such as Compose a new message, as Material [advises](https://m3.material.io/components/floating-action-button/accessibility#aca50187-fb89-4d01-abcf-2bc3514c73ea). The types do not require one.
+- A collapsed FAB hides its label from assistive technology, so it needs an `aria-label` too.
+- An `aria-label` names an extended FAB in place of its label. Material [advises](https://m3.material.io/components/extended-fab/accessibility#50c37163-1d01-4bb7-b642-0d1db90740b0) one that starts with the first word of the label, such as Create a new invite for the label Create, and an icon that matches the label, such as a Compose icon for the label Compose.
+- Material [advises](https://m3.material.io/components/floating-action-button/accessibility#bf6e330f-9c1a-486f-9867-8e5e0c6aac47) a tooltip that shows the FAB's label while it has the focus. Put the `Fab` first in a `TooltipTrigger`: keyboard focus opens its [tooltip](/components/tooltip) at once. The tooltip describes the FAB and does not name it, so a FAB with an icon alone still needs its `aria-label`. An extended FAB [needs no tooltip](https://m3.material.io/components/extended-fab/accessibility#d54b8fc7-6254-4a89-80a7-7463938e8f96), since its label is visible.
+- A pending FAB reports that it is unavailable with `aria-disabled`. Its loading indicator is hidden from assistive technology, so its label or `aria-label` still names it.
+- When a focused FAB becomes pending, or stops being pending, screen readers announce it.
+
+## Props
+
+<PropsTable {...api} />

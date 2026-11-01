@@ -1,0 +1,115 @@
+import api from 'virtual:api/Ripple'
+import * as basic from '../../examples/ripple/basic.tsx?example'
+import * as colors from '../../examples/ripple/colors.tsx?example'
+import * as disabled from '../../examples/ripple/disabled.tsx?example'
+import * as givenStates from '../../examples/ripple/given-states.tsx?example'
+import * as shape from '../../examples/ripple/shape.tsx?example'
+import * as variant from '../../examples/ripple/variant.tsx?example'
+
+Ripples add a state layer and press feedback to interactive elements. Add a `Ripple` to an interactive element of your own to give it the same hover and focus state layer and press ripple as the components. It works in a React Aria component and in any other element.
+
+A `Ripple` draws two things:
+
+- **State layer:** An overlay that shows while the element is hovered, focused from the keyboard or dragged.
+- **Press ripple:** A circle that grows from the pointer when the element is pressed.
+
+The components draw their own state layer and press ripple: for a button, use a [button](/components/button) or an [icon button](/components/icon-button) instead.
+
+```tsx
+import { Ripple } from '@material-web/react'
+```
+
+## Basic ripple
+
+Place the `Ripple` as a direct child of the interactive element, its host, or of a wrapper around a control, and position that element with `relative`. The state layer and the press ripple fill the host and take its text color.
+
+<Example {...basic} />
+
+A `Ripple` shows the states only: give the host its role, its press handling and a [focus ring](/theme/state#focus-ring). For a whole button built this way, see [Complex button](/components/button#complex-button).
+
+Set `variant` to `default` (the default) or to a color role: `primary`, `error`, `on-surface`, `on-surface-variant` or `on-secondary-container`.
+
+| Variant      | Hover and focus layer | Press ripple          |
+| ------------ | --------------------- | --------------------- |
+| `default`    | The host's text color | The host's text color |
+| A color role | The host's text color | The color role        |
+
+Use a color role when the press ripple and the layer differ in color, as on an unselected selection control that is pressed in the color it is about to take.
+
+<Example {...variant} />
+
+## States
+
+The state layer shows the states of its parent, read the same way as the theme's [state variants](/theme/state#state-variants):
+
+| State    | On a React Aria component | On any other element | Layer |
+| -------- | ------------------------- | -------------------- | ----- |
+| Hovered  | `data-hovered`            | `:hover`             | 8%    |
+| Focused  | `data-focus-visible`      | `:focus-visible`     | 10%   |
+| Dragged  | `data-dragging`           | `data-dragging`      | 16%   |
+| Disabled | `data-disabled`           | `:disabled`          | None  |
+
+- **Hover:** The hover layer shows only on a device that hovers. It does not show while the pointer is on a control inside the host that has its own `Ripple`, such as a chip's remove button.
+- **Disabled:** Set `aria-disabled="true"` to disable the layer on either kind of element.
+- **Press:** A press ripples for the pointer's main button only, at 10%. A press on a control inside another host that has a `Ripple` too ripples in the inner one alone.
+
+### Given states
+
+A `Ripple` in a part of the host, such as the round part of a switch or a checkbox, cannot read the host's states. Pass them as `isHovered`, `isFocusVisible` and `isDisabled`, from a React Aria component's [render props](https://react-aria.adobe.com/styling#render-props). Focus shows over hover, and nothing shows while disabled. These props override the states of the ripple's parent. Without them, the layer shows its parent's states.
+
+Give that part `pointer-events-none`, so that a press on the host ripples in it. In this example, a press anywhere on the toggle button ripples in its round part.
+
+<Example {...givenStates} />
+
+### Disabled
+
+A disabled host shows neither the state layer nor the press ripple. Disable it with a native `disabled`, with `data-disabled` on a React Aria component, or with `aria-disabled="true"`.
+
+<Example {...disabled} />
+
+On an element around the host, `data-disabled` and `aria-disabled="true"` stop the press ripple alone. To hide the state layer there as well, pass `isDisabled`.
+
+## Color
+
+The state layer and the press ripple take the host's text color, so the same `Ripple` suits any container. Set the container color and its content color on the host. See [State layers](/theme/state#state-layers).
+
+<Example {...colors} />
+
+## Shapes
+
+Set the shape on the host. The state layer and the press ripple follow its corners.
+
+<Example {...shape} />
+
+## Customization
+
+`Ripple` takes no `className` and no `style`. It follows its host and the theme:
+
+- **Color:** Set the host's text color, or a `variant` for the press ripple. See [Color](#color).
+- **Shape:** Set the corners on the host. See [Shapes](#shapes).
+- **Opacity:** The layer and the press ripple use the theme's state layer opacities. To change them, see [Custom states](/theme/state#custom-states).
+
+## Limitations
+
+### Host position
+
+The state layer and the press ripple fill the nearest positioned element. Without `relative` on the host, they cover an element further out.
+
+### Keyboard presses
+
+A press from the keyboard draws no press ripple. The host shows its focus layer.
+
+## Accessibility
+
+### Interaction and style
+
+- **States:** The focus layer shows for keyboard focus only. It does not include a focus ring: give the host the [`focus-ring`](/theme/state#focus-ring) class, which draws Material's [focus indicator](https://m3.material.io/foundations/interaction/states/applying-states#9edb181a-ed5e-4961-b3d0-cae33125a4a9).
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), the press ripple shows at its full size at once.
+
+### Labeling elements
+
+- `Ripple` is hidden from assistive technology and takes no pointer events. Give the host its role, its name, and its keyboard and press handling.
+
+## Props
+
+<PropsTable {...api} />

@@ -1,0 +1,204 @@
+import api from 'virtual:api/AppBar'
+import * as basic from '../../examples/app-bar/basic.tsx?example'
+import * as elements from '../../examples/app-bar/elements.tsx?example'
+import * as enterAlways from '../../examples/app-bar/enter-always.tsx?example'
+import * as exitUntilCollapsed from '../../examples/app-bar/exit-until-collapsed.tsx?example'
+import * as largeFlexible from '../../examples/app-bar/large-flexible.tsx?example'
+import * as mediumFlexible from '../../examples/app-bar/medium-flexible.tsx?example'
+import * as menu from '../../examples/app-bar/menu.tsx?example'
+import * as onScroll from '../../examples/app-bar/on-scroll.tsx?example'
+import * as pinned from '../../examples/app-bar/pinned.tsx?example'
+import * as search from '../../examples/app-bar/search.tsx?example'
+import * as small from '../../examples/app-bar/small.tsx?example'
+import * as text from '../../examples/app-bar/text.tsx?example'
+import { AppBarSlots } from '../../slot-pictures/app-bar.tsx'
+
+App bars are placed at the top of the screen to help people navigate through a product. They show information about the page, key actions, and navigation actions like Back or Menu. An app bar typically holds:
+
+- A leading button, such as a menu icon or a back arrow
+- A headline that describes the current page, the current section or the product
+- One or two essential actions
+
+To display more page actions, use a [toolbar](/components/toolbar).
+
+```tsx
+import { AppBar, Icon, IconButton } from '@material-web/react'
+import { Button, Heading, Text } from 'react-aria-components'
+```
+
+## Basic app bar
+
+Write the parts of the bar as its children, and give each a `slot`. See [Slots](#slots).
+
+<Example {...basic} isFlush />
+
+The `AppBar` comes in three variants. Set `variant` to `small` (the default), `medium-flexible` or `large-flexible`.
+
+### Small app bar
+
+Use a small app bar in dense layouts, or when a page is scrolled. A small bar is one 64dp row, with its text between the leading and trailing elements and the headline on one line.
+
+<Example {...small} isFlush />
+
+### Medium flexible app bar
+
+Use a medium flexible app bar to display a larger headline. A flexible bar shows its text under the row, in a larger type style. The headline wraps to two lines at most, and the bar is as tall as its text.
+
+<Example {...mediumFlexible} isFlush />
+
+### Large flexible app bar
+
+Use a large flexible app bar to emphasize the headline of the page. It lays out its text as a medium flexible bar does, in a type style larger still.
+
+<Example {...largeFlexible} isFlush />
+
+A flexible bar can collapse into a small app bar as the page scrolls. See [Collapse app bar](#collapse-app-bar).
+
+## Slots
+
+<AppBarSlots showLegend />
+
+| Slot       | Child                                                                                   | Use                                                        |
+| ---------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `leading`  | One element: an `IconButton`, a `Button`, a `Link`, an `Icon` or an element of your own | The start of the row                                       |
+| `headline` | A `Heading`                                                                             | In the row of a small bar, under the row of a flexible bar |
+| `subtitle` | A `Text`                                                                                | Under the headline                                         |
+| `search`   | A `Button` or a `Link`, in place of the headline                                        | In the row, between the leading and trailing elements      |
+| `trailing` | Up to three elements, of the same kinds                                                 | The end of the row                                         |
+
+- **Checked slots:** A `Heading`, `Text`, `Button`, `Link` or `Icon` with a slot the bar does not have throws an `Invalid slot` error. A `Heading` or a `Text` with no slot throws an error too.
+- **Your own elements:** An element of your own is placed by its `slot` attribute, which is not checked. Always give it one: without a slot, it is placed under the row.
+
+Import `Heading`, `Text`, `Button` and `Link` from `react-aria-components`. See [Slots](/get-started/composition#slots).
+
+## Headline and subtitle
+
+Put a `Heading` in the `headline` slot and a `Text` in the `subtitle` slot. The subtitle is shown under the headline. Keep the headline brief enough to fit in the bar, and use the subtitle to add context to the page.
+
+<Example {...text} isFlush />
+
+- **Heading level:** The headline is a level 1 heading. To change that, set `level` on the `Heading`.
+- **Alignment:** The text starts at the leading edge. Set `className="text-center"` on the bar to center it.
+- **Image:** To show an image or a logo in place of the headline text, put it inside the `Heading` and give it an `alt`, which names the headline.
+
+## Leading and trailing elements
+
+Give one element the `leading` slot, and up to three elements the `trailing` slot: an `IconButton`, an `Icon`, or an element of your own, such as an avatar. An `Icon` in either slot is sized by the bar.
+
+<Example {...elements} isFlush />
+
+- **Leading button:** Use the leading button for navigating the product. It is typically a menu icon, or a back arrow that returns to the previous screen.
+- **Trailing buttons:** Place the most used actions closest to the leading edge.
+- **Filled and tonal buttons:** If you change a trailing icon button to the `filled` or `tonal` variant, use only one icon button.
+
+## Placement
+
+The bar stays at the top of its nearest scrolling ancestor, or of the page, above the content. It keeps its own room in the layout, so the content starts under it and needs no offset.
+
+Write the bar inside the element that scrolls, before the content. With no scrolling ancestor, the bar follows the scroll of the page.
+
+<Example {...pinned} isFlush />
+
+## Scrolling
+
+Set `scrollBehavior` to choose what the bar does as the content scrolls:
+
+| `scrollBehavior`       | As the content scrolls                                                                                                   |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `pinned` (the default) | The bar stays in place.                                                                                                  |
+| `enter-always`         | The bar collapses as the content scrolls down, and expands as soon as the content scrolls back up, anywhere in the page. |
+| `exit-until-collapsed` | The bar collapses the same way, and expands only when the content is scrolled all the way back to the top.               |
+
+When a scroll stops with the bar part way collapsed, the bar settles on the nearer end and scrolls the content with it.
+
+### Hide app bar
+
+A small bar collapses completely, which leaves the whole screen to the content.
+
+<Example {...enterAlways} isFlush />
+
+### Collapse app bar
+
+A flexible bar collapses into a small app bar, with its headline and subtitle in the row. The row shows a copy of their content, without its event handlers, so keep links and buttons out of a headline that collapses. Use `exit-until-collapsed` to keep it small until the page is scrolled back to the top.
+
+<Example {...exitUntilCollapsed} isFlush />
+
+### Fill on scroll
+
+Once the content has scrolled under it, the bar and its search bar change to a contrasting fill color, which separates them from the content. Scroll the [pinned bar](#placement) above to see it.
+
+Set `isScrolled` to control the fill yourself.
+
+<Example {...onScroll} isFlush />
+
+## App bar with menu
+
+To open a [menu](/components/menu) from the bar, wrap a trailing `IconButton` and its `MenuPopover` in a `MenuTrigger`. The button keeps its `slot`.
+
+<Example {...menu} isFlush />
+
+> **Note:** Avoid a trailing button that opens a menu with more actions. If the page needs more actions, place them in a [toolbar](/components/toolbar) instead.
+
+## Search app bar
+
+Use a search app bar on home pages when search is key to the product. Put a `Button` in the `search` slot in place of the headline, and open your [search view](/components/search) in its `onPress`. The slot also takes a `Link` with an `href`.
+
+Write the hinted search text as its children, with an `Icon` in its `leading` or `trailing` slot to show an icon before or after the text. The search bar sizes itself to the space between the leading and trailing elements.
+
+<Example {...search} isFlush />
+
+> **Note:** Leave `variant` at `small` for a search app bar.
+
+## Customization
+
+Pass classes in `className` to restyle one bar. They go on its `<header>` element, with `style` and the rest of the props. See [Styling](/get-started/styling) for the classes and the theme.
+
+- **States:** To style the bar by its state, target its `data-scrolled` and `data-collapsed` attributes. A bar has `data-scrolled` while it shows its fill on scroll, and a flexible bar has `data-collapsed` while it is collapsed into a small app bar.
+- **Functions:** The children of the search bar can be a function of its state. The children of the `AppBar` cannot. See [Children as a function](/get-started/composition#children-as-a-function).
+- **Every app bar:** To restyle all the app bars at once, change the [theme](/get-started/styling#theme).
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/app-bars/accessibility#49cc9a58-03b0-417b-b350-377d2c990901) what people should be able to do with assistive technology:
+
+- Understand what page they're currently visiting
+- Take actions or navigate to a new page destination
+- Maintain access to app bar actions when the content is scrolled
+
+### Interaction and style
+
+- **States:** The search bar and the icon buttons show a state layer on hover and a ripple on a press. Keyboard focus shows a [focus ring](/theme/accessibility#focus-ring), and a press with a mouse or touch does not.
+- **Color contrast:** The [search bar](#search-app-bar) uses the default color roles, which Material [advises](https://m3.material.io/components/app-bars/accessibility#93056ba1-1142-463a-b45e-4421dd78614d) keeping where possible: surface container for its container, and on surface variant for its text. If you change them, keep 3:1 contrast between its text and its container.
+- **Forced colors:** The search bar keeps an edge in [forced colors](/theme/accessibility#forced-colors).
+- **Right to left:** The layout is mirrored in a right-to-left direction.
+
+### Focus
+
+- The bar is not a tab stop. Tab moves the focus through the controls in it, in the order written.
+- Write the leading element first, so that the focus lands on the leading button first, as Material [advises](https://m3.material.io/components/app-bars/accessibility#edb9996f-9180-4b1d-8174-cfcad3297b20).
+
+### Keyboard navigation
+
+| Keys           | Actions                            |
+| -------------- | ---------------------------------- |
+| Tab            | Move the focus to the next control |
+| Space or Enter | Activate the focused control       |
+
+### Labeling elements
+
+- The headline is a level 1 heading, unless the `Heading` sets another `level`. Its text names it. Material [advises](https://m3.material.io/components/app-bars/accessibility#f48401a7-396c-4503-b97d-2fd7c137ac41) adding context where needed, so that people understand what page they are on: set an `aria-label` on the `Heading` that includes its text.
+- Give an image headline an `alt`, which names the headline.
+- The search bar is named by its hinted text.
+- An `IconButton` has no visible label, so give each an `aria-label` that names the action it takes, such as View on map. See [Icon button](/components/icon-button#labeling-elements).
+
+## Props
+
+<PropsTable
+  {...api}
+  inherited={api.inherited.map((prop) => ({
+    ...prop,
+    see: prop.see.filter((url) => url.startsWith('https://')),
+  }))}
+/>

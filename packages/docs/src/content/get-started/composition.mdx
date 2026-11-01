@@ -1,0 +1,128 @@
+import * as collections from '../../examples/get-started/collections.tsx?example'
+import * as renderProps from '../../examples/get-started/render-props.tsx?example'
+import * as slots from '../../examples/get-started/slots.tsx?example'
+import * as triggers from '../../examples/get-started/triggers.tsx?example'
+
+Compose a component from its children: write the icon, the text and the buttons inside it, in place of `icon`, `title` or `actions` props. A child takes its place by its `slot`, and can be a function of the component's state.
+
+## Slots
+
+When a component has several places for its content, set the `slot` prop on each child to choose its place, as with React Aria's [slots](https://react-aria.adobe.com/styling#slots).
+
+<Example {...slots} />
+
+These are the slots of the most used components. A component's page lists its own.
+
+| Component                                        | Slots                                                                          |
+| ------------------------------------------------ | ------------------------------------------------------------------------------ |
+| `AppBar`                                         | `leading`, `headline`, `subtitle`, `search`, `trailing`                        |
+| `ListItem`                                       | `leading`, `overline`, `label`, `description`, `trailing`, `selection`, `drag` |
+| `MenuItem`                                       | `leading`, `label`, `description`, `trailing`                                  |
+| `Chip`                                           | `leading`, `label`, and `trailing` or `remove` by its variant                  |
+| `Fab`, `NavigationBarItem`, `NavigationRailItem` | `label`                                                                        |
+| `NavigationRailSection`                          | `header`                                                                       |
+| `SearchField`                                    | `leading`, `trailing`                                                          |
+| `Dialog`, `BottomSheet`                          | `title`, `description`, `close`                                                |
+| `SideSheet`                                      | `title`, `close`                                                               |
+| `SnackbarContent`                                | `title`, `description`                                                         |
+| `CheckboxGroup`, `RadioGroup`                    | `description`                                                                  |
+| `Calendar`, `RangeCalendar`                      | `previous`, `next`, `errorMessage`                                             |
+
+- **Children:** Use `Text`, `Heading`, `Button` and `Keyboard` from `react-aria-components`, and `Icon`, `IconButton` and `Checkbox` from `@material-web/react`, as the children. See [Imports](/get-started/react-aria#imports).
+- **Order:** A child is placed by its slot, wherever it is written. Children in the same slot keep the order they are written in.
+- **Unknown slots:** A child with a slot that the component does not have throws an `Invalid slot` error, which names the slots it does have.
+- **Required slots:** Where a component gives a child no place without a slot, the child throws an error too. A `Text` in a `Fab` must have `slot="label"`.
+- **Plain elements:** A plain element, such as an `<img>` or an avatar, is also placed by its `slot` attribute, but its slot name is not checked.
+- **No slots:** A component with a single place for its content takes plain children with no `slot`, such as the label and icon of a `Button` or a `Tab`.
+
+## Icons
+
+An icon is a child of `Button`, `IconButton`, `Fab` and `SplitButtonLeading`, and a child in the `leading` or `trailing` slot of a `Chip`. Any icon works: the [Icon](/components/icon) component, an icon from an SVG library, or your own component.
+
+```tsx
+// The default: Material Symbols by ligature name
+<Button><Icon name="add" />Create</Button>
+
+// An SVG icon library, or your own component, sized to fill the slot
+<Button><Plus className="size-5" />Create</Button>
+```
+
+A component sizes the `Icon` it holds. Give any other icon the same size, such as `size-5` for the 20dp icon of a default `Button`.
+
+## Children as a function
+
+Pass a function as children to render content from the component's state, as with React Aria's [render props](https://react-aria.adobe.com/styling#render-props). The function receives the state as one object and returns the children.
+
+<Example {...renderProps} />
+
+| Component                                                                  | State                                                                                                                                                                                                                                  |
+| -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Button`, `IconButton`                                                     | `isHovered`, `isPressed`, `isFocused`, `isFocusVisible`, `isDisabled`, `isPending`. A toggle also has `isSelected` and `state`.                                                                                                        |
+| `Fab`, `FabMenuButton`, `SplitButtonLeading`                               | `isHovered`, `isPressed`, `isFocused`, `isFocusVisible`, `isDisabled`, `isPending`                                                                                                                                                     |
+| `SnackbarAction`, `SnackbarCloseButton`                                    | the same                                                                                                                                                                                                                               |
+| `ListItem`                                                                 | `isHovered`, `isPressed`, `isFocused`, `isFocusVisible`, `isFocusVisibleWithin`, `isSelected`, `isDisabled`, `selectionMode`, `selectionBehavior`, `allowsDragging`, `isDragging`, `isDropTarget`, `id`, `state`                       |
+| `MenuItem`, `FabMenuItem`                                                  | `isHovered`, `isPressed`, `isFocused`, `isFocusVisible`, `isSelected`, `isDisabled`, `hasSubmenu`, `isOpen`, `selectionMode`, `selectionBehavior`, `allowsDragging`, `isDragging`, `isDropTarget`                                      |
+| `Chip`                                                                     | `isHovered`, `isPressed`, `isFocused`, `isFocusVisible`, `isSelected`, `isDisabled`, `allowsRemoving`, `selectionMode`, `selectionBehavior`                                                                                            |
+| `Tab`                                                                      | `isHovered`, `isPressed`, `isFocused`, `isFocusVisible`, `isSelected`, `isDisabled`                                                                                                                                                    |
+| `NavigationBarItem`, `NavigationRailItem`                                  | `isHovered`, `isPressed`, `isFocused`, `isFocusVisible`, `isSelected`, `isDisabled`, `state`                                                                                                                                           |
+| `Checkbox`                                                                 | `isSelected`, `isIndeterminate`, `isHovered`, `isPressed`, `isFocused`, `isFocusVisible`, `isDisabled`, `isReadOnly`, `isInvalid`, `isRequired`                                                                                        |
+| `Radio`                                                                    | `isSelected`, `isHovered`, `isPressed`, `isFocused`, `isFocusVisible`, `isDisabled`, `isReadOnly`, `isInvalid`, `isRequired`                                                                                                           |
+| `Switch`                                                                   | `isSelected`, `isHovered`, `isPressed`, `isFocused`, `isFocusVisible`, `isDisabled`, `isReadOnly`, `isInvalid`, `isRequired`, `state`                                                                                                  |
+| `CheckboxGroup`                                                            | `isDisabled`, `isReadOnly`, `isRequired`, `isInvalid`, `state`                                                                                                                                                                         |
+| `RadioGroup`                                                               | `isDisabled`, `isReadOnly`, `isRequired`, `isInvalid`, `orientation`, `state`                                                                                                                                                          |
+| `TextField`, its `leading` and `trailing`                                  | `isHovered`, `isFocusWithin`, `isFocusVisible`, `isDisabled`, `isInvalid`                                                                                                                                                              |
+| `NavigationRailSection`                                                    | the same                                                                                                                                                                                                                               |
+| `SearchField`                                                              | `isEmpty`, `isDisabled`, `isInvalid`, `isReadOnly`, `isRequired`, `state`                                                                                                                                                              |
+| `Slider`, `ButtonGroup`                                                    | `orientation`, `isDisabled`, `state`                                                                                                                                                                                                   |
+| `Tabs`, `Toolbar`, `NavigationBar`, `NavigationRail`                       | `orientation`                                                                                                                                                                                                                          |
+| `TabPanel`                                                                 | `isFocused`, `isFocusVisible`, `isInert`, `isEntering`, `isExiting`, `state`                                                                                                                                                           |
+| `Dialog`, `SearchView`, `DatePickerDialog`, `TimePickerDialog`             | `isEntering`, `isExiting`, `state`                                                                                                                                                                                                     |
+| `BottomSheet`, `SideSheet`                                                 | `isEntering`, `isExiting`, `state`, `position`, `swipeDirection`, `stackIndex`, `hasDescendants`, `isExpanded`                                                                                                                         |
+| `MenuPopover`, `FabMenuPopover`, `TooltipPopover`                          | `isEntering`, `isExiting`, `placement`, `trigger`                                                                                                                                                                                      |
+| `Tooltip`                                                                  | `isEntering`, `isExiting`, `placement`, `state`                                                                                                                                                                                        |
+| `Snackbar`                                                                 | `toast`, `isFocused`, `isFocusVisible`                                                                                                                                                                                                 |
+| `LinearProgressIndicator`, `CircularProgressIndicator`, `LoadingIndicator` | `percentage`, `valueText`, `isIndeterminate`                                                                                                                                                                                           |
+| `Calendar`, `RangeCalendar`                                                | `isDisabled`, `isInvalid`, `state`                                                                                                                                                                                                     |
+| `CalendarCell`                                                             | `date`, `formattedDate`, `isSelected`, `isSelectionStart`, `isSelectionEnd`, `isHovered`, `isPressed`, `isFocused`, `isFocusVisible`, `isDisabled`, `isUnavailable`, `isInvalid`, `isToday`, `isOutsideMonth`, `isOutsideVisibleRange` |
+| `DatePicker`, `DateRangePicker`                                            | `displayMode`                                                                                                                                                                                                                          |
+| `TimePicker`                                                               | `displayMode`, `selection`                                                                                                                                                                                                             |
+
+- **Focus:** `isFocused` is any focus, and `isFocusVisible` is keyboard focus only. On a `MenuItem` or a `FabMenuItem`, `isFocused` is also true while the pointer is on the item.
+- **Toggles:** A `Button` or an `IconButton` reports `isSelected` only when it is a toggle, with `isSelectable`.
+- **Text fields:** On a `TextField`, pass the function as `leading` or `trailing` instead of children. `isFocusWithin` is true while the input has the focus.
+- **One child:** The function must be the only child. To return several children, use a fragment or an array with keys.
+- **Slots:** The children a function returns take slots as written children do.
+- **Types:** The type of the state is exported under the component's name for most components, such as `ListItemRenderProps` and `MenuItemRenderProps`.
+- **Classes:** `className` and `style` take a function of the state too. See [Styling](/get-started/styling#render-props).
+
+## Collections
+
+Write the items of a `List`, a `Menu`, a `FabMenu`, a `ChipGroup` or a `TabList` as children, or pass `items` and a function that renders each one, as with React Aria's [collections](https://react-aria.adobe.com/collections).
+
+<Example {...collections} />
+
+- **Ids:** Give each item an `id`, which selection and actions refer to. With `items`, an item takes the `id` of its object unless you set one, as in `<ListItem id={file.path}>`.
+- **Text values:** Give an item a `textValue` when its children are not plain text, so that typing can find it.
+- **Actions:** Set `onAction` on a `List`, a `Menu`, a `FabMenu` or a `ChipGroup` to handle a press on an item. It is called with the item's `id`, as in `onAction={(id) => open(id)}`.
+- **Selection:** Set `selectionMode` on a `List`, a `Menu` or a `ChipGroup`, and read the selected `id`s with `selectedKeys` and `onSelectionChange`. See React Aria's [Selection](https://react-aria.adobe.com/selection) guide.
+- **Other values:** With `items`, a rendered item is reused until its object changes. Pass [`dependencies`](https://react-aria.adobe.com/collections#dependencies) with the other values the function reads.
+
+## Triggers
+
+To open an overlay from an element, wrap the two in a trigger, with the element first.
+
+<Example {...triggers} />
+
+| Trigger          | Import from             | Opens                                                                                                    |
+| ---------------- | ----------------------- | -------------------------------------------------------------------------------------------------------- |
+| `MenuTrigger`    | `react-aria-components` | A `MenuPopover`, or a `FabMenuPopover` from a `FabMenuButton`                                            |
+| `SubmenuTrigger` | `react-aria-components` | A `MenuPopover` from a `MenuItem`                                                                        |
+| `DialogTrigger`  | `@material-web/react`   | A `Dialog`, a `DatePickerDialog`, a `TimePickerDialog`, a `SearchView`, or a `TooltipPopover` on a press |
+| `SheetTrigger`   | `@material-web/react`   | A modal `BottomSheet` or `SideSheet`                                                                     |
+| `TooltipTrigger` | `@material-web/react`   | A `Tooltip`                                                                                              |
+| `PreviewTrigger` | `@material-web/react`   | A `TooltipPopover` on hover or focus                                                                     |
+
+- **Element:** The element of a trigger is a `Button`, an `IconButton` or any other React Aria button. A `TooltipTrigger` takes any focusable React Aria component.
+- **Open state:** A trigger keeps the open state itself. To control it, set `isOpen` and `onOpenChange` on the trigger. Set `defaultOpen` to start with the overlay open.
+- **No trigger:** To open an overlay from anywhere, control it with `isOpen` and `onOpenChange` on the overlay itself.
+- **Closing:** A button with `slot="close"` inside a dialog or a sheet closes it.

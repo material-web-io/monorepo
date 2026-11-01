@@ -1,0 +1,16 @@
+/* Material 3 for Tailwind CSS: the design tokens, and the utilities and variants over them.
+ * Every token is a CSS custom property named after the Material spec (--md-sys-color-primary,
+ * ...) and is also a Tailwind utility through @theme. Import it after `tailwindcss`. */
+@import './theme-default.css';
+@import './colors.css';
+@import './typography.css';
+@import './shape.css';
+@import './shape-library.css';
+@import './spacing.css';
+@import './elevation.css';
+@import './motion.css';
+@import './transitions.css';
+@import './state.css';
+@import './layout.css';
+@import './stacking.css';
+@import './accessibility.css';

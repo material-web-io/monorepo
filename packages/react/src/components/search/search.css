@@ -1,0 +1,441 @@
+/* Search: React Aria's SearchField as the search bar (search-field.tsx), and React Aria's
+ * ModalOverlay > Modal > Dialog as focused search (search-view.tsx). Sizes are the specs page's,
+ * the motion Compose's docked and full-screen search bars' (SearchBar.kt). */
+
+/* How far focused search is open, 0 to 1, on the spring it opens and closes on: registered, so
+ * that it runs on it, and inherited by what moves with it. As Compose's animatable it overshoots;
+ * clamp(0, …, 1), Compose's progress, does not. */
+@property --search-view-open {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
+
+/* How far what comes below the bar has faded in, 0 to 1, run on the container as the opening is:
+ * React Aria flushes the container's style alone as it enters, so a transition of a part's own
+ * would not start. */
+@property --search-view-content {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
+
+/* React Aria's SearchField, the search bar: 56dp, round, 360 to 720dp wide. Its row is 8dp from
+ * its ends and 8dp apart, so a 40dp icon button's own 4dp make the spec's 48dp targets, 4dp from
+ * the edges and the text, which is 16dp from an end nothing is at. */
+@utility search-field {
+  @apply relative box-border flex h-14 shrink-0 items-center gap-space-100 rounded-full bg-surface-container-high px-space-100 font-plain text-on-surface icon-24;
+  @apply forced-colors:container-border;
+  min-width: min(calc(var(--spacing) * 90), 100%);
+  max-width: calc(var(--spacing) * 180);
+
+  &:not(:has(> [slot='leading'])) {
+    @apply ps-space-200;
+  }
+  &:not(:has(> [slot='trailing'], > :is(button, a):not([slot]))),
+  &[data-empty]:not(:has(> [slot='trailing'])) {
+    @apply pe-space-200;
+  }
+
+  /* React Aria's Input, the hinted text and the query, filling the row. Of no specificity, so
+   * that a class of yours on it wins. */
+  :where(&) > input {
+    @apply m-0 h-full min-w-0 flex-1 appearance-none search-decoration-none truncate border-0 bg-transparent p-0 font-plain text-body-lg text-on-surface caret-primary outline-none placeholder:text-on-surface-variant;
+  }
+
+  /* An icon is 24dp, 8dp in from the sides of its 48dp target; an avatar 30dp and round, on its
+   * own or in a button. What trails is on-surface-variant unless the field is disabled, and what
+   * leads on-surface. */
+  :where(&) > .font-icon {
+    @apply mx-space-100;
+  }
+  :where(&) > img,
+  :where(&) > :is(button, a) > img {
+    @apply size-7.5 rounded-full object-cover;
+  }
+  :where(&) > img {
+    @apply mx-1.25;
+  }
+  :where(&) > :is(button, a) > img {
+    @apply -my-0.75;
+  }
+  :where(&:not([data-disabled])) > [slot='trailing'] {
+    @apply text-on-surface-variant;
+  }
+
+  /* React Aria's clear button, the button with no slot, is there only while there is text. */
+  &[data-empty] > :is(button, a):not([slot]) {
+    display: none;
+  }
+
+  /* Hovered, its state layer shows, unless the pointer is on a control in it with a layer of its
+   * own; React Aria reports no hover of the field, so it is the pointer's. */
+  @media (hover: hover) {
+    &:not([data-disabled]):hover:not(
+        :has(:is([data-rac][data-hovered], :not([data-rac]):hover) > .state-layer)
+      )
+      > .state-layer {
+      opacity: var(--md-sys-state-hover-state-layer-opacity);
+    }
+  }
+
+  /* Its focus ring, the keyboard's focus on its input, as React Aria reports it. */
+  &:has(> input[data-focus-visible]) {
+    @apply focus-indicator;
+  }
+
+  &[data-disabled] {
+    @apply text-on-surface/disabled-content;
+
+    & > input {
+      @apply text-on-surface/disabled-content placeholder:text-on-surface/disabled-content;
+    }
+  }
+}
+
+/* An icon button that leads a search bar is on-surface where the rest are on-surface-variant
+ * (icon-button.tsx). */
+@custom-variant search-field-leading (:where(.search-field) > &[slot='leading']);
+
+/* React Aria's ModalOverlay, the layer: the window, in front of the page as a dialog is stacked. */
+@utility search-view-overlay {
+  @apply fixed inset-0 z-dialog box-border flex flex-col font-plain outline-none;
+}
+
+/* Docked, the container is placed where its trigger is, not in the layer's flow. */
+@utility search-view-overlay-docked {
+  @apply block;
+}
+
+/* React Aria's Modal, the container, a column of its Dialog. It opens on the fast spatial spring
+ * and closes on it, as Compose's contained search does, unless its style says otherwise. React Aria
+ * draws it at rest, hidden, before it sets data-entering: it goes from there at once. */
+@utility search-view {
+  --search-view-open: 1;
+  --search-view-content: 1;
+  /* The container color of the bar, or of what is drawn from the trigger's box: as far as it is
+   * open, from the trigger's own to surface-container-high, so that it starts as what it grows out
+   * of looked. With no trigger, surface-container-high. */
+  --search-view-container-color: color-mix(
+    in srgb,
+    var(--search-view-trigger-color, var(--color-surface-container-high))
+      calc((1 - clamp(0, var(--search-view-open), 1)) * 100%),
+    var(--color-surface-container-high)
+  );
+  @apply relative isolate box-border flex flex-col text-on-surface outline-none;
+  /* With no trigger to grow out of, all of it fades as it opens and closes. */
+  opacity: var(--search-view-trigger-opacity, clamp(0, var(--search-view-open), 1));
+  /* The timings a style sets are fallbacks here: the style's utility may come first. */
+  transition-property: --search-view-open, --search-view-content;
+  transition-duration:
+    var(--search-view-duration, var(--md-sys-motion-spring-fast-spatial-duration)),
+    var(--search-view-content-duration, 0s);
+  transition-timing-function:
+    var(--search-view-easing, var(--md-sys-motion-spring-fast-spatial-easing)),
+    var(--search-view-content-easing, linear);
+  transition-delay: 0s, var(--search-view-content-delay, 0s);
+
+  &:is([data-entering], [data-exiting]) {
+    --search-view-open: 0;
+    --search-view-content: 0;
+  }
+  &[data-entering] {
+    transition-duration: 0s;
+  }
+
+  /* As it leaves, its bar draws no focus ring: Escape, a key, makes React Aria's focus on it the
+   * keyboard's, until the bar is inert. */
+  &[data-exiting] > .search-view-dialog > .search-field {
+    outline: none;
+  }
+}
+
+/* React Aria's Dialog, the column: the bar, at its full width, with no state of its own, then
+ * what comes below it, the last filling the rest and scrolling, counted without React Aria's
+ * hidden elements among them (a collection's <template>, a focus scope's ends). */
+@utility search-view-dialog {
+  @apply flex min-h-0 flex-1 flex-col outline-none;
+
+  & > .search-field {
+    max-width: none;
+    min-width: 0;
+
+    & > :is(.state-layer, .state-layer + *) {
+      display: none;
+    }
+
+    /* Its focus ring is inside its edge, which the container is drawn to and would cut a ring
+     * outside it at. */
+    &:has(> input[data-focus-visible]) {
+      @apply focus-indicator-inset;
+    }
+
+    /* What leads it fades in as it opens, as MDC's search view fades in its back button; given
+     * two, the first, the page's bar's icon, is under the second and fades through it, out over
+     * the first half and the other in over the second. Closing, the other way. */
+    & > [slot='leading'] {
+      opacity: clamp(0, var(--search-view-open), 1);
+    }
+    & > [slot='leading']:has(~ [slot='leading']) {
+      position: absolute;
+      opacity: clamp(0, 1 - 2 * var(--search-view-open), 1);
+    }
+    & > [slot='leading'] ~ [slot='leading'] {
+      opacity: clamp(0, 2 * var(--search-view-open) - 1, 1);
+    }
+  }
+
+  :where(&) > :nth-last-child(1 of :not(.search-field, template, [hidden])) {
+    @apply min-h-0 flex-auto overflow-y-auto overscroll-contain;
+  }
+
+  /* A list's items are on the container's color, as the spec's states diagram draws them,
+   * selected ones aside. */
+  & .list-item-container:not([data-selected]) {
+    @apply bg-transparent;
+  }
+}
+
+/* Docked: over the trigger, as wide, 360 to 720dp, 240dp to 2/3 of the window tall, 12dp short of
+ * its bottom at most; else 16dp below its top, in its middle. The Dialog shows from the bar down as
+ * Compose's grows, never past the bar closing, its corners 12dp unless its style says otherwise. */
+@utility search-view-docked {
+  --search-view-docked-top: var(--search-view-trigger-top, var(--spacing-space-200));
+  --search-view-docked-width: clamp(
+    min(calc(var(--spacing) * 90), 100% - var(--spacing-space-300)),
+    var(--search-view-trigger-width, 100% - var(--spacing-space-400)),
+    calc(var(--spacing) * 180)
+  );
+  --search-view-docked-left: var(
+    --search-view-trigger-left,
+    calc((100% - var(--search-view-docked-width)) / 2)
+  );
+  position: absolute;
+  top: var(--search-view-docked-top);
+  /* Wider than a trigger too near the window's right edge, it comes back to 12dp from that edge,
+   * but no further than to end where the trigger ends. */
+  left: min(
+    var(--search-view-docked-left),
+    max(
+      100% - var(--search-view-docked-width) - var(--spacing-space-150),
+      var(--search-view-docked-left) +
+        var(--search-view-trigger-width, var(--search-view-docked-width)) -
+        var(--search-view-docked-width)
+    )
+  );
+  width: var(--search-view-docked-width);
+  max-height: min(100% * 2 / 3, 100% - var(--search-view-docked-top) - var(--spacing-space-150));
+  min-height: min(
+    calc(var(--spacing) * 60),
+    100% - var(--search-view-docked-top) - var(--spacing-space-150)
+  );
+
+  & > .search-view-dialog {
+    clip-path: inset(
+      0 0 calc((1 - max(var(--search-view-open), 0)) * (100% - var(--spacing-space-700))) 0 round
+        var(--search-view-docked-corner, var(--radius-shape-md))
+    );
+  }
+}
+
+/* Full-screen: the window, its bar at the top, below the device's inset. */
+@utility search-view-full-screen {
+  @apply size-full;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  & > .search-view-dialog {
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+/* Contained: the bar keeps its container. Docked, the list is 2dp below it on its own, over a 32%
+ * scrim; full-screen, on surface-container-low, the bar 12dp from the sides, 4dp from the top. What
+ * is below the bar fades in 50ms on over 100ms, and out over 100ms, as Compose's content. */
+@utility search-view-contained {
+  --search-view-content-duration: var(--md-sys-motion-duration-short2);
+  --search-view-content-easing: var(--md-sys-motion-easing-standard-accelerate);
+  --search-view-content-delay: var(--md-sys-motion-duration-short1);
+
+  &[data-exiting] {
+    --search-view-content-easing: var(--md-sys-motion-easing-standard-decelerate);
+    --search-view-content-delay: 0s;
+  }
+
+  :where(&) > .search-view-dialog > :not(.search-field, template, [hidden]) {
+    opacity: var(--search-view-content);
+  }
+  & > .search-view-dialog > .search-field {
+    background-color: var(--search-view-container-color);
+  }
+
+  &.search-view-docked {
+    /* The scrim over the window, as far on as focused search is open. A press on it is on the
+     * layer below, outside the container, which closes it. */
+    &::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      @apply pointer-events-none bg-scrim/32;
+      opacity: var(--search-view-open);
+    }
+
+    /* Edged in forced colors, which drop its fill, as the divided container is. */
+    & > .search-view-dialog > :not(.search-field, template, [hidden]) {
+      @apply bg-surface-container-high forced-colors:container-border;
+    }
+    & > .search-view-dialog > :nth-child(1 of :not(.search-field, template, [hidden])) {
+      @apply mt-space-25 rounded-t-shape-md;
+    }
+    & > .search-view-dialog > :nth-last-child(1 of :not(.search-field, template, [hidden])) {
+      @apply rounded-b-shape-md;
+    }
+  }
+
+  /* Full-screen, the fill comes on, and the bar comes up from the trigger, widening to 12dp from
+   * the sides and past on the spring, as Compose's moves; closing, never inside the trigger, which
+   * would show around it. With no trigger, the bar is where it rests. */
+  &.search-view-full-screen {
+    --search-view-rest-top: calc(var(--spacing-space-50) + env(safe-area-inset-top, 0px));
+    --search-view-from-left: var(--search-view-trigger-left, var(--spacing-space-150));
+    --search-view-from-right: calc(
+      100% - var(--search-view-from-left) -
+        var(--search-view-trigger-width, 100% - 2 * var(--spacing-space-150))
+    );
+
+    &::before {
+      @apply bg-surface-container-low;
+      opacity: var(--search-view-open);
+    }
+
+    & > .search-view-dialog {
+      padding-top: var(--search-view-rest-top);
+      translate: 0
+        calc(
+          (
+              var(--search-view-trigger-top, var(--search-view-rest-top)) -
+                var(--search-view-rest-top)
+            ) *
+            (1 - clamp(0, var(--search-view-open), 1))
+        );
+    }
+    & > .search-view-dialog > .search-field {
+      margin-left: calc(
+        var(--search-view-from-left) + (var(--spacing-space-150) - var(--search-view-from-left)) *
+          max(var(--search-view-open), 0)
+      );
+      margin-right: calc(
+        var(--search-view-from-right) + (var(--spacing-space-150) - var(--search-view-from-right)) *
+          max(var(--search-view-open), 0)
+      );
+    }
+    & > .search-view-dialog > :nth-child(1 of :not(.search-field, template, [hidden])) {
+      @apply mt-space-100;
+    }
+  }
+}
+
+/* Divided: one surface-container-high container, the bar a header on it over an outline divider,
+ * 56dp docked, the container's corners 12dp, and 72dp full-screen. It opens on the default
+ * spatial spring and closes on the fast effects one. */
+@utility search-view-divided {
+  --search-view-duration: var(--md-sys-motion-spring-default-spatial-duration);
+  --search-view-easing: var(--md-sys-motion-spring-default-spatial-easing);
+
+  /* Not the fast spatial spring, which comes back 0.9% open once closed: 7px of a window. */
+  &[data-exiting] {
+    --search-view-duration: var(--md-sys-motion-spring-fast-effects-duration);
+    --search-view-easing: var(--md-sys-motion-spring-fast-effects-easing);
+  }
+
+  /* The divider is below the header's 56dp or 72dp, not in them. */
+  & > .search-view-dialog > .search-field {
+    @apply box-content rounded-none border-0 border-b border-solid bg-transparent forced-colors:border-x-0 forced-colors:border-t-0;
+    border-bottom-color: var(--color-outline);
+  }
+
+  /* Docked, its corners go from the trigger's round, the bar's, to 12dp as it opens, and back as
+   * it closes, so that it grows out of the bar as Compose's, whose corners are the bar's. */
+  &.search-view-docked {
+    --search-view-docked-corner: calc(
+      var(--radius-shape-md) +
+        (var(--search-view-trigger-height, var(--spacing-space-700)) / 2 - var(--radius-shape-md)) *
+        (1 - clamp(0, var(--search-view-open), 1))
+    );
+
+    & > .search-view-dialog {
+      @apply rounded-shape-md forced-colors:container-border;
+      background-color: var(--search-view-container-color);
+    }
+    /* The header's top corners are the container's, which its focus ring follows. */
+    & > .search-view-dialog > .search-field {
+      @apply rounded-t-shape-md;
+    }
+  }
+
+  /* Full-screen, all of it shows within its fill, which grows from the trigger's box to the window,
+   * round to square, the bar widening and coming up with it, as Compose lays it out; what is below
+   * the bar, the divider too, comes on. With no trigger, all of it only comes on. */
+  &.search-view-full-screen {
+    --search-view-progress: clamp(0, var(--search-view-open), 1);
+    --search-view-from-top: var(--search-view-trigger-top, 0px);
+    --search-view-from-left: var(--search-view-trigger-left, 0px);
+    --search-view-from-width: var(--search-view-trigger-width, 100%);
+    --search-view-from-height: var(--search-view-trigger-height, 100%);
+
+    clip-path: inset(
+      calc(var(--search-view-from-top) * (1 - var(--search-view-progress)))
+        calc(
+          (100% - var(--search-view-from-left) - var(--search-view-from-width)) *
+            (1 - var(--search-view-progress))
+        )
+        calc(
+          (100% - var(--search-view-from-top) - var(--search-view-from-height)) *
+            (1 - var(--search-view-progress))
+        )
+        calc(var(--search-view-from-left) * (1 - var(--search-view-progress))) round
+        calc(var(--search-view-trigger-height, 0px) / 2 * (1 - var(--search-view-progress)))
+    );
+
+    &::before {
+      background-color: var(--search-view-container-color);
+    }
+
+    & > .search-view-dialog {
+      translate: 0
+        calc(
+          (
+              var(
+                  --search-view-trigger-top,
+                  var(--spacing-space-100) + env(safe-area-inset-top, 0px)
+                ) -
+                var(--spacing-space-100) - env(safe-area-inset-top, 0px)
+            ) *
+            (1 - var(--search-view-progress))
+        );
+    }
+    & > .search-view-dialog > .search-field {
+      @apply h-18;
+      border-bottom-color: color-mix(
+        in srgb,
+        var(--color-outline) calc(var(--search-view-progress) * 100%),
+        transparent
+      );
+      margin-left: calc(var(--search-view-from-left) * (1 - max(var(--search-view-open), 0)));
+      margin-right: calc(
+        (100% - var(--search-view-from-left) - var(--search-view-from-width)) *
+          (1 - max(var(--search-view-open), 0))
+      );
+    }
+    & > .search-view-dialog > :not(.search-field, template, [hidden]) {
+      opacity: var(--search-view-progress);
+    }
+  }
+}

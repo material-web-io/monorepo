@@ -1,0 +1,180 @@
+/* Dialogs: what any dialog of React Aria's ModalOverlay > Modal > Dialog is drawn with, dialog.tsx's
+ * and the date picker's. A basic one comes and goes as the guidelines' enter and exit video draws it,
+ * measured frame by frame. Times are steps of short1 (50ms), so reduced motion skips them. */
+
+/* How much of a basic dialog's container its fill covers, from the top: registered, so that it
+ * runs on the video's easing, and inherited by the Dialog, which is cut to it (dialog-modal-basic). */
+@property --dialog-fill {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
+
+/* React Aria's ModalOverlay, the layer: the window, in front of the page as a dialog is stacked,
+ * under the scrim at 32%, the container in its middle. The scrim comes in 75ms after the dialog
+ * starts to open, over 125ms, and goes 62.5ms after it starts to close, over 75ms, evenly. */
+@utility dialog-modal-overlay {
+  transition-property: background-color;
+  transition-timing-function: linear;
+  transition-delay: calc(var(--md-sys-motion-duration-short1) * 1.5);
+  transition-duration: calc(var(--md-sys-motion-duration-short1) * 2.5);
+  @apply fixed inset-0 z-dialog box-border flex items-center justify-center bg-scrim/32 font-plain outline-none;
+  @apply entering:bg-transparent exiting:bg-transparent;
+
+  &[data-exiting] {
+    transition-delay: calc(var(--md-sys-motion-duration-short1) * 1.25);
+    transition-duration: calc(var(--md-sys-motion-duration-short1) * 1.5);
+  }
+}
+
+/* A basic dialog's layer: its container 48dp from the edges, as the guidelines' video draws one on a
+ * phone, and 56dp from a medium window's on, as the spec does. A full-screen one fills the layer. */
+@utility dialog-modal-overlay-basic {
+  @apply p-space-600 medium-screen:p-space-700;
+}
+
+/* React Aria's Modal, the container: a column of its Dialog up to 560dp wide, breaking words too
+ * long for it, edged in forced colors. */
+@utility dialog-modal {
+  @apply relative isolate box-border flex max-w-140 flex-col text-body-md wrap-break-word text-on-surface-variant outline-none;
+  @apply forced-colors:container-border;
+}
+
+/* A basic dialog's container: 280dp wide at least, no taller than its layer, its Dialog 24dp above
+ * and below what it holds, its ::before the fill, surface-container-high, 28dp corners, and no
+ * shadow, as the spec's diagrams draw it. */
+@utility dialog-modal-basic {
+  --dialog-easing: linear(
+    0,
+    0.0054,
+    0.0198,
+    0.0495,
+    0.0915,
+    0.1619,
+    0.2733,
+    0.4788,
+    0.6342,
+    0.7189,
+    0.7741,
+    0.8103,
+    0.8389,
+    0.8645,
+    0.8837,
+    0.8983,
+    0.9113,
+    0.9251,
+    0.9344,
+    0.9423,
+    0.95,
+    0.9584,
+    0.9625,
+    0.9687,
+    0.9718,
+    0.9782,
+    0.9799,
+    0.983,
+    0.9876,
+    0.9894,
+    0.9906,
+    0.9921,
+    0.9952,
+    0.9967,
+    0.998,
+    0.999,
+    1
+  );
+  --dialog-part-opacity: 1;
+  --dialog-text-delay: calc(var(--md-sys-motion-duration-short1) * 1.25);
+  --dialog-text-duration: calc(var(--md-sys-motion-duration-short1) * 2.25);
+  --dialog-fill: 1;
+  @apply max-h-full min-w-70 rounded-shape-xl;
+  @apply before:bg-surface-container-high;
+
+  /* Opening, it shows at once and comes 49dp down as the fill grows from 29% of its height, on the
+   * video's own easing (no M3 one fits it) over 600ms. */
+  translate: 0 0;
+  transition-property: translate, opacity, --dialog-fill;
+  transition-duration: var(--md-sys-motion-duration-long4), 0s, var(--md-sys-motion-duration-long4);
+  transition-timing-function: var(--dialog-easing), linear, var(--dialog-easing);
+
+  &::before {
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    z-index: -1;
+    height: calc(var(--dialog-fill) * 100%);
+    border-radius: inherit;
+  }
+
+  /* The Dialog fills the container and is cut to the fill's shape, its 28dp corners and, as it
+   * grows, its bottom edge: nothing it holds is drawn past the fill, however it is padded. */
+  :where(&) > * {
+    padding-block: var(--spacing-space-300);
+    clip-path: inset(0 0 calc((1 - var(--dialog-fill)) * 100%) 0 round var(--radius-shape-xl));
+  }
+
+  /* What it holds, in the Dialog or a form in it (dialog): in 62.5ms after it starts to open,
+   * over 112.5ms. Of no specificity, so that a timing of yours on one of them wins. */
+  :where(&) > * > :where(:not(form)),
+  :where(&) > * > :where(form) > * {
+    opacity: var(--dialog-part-opacity);
+    transition-property: opacity;
+    transition-timing-function: linear;
+    transition-delay: var(--dialog-text-delay);
+    transition-duration: var(--dialog-text-duration);
+  }
+
+  /* Before it opens (data-entering) and as it closes (data-exiting) it is up and the fill small.
+   * React Aria draws it at rest, hidden, before it sets data-entering: it goes from there at once,
+   * or what it holds and its fill, mid-way there, would go back to rest at once as it opens. */
+  &:is([data-entering], [data-exiting]) {
+    --dialog-part-opacity: 0;
+    --dialog-text-delay: 0s;
+    --dialog-text-duration: 0s;
+    --dialog-fill: 0.29;
+    translate: 0 -49px;
+    opacity: 0;
+    transition-duration: 0s;
+  }
+
+  /* Closing, over 66.7ms on the emphasized accelerate easing, while it fades evenly from a frame
+   * in to a frame past that, what it holds over the first 50ms. */
+  &[data-exiting] {
+    --dialog-text-duration: var(--md-sys-motion-duration-short1);
+    transition-delay: 0s, calc(var(--md-sys-motion-duration-short1) / 3), 0s;
+    transition-duration: calc(var(--md-sys-motion-duration-short1) * 4 / 3);
+    transition-timing-function:
+      var(--md-sys-motion-easing-emphasized-accelerate), linear,
+      var(--md-sys-motion-easing-emphasized-accelerate);
+  }
+}
+
+/* A full-screen dialog's container fills its layer, surface, and scrolls clear of its header. It
+ * slides up from below the window over 400ms, and back down over 150ms as the guidelines' video
+ * closes one (data-exiting). What it holds goes with it, unfaded. */
+@utility dialog-modal-full-screen {
+  @apply size-full scroll-pt-16 overflow-y-auto overscroll-contain bg-surface pb-space-300;
+  translate: 0 0;
+  transition-property: translate;
+  transition-duration: var(--md-sys-motion-duration-medium4);
+  transition-timing-function: var(--md-sys-motion-easing-emphasized-decelerate);
+
+  &:is([data-entering], [data-exiting]) {
+    translate: 0 100%;
+    transition-duration: var(--md-sys-motion-duration-short3);
+    transition-timing-function: var(--md-sys-motion-easing-emphasized-accelerate);
+  }
+}
+
+/* React Aria's Dialog, the column in the container that holds what it is given and takes the focus
+ * as the dialog opens; a form in it, around the rest, as React Aria writes one, is that column. */
+@utility dialog {
+  @apply flex min-h-0 grow flex-col outline-none;
+
+  & > form {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    min-height: 0;
+  }
+}

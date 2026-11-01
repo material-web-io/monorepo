@@ -1,0 +1,315 @@
+/* The value indicator's label text: 14/20, 0.5 tracking, regular, as the spec's token table has it,
+ * which matches none of the type scale's roles. */
+@theme {
+  --text-slider-value: 0.875rem;
+  --text-slider-value--line-height: 1.25rem;
+  --text-slider-value--letter-spacing: 0.5px;
+  --text-slider-value--font-weight: var(--md-ref-typeface-weight-regular);
+}
+
+/* React Aria's Slider, the <div> in the group role. A handle's center travels 6dp in from either end
+ * of the track, where the end stops sit, with a 6dp gap to the track on each side. */
+@utility slider {
+  --slider-inset: calc(var(--spacing) * 1.5);
+  --slider-gap: calc(var(--spacing) * 1.5);
+  --slider-inner-corner: calc(var(--spacing) * 0.5);
+  --slider-icon-room: calc(var(--slider-icon) + 2 * var(--slider-icon-padding));
+}
+
+/* Each size's track thickness, outer track corner, handle length, and inset icon with its padding. */
+@utility slider-size-xs {
+  --slider-track: calc(var(--spacing) * 4);
+  --slider-track-corner: calc(var(--spacing) * 2);
+  --slider-handle: calc(var(--spacing) * 11);
+  --slider-icon: calc(var(--spacing) * 6);
+  --slider-icon-padding: calc(var(--spacing) * 1.5);
+}
+
+@utility slider-size-s {
+  --slider-track: calc(var(--spacing) * 6);
+  --slider-track-corner: calc(var(--spacing) * 2);
+  --slider-handle: calc(var(--spacing) * 11);
+  --slider-icon: calc(var(--spacing) * 6);
+  --slider-icon-padding: calc(var(--spacing) * 1.5);
+}
+
+@utility slider-size-m {
+  --slider-track: calc(var(--spacing) * 10);
+  --slider-track-corner: calc(var(--spacing) * 3);
+  --slider-handle: calc(var(--spacing) * 13);
+  --slider-icon: calc(var(--spacing) * 6);
+  --slider-icon-padding: calc(var(--spacing) * 1.5);
+}
+
+@utility slider-size-l {
+  --slider-track: calc(var(--spacing) * 14);
+  --slider-track-corner: calc(var(--spacing) * 4);
+  --slider-handle: calc(var(--spacing) * 17);
+  --slider-icon: calc(var(--spacing) * 6);
+  --slider-icon-padding: calc(var(--spacing) * 1.5);
+}
+
+@utility slider-size-xl {
+  --slider-track: calc(var(--spacing) * 24);
+  --slider-track-corner: calc(var(--spacing) * 7);
+  --slider-handle: calc(var(--spacing) * 27);
+  --slider-icon: calc(var(--spacing) * 8);
+  --slider-icon-padding: calc(var(--spacing) * 2);
+}
+
+/* React Aria's SliderTrack: the handles' travel, 6dp short of the track at either end, as tall as a
+ * handle, with a 48dp target. A press anywhere on it moves the nearest handle there. Its style is
+ * slider.tsx's, which drops React Aria's own position and touch action, so they are given here. */
+@utility slider-track {
+  @apply touch-target relative shrink-0 cursor-pointer touch-none;
+  @apply group-disabled/md-slider:cursor-default;
+}
+
+@utility slider-track-horizontal {
+  margin-inline: var(--slider-inset);
+  height: var(--slider-handle);
+}
+
+@utility slider-track-vertical {
+  margin-block: var(--slider-inset);
+  width: var(--slider-handle);
+  @apply min-h-0 flex-1;
+}
+
+/* A stretch of the track, active or inactive: the whole track, clipped to the stretch between its two
+ * ends, which slider.tsx picks from these (where a handle is, less half its width and the gap, or 2dp
+ * either side of the center), and rounded there by its outer corner or the 2dp inner one. */
+@utility slider-segment {
+  --slider-half-0: calc(var(--spacing) * 0.5);
+  --slider-half-1: calc(var(--spacing) * 0.5);
+  --slider-at-0: calc(
+    var(--slider-inset) + var(--slider-value-0) * (100% - 2 * var(--slider-inset))
+  );
+  --slider-at-1: calc(
+    var(--slider-inset) + var(--slider-value-1) * (100% - 2 * var(--slider-inset))
+  );
+  --slider-before-0: calc(var(--slider-at-0) - var(--slider-half-0) - var(--slider-gap));
+  --slider-after-0: calc(var(--slider-at-0) + var(--slider-half-0) + var(--slider-gap));
+  --slider-before-1: calc(var(--slider-at-1) - var(--slider-half-1) - var(--slider-gap));
+  --slider-after-1: calc(var(--slider-at-1) + var(--slider-half-1) + var(--slider-gap));
+  --slider-center-before: calc(50% - var(--slider-inner-corner));
+  --slider-center-after: calc(50% + var(--slider-inner-corner));
+  @apply pointer-events-none absolute;
+  /* A handle held or under keyboard focus is 2dp wide, not 4dp, so the track reaches 1dp closer. */
+  @apply peer-focus-visible/md-slider-thumb-0:slider-narrow-0 peer-dragging/md-slider-thumb-0:slider-narrow-0;
+  @apply peer-focus-visible/md-slider-thumb-1:slider-narrow-1 peer-dragging/md-slider-thumb-1:slider-narrow-1;
+}
+
+@utility slider-narrow-0 {
+  --slider-half-0: calc(var(--spacing) * 0.25);
+}
+
+@utility slider-narrow-1 {
+  --slider-half-1: calc(var(--spacing) * 0.25);
+}
+
+/* The track runs past the travel by its 6dp inset; its stretches are clipped along it from the start
+ * React Aria's locale gives, the left, the right or, vertical, the bottom. */
+@utility slider-segment-ltr {
+  inset-inline: calc(var(--slider-inset) * -1);
+  top: 50%;
+  height: var(--slider-track);
+  translate: 0 -50%;
+  clip-path: inset(
+    0 calc(100% - var(--slider-to)) 0 var(--slider-from) round var(--slider-from-corner)
+      var(--slider-to-corner) var(--slider-to-corner) var(--slider-from-corner)
+  );
+}
+
+@utility slider-segment-rtl {
+  inset-inline: calc(var(--slider-inset) * -1);
+  top: 50%;
+  height: var(--slider-track);
+  translate: 0 -50%;
+  clip-path: inset(
+    0 var(--slider-from) 0 calc(100% - var(--slider-to)) round var(--slider-to-corner)
+      var(--slider-from-corner) var(--slider-from-corner) var(--slider-to-corner)
+  );
+}
+
+@utility slider-segment-vertical {
+  inset-block: calc(var(--slider-inset) * -1);
+  left: 50%;
+  width: var(--slider-track);
+  translate: -50% 0;
+  clip-path: inset(
+    calc(100% - var(--slider-to)) 0 var(--slider-from) 0 round var(--slider-to-corner)
+      var(--slider-to-corner) var(--slider-from-corner) var(--slider-from-corner)
+  );
+}
+
+/* The active track, primary, its stops and inset icon on primary; disabled, on-surface at 38%,
+ * its stops inverse-on-surface at 38%. Forced colors draw it in Highlight, greyed when disabled. */
+@utility slider-active-track {
+  @apply bg-primary text-on-primary;
+  @apply group-disabled/md-slider:bg-on-surface/disabled-content group-disabled/md-slider:text-inverse-on-surface/disabled-content;
+  @apply forced-colors:bg-highlight forced-colors:text-highlight-text forced-colors:forced-color-adjust-none;
+  @apply group-disabled/md-slider:forced-colors:bg-gray-text group-disabled/md-slider:forced-colors:text-canvas;
+}
+
+/* The inactive track, secondary container, its stops and inset icon on secondary container; disabled,
+ * on-surface at 12%, its stops on-surface at 38%. Forced colors draw it in CanvasText. */
+@utility slider-inactive-track {
+  @apply bg-secondary-container text-on-secondary-container;
+  @apply group-disabled/md-slider:bg-on-surface/disabled-container group-disabled/md-slider:text-on-surface/disabled-content;
+  @apply forced-colors:bg-canvas-text forced-colors:text-canvas forced-colors:forced-color-adjust-none;
+  @apply group-disabled/md-slider:forced-colors:bg-gray-text group-disabled/md-slider:forced-colors:text-canvas;
+}
+
+/* A 4dp stop at its value (--slider-stop, 0 to 1), on the handles' travel, in its stretch's color. */
+@utility slider-stop {
+  --slider-stop-at: calc(
+    var(--slider-inset) + var(--slider-stop) * (100% - 2 * var(--slider-inset))
+  );
+  @apply absolute size-1 rounded-full bg-current;
+}
+
+@utility slider-stop-ltr {
+  left: var(--slider-stop-at);
+  top: 50%;
+  translate: -50% -50%;
+}
+
+@utility slider-stop-rtl {
+  right: var(--slider-stop-at);
+  top: 50%;
+  translate: 50% -50%;
+}
+
+@utility slider-stop-vertical {
+  bottom: var(--slider-stop-at);
+  left: 50%;
+  translate: -50% 50%;
+}
+
+/* The inset icon, drawn on both stretches: on the active track at its start while that holds the icon
+ * and its padding either side, else on the inactive track after the gap. Each copy is clipped away
+ * whole (an inset of 0 or all of it, along the track's length) while the other one shows. */
+@utility slider-icon-active {
+  --slider-icon-at: var(--slider-icon-padding);
+  --slider-icon-hidden: clamp(0px, (var(--slider-icon-room) - var(--slider-before-0)) * 1000, 100%);
+  @apply absolute inset-0;
+}
+
+@utility slider-icon-inactive {
+  --slider-icon-at: calc(var(--slider-after-0) + var(--slider-icon-padding));
+  --slider-icon-hidden: clamp(
+    0px,
+    (var(--slider-before-0) - var(--slider-icon-room)) * 1000 + 1px,
+    100%
+  );
+  @apply absolute inset-0;
+}
+
+@utility slider-icon-reveal-horizontal {
+  clip-path: inset(0 0 0 var(--slider-icon-hidden));
+}
+
+@utility slider-icon-reveal-vertical {
+  clip-path: inset(var(--slider-icon-hidden) 0 0 0);
+}
+
+/* The inset icon's box, 24dp, 32dp on an XL slider, and the Icon in it as big (icon-*). */
+@utility slider-icon {
+  @apply absolute flex items-center justify-center;
+  width: var(--slider-icon);
+  height: var(--slider-icon);
+  --icon-size: var(--slider-icon);
+}
+
+@utility slider-icon-ltr {
+  left: var(--slider-icon-at);
+  top: 50%;
+  translate: 0 -50%;
+}
+
+@utility slider-icon-rtl {
+  right: var(--slider-icon-at);
+  top: 50%;
+  translate: 0 -50%;
+}
+
+@utility slider-icon-vertical {
+  bottom: var(--slider-icon-at);
+  left: 50%;
+  translate: -50% 0;
+}
+
+/* React Aria's SliderThumb, which it places at the value: the box its focus ring is drawn around, 3dp
+ * either side of a focused 2dp handle and 4dp past its ends, raised over the track. It holds the
+ * hidden <input>, the handle and the value indicator. */
+@utility slider-thumb {
+  @apply focus-ring z-raised flex items-center justify-center rounded-full;
+}
+
+@utility slider-thumb-horizontal {
+  top: 50%;
+  width: calc(var(--spacing) * 2);
+  height: calc(var(--slider-handle) + var(--spacing) * 2);
+}
+
+@utility slider-thumb-vertical {
+  left: 50%;
+  height: calc(var(--spacing) * 2);
+  width: calc(var(--slider-handle) + var(--spacing) * 2);
+}
+
+/* The handle: 4dp across, 2dp while held or under keyboard focus, at once, as Compose has it.
+ * Disabled, on-surface at 38%; CanvasText in forced colors, greyed when disabled. */
+@utility slider-handle {
+  @apply pointer-events-none shrink-0 rounded-full bg-primary;
+  @apply group-disabled/md-slider-thumb:bg-on-surface/disabled-content;
+  @apply forced-colors:bg-canvas-text forced-colors:forced-color-adjust-none group-disabled/md-slider-thumb:forced-colors:bg-gray-text;
+}
+
+@utility slider-handle-horizontal {
+  height: var(--slider-handle);
+  @apply w-1 group-focus-visible/md-slider-thumb:w-0.5 group-dragging/md-slider-thumb:w-0.5;
+}
+
+@utility slider-handle-vertical {
+  width: var(--slider-handle);
+  @apply h-1 group-focus-visible/md-slider-thumb:h-0.5 group-dragging/md-slider-thumb:h-0.5;
+}
+
+/* The value indicator, 44dp tall and at least 48dp wide, 4dp from the handle's end. It grows out of
+ * that end on the default spatial spring while the handle is held or under keyboard focus, and
+ * shrinks back into it on emphasized accelerate over a short-3, as the guideline's motion video has it. */
+@utility slider-value-indicator {
+  transition-property: scale;
+  transition-duration: var(--md-sys-motion-duration-short3);
+  transition-timing-function: var(--md-sys-motion-easing-emphasized-accelerate);
+  @apply pointer-events-none absolute box-border flex h-11 min-w-12 scale-0 items-center justify-center rounded-full bg-inverse-surface px-space-200 font-plain text-slider-value whitespace-nowrap text-inverse-on-surface;
+  @apply group-focus-visible/md-slider-thumb:slider-value-indicator-shown group-dragging/md-slider-thumb:slider-value-indicator-shown;
+  @apply forced-colors:bg-canvas-text forced-colors:text-canvas forced-colors:forced-color-adjust-none;
+}
+
+@utility slider-value-indicator-shown {
+  transition-duration: var(--md-sys-motion-spring-default-spatial-duration);
+  transition-timing-function: var(--md-sys-motion-spring-default-spatial-easing);
+  @apply scale-100;
+}
+
+/* Above a horizontal handle; on a vertical one's inline start, as MDC-Android puts it. */
+@utility slider-value-indicator-horizontal {
+  bottom: 100%;
+  left: 50%;
+  translate: -50% 0;
+  transform-origin: 50% calc(100% + var(--spacing));
+}
+
+@utility slider-value-indicator-vertical {
+  inset-inline-end: 100%;
+  top: 50%;
+  translate: 0 -50%;
+  transform-origin: calc(100% + var(--spacing)) 50%;
+
+  @variant rtl {
+    transform-origin: calc(var(--spacing) * -1) 50%;
+  }
+}

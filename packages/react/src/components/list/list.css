@@ -1,0 +1,291 @@
+/* List (list.tsx): React Aria's GridList, a column of rows, each this package's ListItem
+ * (list-item.tsx), in the expressive style of the lists spec. The list itself is focused only
+ * while empty, where React Aria has it, and rings itself inside its edge then. */
+@utility list {
+  @apply focus-ring-inset box-border flex flex-col outline-none;
+  &[data-orientation='horizontal'] {
+    @apply flex-row;
+  }
+  /* In a list too short for its items, which scrolls, each keeps its height: the 48dp that is its
+   * least is a target's, not what it may be pressed down to. */
+  &:not([data-orientation='horizontal']) > .list-item-container {
+    @apply shrink-0;
+  }
+  /* React Aria's DropIndicator, a row of its own between two items while a drag is on: nothing,
+   * out of the flow, but where the drop will land, a 2dp line of primary across the list there.
+   * That is React Aria's own hook; this package's draws a placeholder (list-placeholder). */
+  & > .react-aria-DropIndicator {
+    @apply absolute z-raised h-0 shrink-0 opacity-0 outline-none;
+    &[data-drop-target] {
+      @apply relative opacity-100 outline outline-primary outline-solid;
+    }
+  }
+  &[data-orientation='horizontal'] > .react-aria-DropIndicator {
+    @apply h-auto w-0;
+  }
+  /* The item a pointer drags is out of the list while its placeholder is in it, the one drop
+   * position drawn: no room, whatever its own style gives it, and no gap of its own, the list's as
+   * the hook read it. A keyboard's drag draws every drop position, its item lifted where it is. */
+  &:has(> .list-placeholder[data-drop-target]):not(
+      :has(> .list-placeholder:not([data-drop-target]))
+    )
+    > [data-dragging] {
+    @apply h-0! min-h-0! flex-none! overflow-clip py-0! opacity-0;
+    margin-block-end: calc(var(--list-placeholder-gap, 0px) * -1);
+  }
+  &[data-orientation='horizontal']:has(> .list-placeholder[data-drop-target]):not(
+      :has(> .list-placeholder:not([data-drop-target]))
+    )
+    > [data-dragging] {
+    @apply w-0! min-w-0! px-0!;
+    /* It keeps the height it had, which its text, wrapping in no width, would add to. */
+    height: var(--list-placeholder-height, auto) !important;
+    margin-block-end: 0;
+    margin-inline-end: calc(var(--list-placeholder-gap, 0px) * -1);
+  }
+}
+
+/* The drop indicator of this package's useDragAndDrop (use-drag-and-drop.tsx), a row of its own
+ * between two items while a drag is on: nothing, out of the flow, but where the drop will land.
+ * That one is the dragged item's placeholder, which keeps its room in a list too short for it. */
+@utility list-placeholder {
+  @apply absolute h-0 shrink-0 overflow-clip opacity-0 outline-none;
+  scale: 1 0.6;
+  /* The placeholder: the room the hook measured for it, and in it, 12dp from the sides and 6dp
+   * from the top and bottom, the dragged container under its state layer, all at 38%. It opens
+   * and fades in on the fast effects spring, a short-1 after the items around start to make way. */
+  &[data-drop-target] {
+    @apply relative opacity-38;
+    @apply before:absolute before:inset-x-space-150 before:inset-y-space-75 before:rounded-shape-xs before:bg-tertiary-container;
+    @apply after:absolute after:inset-x-space-150 after:inset-y-space-75 after:rounded-shape-xs after:bg-on-tertiary-container/state-dragged;
+    @apply forced-colors:before:border forced-colors:before:border-solid forced-colors:before:border-canvas-text;
+    height: var(--list-placeholder-height, 0px);
+    scale: 1;
+    transition-property: opacity, scale;
+    transition-duration: var(--md-sys-motion-spring-fast-effects-duration);
+    transition-timing-function: var(--md-sys-motion-spring-fast-effects-easing);
+    transition-delay: var(--md-sys-motion-duration-short1);
+    @starting-style {
+      opacity: 0;
+      scale: 1 0.6;
+    }
+  }
+  /* Side by side, the placeholder's room is its width, and it opens sideways. */
+  [data-orientation='horizontal'] > & {
+    @apply h-auto w-0;
+    scale: 0.6 1;
+    &[data-drop-target] {
+      width: var(--list-placeholder-width, 0px);
+      scale: 1;
+      @starting-style {
+        scale: 0.6 1;
+      }
+    }
+  }
+}
+
+/* Segmented: 2dp between the items, and the list's 16dp corners on the first item's top and the
+ * last's bottom, or side by side on the first's start and the last's end, whatever its state
+ * (list-item-container); in forced colors, each item a bordered box. */
+@utility list-segmented {
+  @apply gap-space-25;
+  /* React Aria's own drop indicator, a line in the middle of the gap, which it adds nothing to. */
+  & > .react-aria-DropIndicator[data-drop-target] {
+    margin-block: calc(var(--spacing-space-25) / -2);
+  }
+  &[data-orientation='horizontal'] > .react-aria-DropIndicator[data-drop-target] {
+    margin-block: 0;
+    margin-inline: calc(var(--spacing-space-25) / -2);
+  }
+  & .list-item-container {
+    @apply forced-colors:container-border;
+  }
+  &:not([data-orientation='horizontal']) {
+    & > :nth-child(1 of .list-item-container) {
+      @apply rounded-t-shape-lg;
+    }
+    & > :nth-last-child(1 of .list-item-container) {
+      @apply rounded-b-shape-lg;
+    }
+  }
+  &[data-orientation='horizontal'] {
+    & > :nth-child(1 of .list-item-container) {
+      @apply rounded-s-shape-lg;
+    }
+    & > :nth-last-child(1 of .list-item-container) {
+      @apply rounded-e-shape-lg;
+    }
+  }
+}
+
+/* A divider over each item but the first, 1dp of outline variant 16dp in from the sides, in no
+ * room of its own: a line in the item's background, under its state layer and ripple, and in
+ * forced colors a border. */
+@utility list-divided {
+  & > .list-item-container:not(:nth-child(1 of .list-item-container)) {
+    background-image: linear-gradient(
+      var(--md-sys-color-outline-variant),
+      var(--md-sys-color-outline-variant)
+    );
+    background-size: calc(100% - 2 * var(--spacing-space-200)) 1px;
+    background-position: center top;
+    background-repeat: no-repeat;
+    @apply forced-colors:border-t forced-colors:border-canvas-text;
+  }
+}
+
+/* The item's transition: its corners and shadow on the fast spatial spring and its colors on the
+ * default effects one, as Compose animates its shape, elevation and colors. A dragged item's lift
+ * over its neighbours is there at once and, let go, stays for that spring's length, as it settles. */
+@utility transition-list-item {
+  transition-property: border-radius, background-color, color, box-shadow, --list-item-lift;
+  transition-behavior: allow-discrete;
+  transition-duration:
+    var(--md-sys-motion-spring-fast-spatial-duration),
+    var(--md-sys-motion-spring-default-effects-duration),
+    var(--md-sys-motion-spring-default-effects-duration),
+    var(--md-sys-motion-spring-fast-spatial-duration), 0s;
+  transition-timing-function:
+    var(--md-sys-motion-spring-fast-spatial-easing),
+    var(--md-sys-motion-spring-default-effects-easing),
+    var(--md-sys-motion-spring-default-effects-easing),
+    var(--md-sys-motion-spring-fast-spatial-easing), linear;
+  transition-delay: 0s, 0s, 0s, 0s, var(--md-sys-motion-spring-fast-spatial-duration);
+  &[data-dragging] {
+    transition-delay: 0s;
+  }
+}
+
+/* An item, React Aria's GridListItem, the row, its ripple its first child (list-item.tsx): its
+ * parts in a grid, 16dp from its sides and 10dp (less the density step) from its top and bottom,
+ * 48dp tall at least, a target. Its 4dp corners are 12dp hovered and 16dp in its other states. */
+@utility list-item-container {
+  @apply relative box-border grid min-h-12 touch-manipulation px-space-200 py-space-125-variable font-plain text-body-lg text-on-surface outline-none select-none;
+  @apply rounded-shape-xs bg-surface icon-20;
+  @apply focus-ring-inset hover:cursor-pointer;
+  @apply transition-list-item;
+  @apply hover:rounded-shape-md focus-visible:rounded-shape-lg pressed:rounded-shape-lg selected:rounded-shape-lg dragging:rounded-shape-lg;
+  /* Selected: secondary container, all of it on-secondary-container. */
+  @apply selected:bg-secondary-container selected:text-on-secondary-container selected:icon-filled;
+  /* Disabled: its content at 38%, and a selected one on its disabled state layer, on-surface at 10%,
+   * as the spec's states diagram draws it. */
+  @apply disabled:text-on-surface/disabled-content selected:disabled:bg-on-surface/10 selected:disabled:text-on-surface/disabled-content;
+  /* Dragged: tertiary container at elevation 4, on-tertiary-container, over its neighbours by its
+   * lift, which alone is slow to go (transition-list-item): a focus ring rises and goes at once. */
+  @apply dragging:bg-tertiary-container dragging:text-on-tertiary-container dragging:shadow-elevation-4;
+  --list-item-lift: auto;
+  z-index: var(--list-item-lift);
+  &[data-dragging] {
+    --list-item-lift: var(--z-index-raised);
+  }
+  @apply disabled:forced-colors:text-gray-text selected:forced-colors:selected-fill;
+  /* The Ripple draws under any press. It shows on an item React Aria presses, one that is selected
+   * or acts, and until a tap's ripple is over (ripple.tsx): half its growth, then its fade. */
+  & > .state-layer + * {
+    opacity: 0;
+    transition: opacity var(--md-sys-motion-duration-short4) linear
+      calc(var(--md-sys-motion-duration-long1) / 2 + var(--md-sys-motion-duration-short4));
+  }
+  &[data-pressed] > .state-layer + * {
+    opacity: 1;
+    transition: none;
+  }
+  /* Its parts by their slots: a column for the drag handle, one for the leading part, the content
+   * column of the overline, label and supporting text in three rows, and one for each trailing
+   * part, in written order. The pad rows above and below the text, which take what room is left,
+   * keep the text in the middle of a leading or trailing part taller than it, and of the item. */
+  grid-template-columns: [drag] auto [leading] auto [content] minmax(0, 1fr) [trailing] auto;
+  grid-template-rows:
+    [top] var(--list-item-top-pad, minmax(0, 1fr)) [overline] auto [label] auto [description] auto
+    [bottom] minmax(0, 1fr) [end];
+  grid-auto-flow: column;
+  grid-auto-columns: auto;
+  align-items: var(--list-item-align, center);
+  /* Nothing of its own goes in the handle's, the leading or the top pad cells, so what has no slot,
+   * text alone, lands in the content column, and a trailing part after the content. The first is
+   * as tall as the content is at least, by its lines of text: 36dp for one, the spec's 56dp. */
+  &::before {
+    content: '';
+    grid-area: top / drag / end / content;
+    min-height: var(--list-item-lines-height, calc(var(--spacing) * 9));
+  }
+  &::after {
+    content: '';
+    grid-area: top / content / overline / trailing;
+  }
+  :where(& > * > :is([slot='leading'], [slot='selection'])) {
+    grid-area: top / leading / end / content;
+    margin-inline-end: var(--spacing-space-150);
+  }
+  :where(& > * > [slot='overline']) {
+    @apply text-label-sm;
+    grid-area: overline / content;
+  }
+  :where(& > * > [slot='label']) {
+    grid-area: label / content;
+  }
+  :where(& > * > [slot='description']) {
+    @apply text-body-md;
+    grid-area: description / content;
+  }
+  :where(& > * > [slot='trailing']) {
+    grid-row: top / end;
+    margin-inline-start: var(--spacing-space-150);
+  }
+  /* Trailing text, React Aria's Text in the trailing slot: label small. */
+  :where(& > * > span[slot='trailing']:not(.font-icon)) {
+    @apply text-label-sm;
+  }
+  /* The overline, supporting and trailing text and the icons in the slots are on-surface-variant;
+   * selected, disabled or dragged, they take the item's color. */
+  :where(
+    &:not([data-selected], [data-disabled], [data-dragging])
+      > *
+      > :is(
+        [slot='overline'],
+        [slot='description'],
+        span[slot='trailing'],
+        .font-icon:is([slot='leading'], [slot='trailing'])
+      )
+  ) {
+    @apply text-on-surface-variant;
+  }
+  /* Two lines of text, 72dp: 52dp of content at least; three, an overline and supporting text,
+   * 88dp (list-item-three-line). */
+  &:has(> * > :is([slot='overline'], [slot='description']))::before {
+    min-height: var(--list-item-lines-height, calc(var(--spacing) * 13));
+  }
+  &:has(> * > [slot='overline']):has(> * > [slot='description']) {
+    @apply list-item-three-line;
+  }
+}
+
+/* A two-line item, 72dp: 52dp of content at least. The stylesheet tells an overline or supporting
+ * text with the label (list-item-container); list-item.tsx measures a label that wraps. */
+@utility list-item-two-line {
+  --list-item-lines-height: calc(var(--spacing) * 13);
+}
+
+/* A three-line item, 88dp: 68dp of content at least, its parts at its top. The stylesheet tells an
+ * overline with supporting text; list-item.tsx measures text that wraps to a third line. */
+@utility list-item-three-line {
+  @apply list-item-top;
+  --list-item-lines-height: calc(var(--spacing) * 17);
+}
+
+/* The parts at the item's top, as the spec has them with three lines of text or from 88dp up:
+ * list-item.tsx measures an item that tall, whatever makes it so, its padding counted. */
+@utility list-item-top {
+  --list-item-top-pad: 0px;
+  --list-item-align: start;
+}
+
+/* The drag handle, React Aria's Button in the drag slot, drawn when the list drags its items: the
+ * 20dp drag_handle symbol in a 32dp round button at the item's start, 12dp before the next part.
+ * The keyboard's way to drag the row; the pointer drags the row itself, and React Aria lets no
+ * press through to the handle. */
+@utility list-item-drag-handle {
+  @apply -ms-space-75 me-space-75 inline-flex size-8 shrink-0 appearance-none items-center justify-center rounded-full border-0 bg-transparent p-0 text-inherit outline-none;
+  @apply focus-ring;
+  grid-area: top / drag / end / leading;
+}

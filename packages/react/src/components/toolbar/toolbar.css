@@ -1,0 +1,43 @@
+/* React Aria's Toolbar (toolbar.tsx): its elements in a grid, each centered in a cell at least 48dp
+ * wide and tall, as the measurements draw them: a 40dp icon button takes 48dp, and a button or a
+ * text field wider than that its own width. */
+@utility toolbar-container {
+  grid-auto-columns: minmax(var(--spacing-space-600), auto);
+  grid-auto-rows: minmax(var(--spacing-space-600), auto);
+  place-items: center;
+  @apply box-border font-plain;
+
+  /* A group in it, such as a ButtonGroup, holds its buttons in no cells: 4dp in, their targets
+   * stand 4dp from the next element's, and from a floating toolbar's ends, as a cell's do. */
+  & > :is([role='group'], [role='radiogroup']) {
+    @apply mx-space-50;
+  }
+
+  &[data-orientation='vertical'] > :is([role='group'], [role='radiogroup']) {
+    @apply mx-0 my-space-50;
+  }
+
+  /* Every React Aria toggle in it, a single-select group's radio too, is the toolbar's: flat in its
+   * icon color, selected in its container (toolbar-standard, toolbar-vibrant), round as the specs
+   * draw it. The toolbar's class outweighs the button's own; in forced colors the button's stay. */
+  & :is([aria-pressed], [role='radio']) {
+    @apply shadow-none inset-ring-0 not-forced-colors:bg-transparent not-forced-colors:text-inherit hover:shadow-none;
+    /* Round at 28dp, half the tallest button a toolbar holds: from 9999px the spring's overshoot back
+     * to a 40dp button's 20dp would take the corner below zero, square for a few frames. */
+    @apply selected:rounded-shape-xl not-forced-colors:selected:bg-(--toolbar-selected-container) not-forced-colors:selected:text-(--toolbar-selected-content);
+    /* Disabled, selected or not, it has no container and the toolbar's icon color at 38%. */
+    @apply not-forced-colors:disabled:bg-transparent not-forced-colors:disabled:text-current/disabled-content not-forced-colors:selected:disabled:bg-transparent not-forced-colors:selected:disabled:text-current/disabled-content;
+  }
+}
+
+/* A selected toggle's container and content in each color scheme, from the token sets "Toolbar -
+ * Color - Standard" and "- Vibrant"; the fill and the icon color are toolbar.tsx's. */
+@utility toolbar-standard {
+  --toolbar-selected-container: var(--md-sys-color-secondary-container);
+  --toolbar-selected-content: var(--md-sys-color-on-secondary-container);
+}
+
+@utility toolbar-vibrant {
+  --toolbar-selected-container: var(--md-sys-color-surface-container);
+  --toolbar-selected-content: var(--md-sys-color-on-surface);
+}

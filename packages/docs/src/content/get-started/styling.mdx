@@ -1,0 +1,144 @@
+import * as buttonStyles from '../../examples/get-started/button-styles.tsx?example'
+import * as className from '../../examples/get-started/class-name.tsx?example'
+import * as customComponent from '../../examples/get-started/custom-component.tsx?example'
+import * as density from '../../examples/get-started/density.tsx?example'
+import * as stateVariants from '../../examples/get-started/state-variants.tsx?example'
+
+Style the components the way you style your own markup: with Tailwind's [utility classes](https://tailwindcss.com/docs/styling-with-utility-classes) and the classes of the [theme](/theme). Add classes to one component, style its states, or change the theme to restyle them all.
+
+## Classes
+
+Pass classes to a component in `className`. A class of yours replaces the component's class for the same property: `bg-tertiary` replaces the button's `bg-primary`.
+
+<Example {...className} />
+
+- **Element:** The classes go on the component's root element. For a `Dialog` or a modal sheet, that is its container, inside the scrim.
+- **Parts:** A component made of several parts takes `className` on each one, such as `Tabs`, `TabList` and `Tab`.
+- **Children:** The children you write take classes of their own, such as an `Icon` or a `Text` in a slot. See [Composition](/get-started/composition).
+- **Window size:** Add a [breakpoint variant](/theme/layout#breakpoints) for another class in a larger window, as in `expanded-screen:w-80`.
+- **Inline styles:** Pass `style` for a value that no class provides.
+- **Inner elements:** To restyle an element inside a component that `className` does not reach, such as the track of a `Switch`, set the color roles it uses. See [Theme](/get-started/styling#theme).
+
+## States
+
+A component reports its states, such as hovered, pressed or selected. Style a state with a Tailwind variant, with a function passed as `className` or `style`, or with a data attribute in your own CSS.
+
+| State                     | Variant                 | Function                  | Attribute                       |
+| ------------------------- | ----------------------- | ------------------------- | ------------------------------- |
+| Hovered                   | `hover:`                | `isHovered`               | `data-hovered`                  |
+| Pressed                   | `pressed:`              | `isPressed`               | `data-pressed`                  |
+| Focused                   | `focus:`                | `isFocused`               | `data-focused`                  |
+| Focused from the keyboard | `focus-visible:`        | `isFocusVisible`          | `data-focus-visible`            |
+| Focus inside              | `focus-within:`         | `isFocusWithin`           | `data-focus-within`             |
+| Selected                  | `selected:`             | `isSelected`              | `data-selected`                 |
+| Indeterminate             | `indeterminate:`        | `isIndeterminate`         | `data-indeterminate`            |
+| Disabled                  | `disabled:`             | `isDisabled`              | `data-disabled`                 |
+| Read-only                 | `read-only:`            | `isReadOnly`              | `data-readonly`                 |
+| Required                  | `required:`             | `isRequired`              | `data-required`                 |
+| Invalid                   | `invalid:`              | `isInvalid`               | `data-invalid`                  |
+| Open                      | `open:`                 | `isOpen`                  | `data-open`                     |
+| Dragging                  | `dragging:`             | `isDragging`              | `data-dragging`                 |
+| Drop target               | `drop-target:`          | `isDropTarget`            | `data-drop-target`              |
+| Opening, closing          | `entering:`, `exiting:` | `isEntering`, `isExiting` | `data-entering`, `data-exiting` |
+
+A component reports only the states that apply to it. For the states of each component, see [Composition](/get-started/composition#children-as-a-function).
+
+### Variants
+
+Put a state's [variant](https://tailwindcss.com/docs/hover-focus-and-other-states) before a class to apply the class in that state.
+
+<Example {...stateVariants} />
+
+- **Combined states:** To style a selected component in another state, name both variants, as in `selected:disabled:`.
+- **Related elements:** Each variant has Tailwind's [`group-*`](https://tailwindcss.com/docs/hover-focus-and-other-states#styling-based-on-parent-state), [`peer-*`](https://tailwindcss.com/docs/hover-focus-and-other-states#styling-based-on-sibling-state), [`not-*`](https://tailwindcss.com/docs/hover-focus-and-other-states#not) and [`has-*`](https://tailwindcss.com/docs/hover-focus-and-other-states#has) forms, such as `group-selected:`.
+- **Controls with a label:** A `Checkbox`, a `Radio`, a `Switch` and a `TextField` report hover, press and focus on an element inside them, and their other states on the root element. For those three states, use the `has-*` form on the component, as in `has-hover:bg-surface-container`.
+- **Tailwind's own names:** On a component, use `pressed:`, `selected:` and `not-disabled:` in place of Tailwind's `active:`, `checked:` and `enabled:`.
+- **Text controls:** Use `populated:` for a text control that holds text and is not showing its placeholder.
+- **Other elements:** On an element that is not a component, a variant that Tailwind also has, such as `hover:` or `disabled:`, matches the element's pseudo-class.
+
+The variants are those of React Aria's [Tailwind plugin](https://react-aria.adobe.com/styling#plugin), which lists the variant of every state.
+
+### Render props
+
+Pass a function as `className` or `style` to compute the value from the component's state, as with React Aria's [render props](https://react-aria.adobe.com/styling#render-props). The function receives the states as one object.
+
+```tsx
+<Button className={({ isPressed }) => (isPressed ? 'bg-tertiary text-on-tertiary' : '')}>
+  Save
+</Button>
+```
+
+- **No state:** On a component that reports no state, such as a `Card` or an `Icon`, `className` and `style` take a value only.
+- **Controls with a label:** On a `Checkbox`, a `Radio`, a `Switch` and a `TextField`, the function receives the states of the root element, without hover, press and focus. To read those, pass a function as [children](/get-started/composition#children-as-a-function).
+
+### Data attributes
+
+In your own CSS, select a state by its data attribute. See React Aria's [States](https://react-aria.adobe.com/styling#states) guide.
+
+```css
+.save-button[data-pressed] {
+  background-color: var(--md-sys-color-tertiary);
+  color: var(--md-sys-color-on-tertiary);
+}
+```
+
+## Theme
+
+The components take their colors, typefaces, corners and motion from the theme. To restyle every component at once, change the theme:
+
+| To change                                           | See                                                                                                            |
+| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| The colors                                          | [Seed color](/theme/color#seed-color), [Custom colors](/theme/color#custom-colors)                             |
+| The light or dark scheme, of the page or an element | [Light and dark](/theme/color#light-and-dark)                                                                  |
+| The contrast level                                  | [Contrast](/theme/color#contrast)                                                                              |
+| The typefaces and the icon font                     | [Custom fonts](/theme/typography#custom-fonts)                                                                 |
+| The font weights and the type styles                | [Custom weights](/theme/typography#custom-weights), [Custom type styles](/theme/typography#custom-type-styles) |
+| The corners                                         | [Custom shapes](/theme/shape#custom-shapes)                                                                    |
+| The motion scheme                                   | [Motion scheme](/theme/motion#motion-scheme)                                                                   |
+
+To restyle one component, set the color roles it uses on the component itself. A color role is a custom property, and a value set on an element applies to everything inside it, including the elements that `className` does not reach:
+
+```css
+.danger {
+  --md-sys-color-primary: var(--md-sys-color-error);
+  --md-sys-color-on-primary: var(--md-sys-color-on-error);
+}
+```
+
+```tsx
+<Switch className="danger" />
+```
+
+> **Note:** A menu, a dialog, a modal sheet, a tooltip and a snackbar are rendered at the end of the page, not inside the element they are written in. A class or a `data-theme` on an element around them does not reach them. Set it on the overlay itself, or on the root element.
+
+## Density
+
+Add `density-1`, `density-2` or `density-3` to a component, or to any element around it, to make it more compact. Each step takes 4dp off the height of a component that follows the density: a `Button`, an `IconButton`, a `SplitButton`, a `Chip`, a `ListItem`, a `MenuItem`, a `Tab` and a `TextField`.
+
+<Example {...density} />
+
+- **List items:** A `ListItem` gets no shorter than 48dp.
+- **Menus:** A menu is rendered at the end of the page. Add the class to its `MenuPopover`, or to an element that contains it, such as the root element.
+- **Your own elements:** To make an element of your own follow the density, see [Spacing](/theme/spacing#density).
+
+## Custom components
+
+Define the variants of your own component with the exported `tv`, a [tailwind-variants](https://www.tailwind-variants.org/docs/variants) function, and type its props with `VariantProps`. Use it in place of tailwind-variants' own `tv`, which lets one theme class replace another, such as `text-primary`, a color, and `text-label-md`, a text style.
+
+<Example {...customComponent} />
+
+To join class lists without variants, use the exported `twMerge`, a [tailwind-merge](https://github.com/dcastil/tailwind-merge) function that knows the theme's classes as `tv` does. A later class replaces an earlier one of the same utility, as in `twMerge(box, 'rounded-shape-xl')`.
+
+For the rest of a component, use what the library's own components use:
+
+| For                                     | Use                                                                                                              |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| A state layer and a press ripple        | The [Ripple](/components/ripple) component                                                                       |
+| A focus indicator                       | The [`focus-ring`](/theme/state#focus-ring) class                                                                |
+| A 48dp target for a small control       | The [`touch-target`](/theme/accessibility#touch-targets) class                                                   |
+| A transition between states             | A [transition preset](/theme/motion#transition-presets), such as `transition-shape-color`                        |
+| The look of a button on another element | The exported `buttonStyles`, called with a `variant`, a `size` and a `shape` of the [Button](/components/button) |
+
+In this example, `buttonStyles` gives the `<label>` of a file input the look of a tonal button:
+
+<Example {...buttonStyles} />

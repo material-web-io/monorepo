@@ -1,0 +1,1488 @@
+/* The site's stylesheet: Tailwind without its preflight, the library's own, the tonal palettes,
+ * which the theme pages show, and the utilities of the site's own parts below. The layer order
+ * is the one Tailwind's full entry point declares. */
+@layer theme, base, utilities;
+
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities) source(none);
+@import '../../react/src/tailwind.css';
+@import '../../tailwind/src/palettes.css';
+
+@source '../../react/src/components';
+@source '.';
+
+/* The site is in the theme's own typeface, Roboto, and its code in Roboto Mono; root.tsx
+ * loads both. */
+:root {
+  --docs-typeface-code: 'Roboto Mono Variable', ui-monospace, monospace;
+}
+
+/* The type scale's letter spacing as m3.material.io has it, in place of the theme's own:
+ * none, but a little in the sizes under 14px. The examples on the site follow it too, but
+ * the samples of the type scale itself (docs-theme-tracking). */
+@theme {
+  --text-display-lg--letter-spacing: 0;
+  --text-title-md--letter-spacing: 0;
+  --text-title-sm--letter-spacing: 0;
+  --text-body-lg--letter-spacing: 0;
+  --text-body-md--letter-spacing: 0;
+  --text-body-sm--letter-spacing: 0.1px;
+  --text-label-lg--letter-spacing: 0;
+  --text-label-md--letter-spacing: 0.1px;
+  --text-label-sm--letter-spacing: 0.1px;
+
+  --text-display-lg-emphasized--letter-spacing: 0;
+  --text-title-md-emphasized--letter-spacing: 0;
+  --text-title-sm-emphasized--letter-spacing: 0;
+  --text-body-lg-emphasized--letter-spacing: 0;
+  --text-body-md-emphasized--letter-spacing: 0;
+  --text-body-sm-emphasized--letter-spacing: 0.1px;
+  --text-label-lg-emphasized--letter-spacing: 0;
+  --text-label-md-emphasized--letter-spacing: 0.1px;
+  --text-label-sm-emphasized--letter-spacing: 0.1px;
+
+  /* The one text size a component has past the type scale. */
+  --text-slider-value--letter-spacing: 0;
+}
+
+/* The theme's own letter spacing, put back in an example that shows the type scale
+ * (example.tsx): the values of the theme's typography.css that the site's above replace. */
+@utility docs-theme-tracking {
+  --text-display-lg--letter-spacing: -0.25px;
+  --text-title-md--letter-spacing: 0.15px;
+  --text-title-sm--letter-spacing: 0.1px;
+  --text-body-lg--letter-spacing: 0.5px;
+  --text-body-md--letter-spacing: 0.25px;
+  --text-body-sm--letter-spacing: 0.4px;
+  --text-label-lg--letter-spacing: 0.1px;
+  --text-label-md--letter-spacing: 0.5px;
+  --text-label-sm--letter-spacing: 0.5px;
+
+  --text-display-lg-emphasized--letter-spacing: -0.25px;
+  --text-title-md-emphasized--letter-spacing: 0.15px;
+  --text-title-sm-emphasized--letter-spacing: 0.1px;
+  --text-body-lg-emphasized--letter-spacing: 0.5px;
+  --text-body-md-emphasized--letter-spacing: 0.25px;
+  --text-body-sm-emphasized--letter-spacing: 0.4px;
+  --text-label-lg-emphasized--letter-spacing: 0.1px;
+  --text-label-md-emphasized--letter-spacing: 0.5px;
+  --text-label-sm-emphasized--letter-spacing: 0.5px;
+}
+
+/* The page's ground: the neutral palette's 99 in light, a tone lighter than the surface, as
+ * m3.material.io's is, and in dark the surface, by the theme's own two rules for the scheme.
+ * Set on the root, as a scheme rule nested in a pseudo-element's would match nothing. */
+:root {
+  --docs-ground: var(--md-ref-palette-neutral99);
+
+  @media (prefers-color-scheme: dark) {
+    &:not([data-theme='light']) {
+      --docs-ground: var(--md-sys-color-surface);
+    }
+  }
+
+  &[data-theme='dark'] {
+    --docs-ground: var(--md-sys-color-surface);
+  }
+}
+
+@utility docs-ground {
+  background-color: var(--docs-ground);
+}
+
+@layer base {
+  html {
+    /* A heading a link jumps to stops under the tabs, which stay at the window's top. */
+    scroll-padding-top: 7rem;
+  }
+
+  body {
+    @apply docs-ground m-0 font-plain text-body-lg text-on-surface;
+  }
+
+  /* The code's colors are the theme's roles, so they follow its scheme and its contrast. */
+  :root {
+    --shiki-foreground: var(--md-sys-color-on-surface);
+    --shiki-background: transparent;
+    --shiki-token-constant: var(--md-sys-color-tertiary);
+    --shiki-token-string: var(--md-sys-color-tertiary);
+    --shiki-token-string-expression: var(--md-sys-color-tertiary);
+    --shiki-token-comment: var(--md-sys-color-on-surface-variant);
+    --shiki-token-keyword: var(--md-sys-color-primary);
+    --shiki-token-parameter: var(--md-sys-color-on-surface);
+    --shiki-token-function: var(--md-sys-color-secondary);
+    --shiki-token-punctuation: var(--md-sys-color-on-surface-variant);
+    --shiki-token-link: var(--md-sys-color-primary);
+  }
+}
+
+/* A title of the site's: the brand typeface, in the weight its type scale class has. */
+@utility docs-display {
+  @apply font-brand text-on-surface;
+}
+
+/* Code, in its own typeface, without the letter spacing the type scale has for Roboto. */
+@utility docs-mono {
+  @apply tracking-normal;
+  font-family: var(--docs-typeface-code);
+}
+
+/* The shell (shell.tsx): the rail and the page in a row, the window scrolling the page. */
+@utility docs-shell {
+  @apply flex min-h-dvh;
+}
+
+@utility docs-column {
+  @apply flex min-w-0 flex-1 flex-col;
+}
+
+/* The page, in the middle of a window wider than it. The shell (shell.tsx) gives it and the
+ * footer the width a page's header reads well at, but for a page that fills the window. */
+@utility docs-main {
+  @apply docs-enter mx-auto box-border w-full flex-1 p-space-100 outline-none;
+}
+
+/* The link that skips the rail, the first thing the keyboard reaches on a page: out of sight
+ * until it has the focus, then at the window's top corner, over the rail. */
+@utility docs-skip-link {
+  @apply sr-only focus-ring rounded-shape-full bg-primary px-space-300 py-space-150 text-label-lg text-on-primary no-underline;
+
+  /* not-sr-only takes the padding away with the rest of sr-only, so it is given again. */
+  &:focus {
+    @apply not-sr-only fixed start-space-200 top-space-200 z-tooltip px-space-300 py-space-150;
+  }
+}
+
+/* A page or a tab coming in, as on m3.material.io (shell.tsx, mdx.tsx): what was there is gone
+ * at once, and once it would have faded out, this fades in and comes 10px into place, from below
+ * or the side of the tab bar its tab is on. Unseen while it waits, it waits in place, so that a
+ * heading the page opens at is scrolled to where it stays. */
+@utility docs-enter {
+  animation-name: docs-fade-in, docs-in-from-below;
+  animation-duration:
+    var(--md-sys-motion-spring-default-effects-duration),
+    var(--md-sys-motion-spring-default-spatial-duration);
+  animation-timing-function:
+    var(--md-sys-motion-spring-default-effects-easing),
+    var(--md-sys-motion-spring-default-spatial-easing);
+  animation-delay: var(--md-sys-motion-spring-fast-effects-duration);
+  animation-fill-mode: backwards, none;
+}
+
+@utility docs-enter-from-end {
+  @apply docs-enter;
+  animation-name: docs-fade-in, docs-in-from-right;
+
+  @variant rtl {
+    animation-name: docs-fade-in, docs-in-from-left;
+  }
+}
+
+@utility docs-enter-from-start {
+  @apply docs-enter;
+  animation-name: docs-fade-in, docs-in-from-left;
+
+  @variant rtl {
+    animation-name: docs-fade-in, docs-in-from-right;
+  }
+}
+
+@utility docs-enter-in-place {
+  @apply docs-enter;
+  animation-name: docs-fade-in;
+}
+
+@keyframes docs-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes docs-in-from-below {
+  from {
+    translate: 0 var(--spacing-space-125);
+  }
+}
+
+@keyframes docs-in-from-right {
+  from {
+    translate: var(--spacing-space-125) 0;
+  }
+}
+
+@keyframes docs-in-from-left {
+  from {
+    translate: calc(var(--spacing-space-125) * -1) 0;
+  }
+}
+
+/* The rail (rail.tsx): a tinted column the height of the window, which stays as the page
+ * scrolls, the destinations between the search button and the theme's switches. */
+@utility docs-rail {
+  @apply sticky top-0 z-navigation hidden h-dvh shrink-0 medium-screen:flex;
+}
+
+@utility docs-rail-bar {
+  @apply relative z-raised flex h-full flex-col bg-surface-container;
+}
+
+@utility docs-rail-actions {
+  @apply flex flex-col items-center gap-space-150 pb-space-300;
+}
+
+/* The drawer beside the rail (rail.tsx), a panel the height of the window with round outer
+ * corners: under the rail and out of reach until it is open, when it comes out over the page. */
+@utility docs-drawer {
+  @apply invisible absolute inset-y-0 start-full box-border w-60 shrink-0 -translate-x-full rounded-e-shape-lg bg-surface-container shadow-elevation-2;
+  transition-property: translate, visibility;
+  transition-duration: var(--transition-duration-spring-default-spatial);
+  transition-timing-function: var(--ease-spring-default-spatial), linear;
+
+  /* Its fill goes on under the rail, so a spring that passes its place opens no gap there. */
+  &::before {
+    @apply absolute inset-y-0 end-full w-space-200 bg-inherit;
+    content: '';
+  }
+}
+
+/* The open drawer, and the one that stays in a window with room for it and the page, which
+ * starts after it. Each names the drawer, to come after its own rule whatever their order. */
+@utility docs-drawer-open {
+  &.docs-drawer {
+    @apply visible translate-x-0;
+  }
+}
+
+@utility docs-drawer-kept {
+  &.docs-drawer {
+    @apply visible relative start-auto translate-x-0;
+  }
+}
+
+/* A section's pages in the drawer, each list a layer of it that scrolls itself. The one in
+ * sight comes in once the one before it has gone. */
+@utility docs-drawer-list {
+  @apply invisible absolute inset-0 box-border flex flex-col overflow-y-auto p-space-100 opacity-0;
+  border-radius: inherit;
+  transition-property: opacity, visibility;
+  transition-duration: var(--transition-duration-spring-fast-effects);
+  transition-timing-function: var(--ease-spring-fast-effects), linear;
+
+  /* Its scrollbar, along the drawer's end, stops where the round corners start. */
+  &::-webkit-scrollbar-track:vertical {
+    margin-block: var(--radius-shape-lg);
+  }
+}
+
+/* In sight, a list is still out of reach with the drawer: its visibility is the drawer's,
+ * and only its fade waits for the list before it. */
+@utility docs-drawer-list-shown {
+  &.docs-drawer-list {
+    @apply opacity-100;
+    visibility: inherit;
+    transition-delay: var(--transition-duration-spring-fast-effects), 0s;
+  }
+}
+
+@utility docs-drawer-link {
+  @apply relative box-border flex min-h-12 shrink-0 items-center rounded-shape-full px-space-200 py-space-100 text-label-lg font-regular text-on-surface-variant no-underline focus-visible:focus-ring-inset;
+}
+
+@utility docs-drawer-link-current {
+  @apply bg-secondary-container text-on-secondary-container;
+}
+
+/* A group of a list's pages: a row that is a button, with an arrow at its end, and under it
+ * the group's own links, further in, which the button opens to their height and closes. */
+@utility docs-drawer-group {
+  @apply shrink-0;
+}
+
+@utility docs-drawer-group-button {
+  @apply relative box-border flex min-h-12 w-full cursor-pointer items-center justify-between gap-space-100 rounded-shape-full border-0 bg-transparent px-space-200 py-space-100 text-start font-plain text-label-lg font-regular text-on-surface-variant focus-visible:focus-ring-inset;
+}
+
+/* No display of its own: closed, the links are hidden as React Aria hides them. A spring
+ * that settles without passing its end, since a height that passes none stops short there. */
+@utility docs-drawer-group-pages {
+  @apply box-border overflow-clip ps-space-150 duration-spring-default-effects ease-spring-default-effects;
+  height: var(--disclosure-panel-height);
+  transition-property: height;
+}
+
+/* A compact window's navigation (rail.tsx): the app bar over the page, and the menu it
+ * opens, the destinations on a panel that comes in from the window's edge over a scrim. */
+@utility docs-top-bar {
+  @apply sticky top-0 z-app-bar medium-screen:hidden;
+}
+
+@utility docs-menu-scrim {
+  @apply fixed inset-0 z-sheet bg-scrim/32 transition-opacity duration-spring-default-effects ease-spring-default-effects entering:opacity-0 exiting:opacity-0;
+}
+
+@utility docs-menu {
+  @apply fixed inset-y-0 start-0 max-w-full overflow-y-auto rounded-e-shape-lg bg-surface-container transition-transform duration-spring-default-spatial ease-spring-default-spatial entering:-translate-x-full exiting:-translate-x-full;
+}
+
+/* Where the search is drawn (site-search.tsx): across the top of the page, beside the rail. */
+@utility docs-search-place {
+  @apply pointer-events-none invisible fixed inset-x-space-100 top-space-100 mx-auto h-14 max-w-180 medium-screen:start-26;
+}
+
+@utility docs-search-empty {
+  @apply m-0 p-space-300 text-center text-body-md text-on-surface-variant;
+}
+
+/* A page's header (hero.tsx): two round panels side by side, its title in one and a picture
+ * or its first example in the other; one over the other where there is no room for both. */
+@utility docs-hero {
+  @apply grid grid-cols-1 gap-space-100 expanded-screen:grid-cols-2;
+}
+
+@utility docs-hero-text {
+  @apply box-border flex min-w-0 flex-col items-start justify-center gap-space-200 rounded-shape-xl bg-surface-container-low p-space-400 expanded-screen:min-h-136 expanded-screen:p-space-700;
+  /* The width its title's size is measured against (docs-hero-title). */
+  container-type: inline-size;
+}
+
+@utility docs-hero-overline {
+  @apply rounded-shape-xs text-title-md text-primary no-underline hover:underline focus-visible:focus-ring;
+}
+
+/* The libraries' version and the label that they are in beta (release.tsx). */
+@utility docs-version {
+  @apply inline-flex items-center gap-space-100;
+}
+
+@utility docs-beta {
+  @apply rounded-shape-full bg-tertiary-container px-space-150 py-space-25 text-label-lg text-on-tertiary-container;
+}
+
+/* A page's title, in display type, or smaller where its panel is too narrow for the widest
+ * word of any title on one line: "Components", 5.71 times the type's size, measured in Roboto.
+ * Every title is the same size in a window of a given width, and the lines keep their ratio. */
+@utility docs-hero-title {
+  @apply docs-display m-0 max-w-full text-display-md wrap-break-word;
+  font-size: min(var(--text-display-md), 100cqi / 5.8);
+  line-height: calc(52 / 45);
+
+  @variant expanded-screen {
+    font-size: min(var(--text-display-lg), 100cqi / 5.8);
+    line-height: calc(64 / 57);
+  }
+
+  /* The site's largest type, past the type scale, in a window wide enough for it. */
+  @variant large-screen {
+    font-size: min(6rem, 100cqi / 5.8);
+    line-height: 1;
+  }
+}
+
+@utility docs-hero-description {
+  @apply m-0 max-w-xl text-title-lg text-on-surface;
+}
+
+@utility docs-hero-actions {
+  @apply mt-space-100 flex flex-wrap gap-space-100;
+}
+
+/* A logo in place of a Material Symbol (logos.tsx): the box of an Icon, as large as the nearest
+ * icon-* (--icon-size) or else the font size, in the color of the text. */
+@utility docs-logo {
+  @apply inline-block shrink-0 fill-current;
+  font-size: var(--icon-size, inherit);
+  width: 1em;
+  height: 1em;
+}
+
+@utility docs-hero-visual {
+  @apply relative box-border flex min-h-80 min-w-0 items-center justify-center overflow-hidden rounded-shape-xl p-space-400 expanded-screen:min-h-136;
+
+  /* A device is as tall as the panel it is in: taller, where the panel is as wide as the page. */
+  &:has(> .docs-scene) {
+    @apply max-expanded-screen:min-h-104;
+  }
+
+  /* The home page's wall shows whole, as wide as twice its height, where the panel is as wide
+   * as the page; in a narrow window, its middle, the panel's least height. Stretched, or a grid
+   * would make it as wide as twice that height. */
+  &:has(> .docs-wall-frame) {
+    @apply max-expanded-screen:aspect-2/1 max-expanded-screen:justify-self-stretch;
+  }
+}
+
+/* A fine grain over a picture, as of print, blended softly into it: a tile of noise at its own
+ * size in pixels, so the specks are as fine on a card as on a picture as wide as the page. */
+@utility docs-grain {
+  @apply pointer-events-none absolute inset-0 opacity-60 mix-blend-soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.345' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+
+/* A component page's picture (scenes/): the component in use on a device's screen, over the
+ * page's shapes. A layer of its own, as a card's picture is, to look at and not to use. */
+@utility docs-scene {
+  @apply absolute inset-0 box-border flex justify-center px-space-100;
+  isolation: isolate;
+}
+
+/* A device in such a picture (phone.tsx): a screen in a thick edge, as tall as the picture,
+ * which shows an end of it. A phone's top is in view, or its bottom, where its screen ends. */
+@utility docs-device {
+  @apply relative box-border flex shrink-0 flex-col self-stretch overflow-hidden border-outline/60 bg-surface bg-clip-padding text-on-surface;
+}
+
+@utility docs-device-top {
+  @apply mt-space-500 w-96 max-w-full rounded-t-shape-xl-inc border-x-8 border-t-8;
+}
+
+@utility docs-device-bottom {
+  @apply mb-space-500 w-96 max-w-full justify-end rounded-b-shape-xl-inc border-x-8 border-b-8;
+}
+
+/* The home page's picture (wall/): phones' screens on a lavender ground, filling the panel. Its
+ * size is the wall's measure, as a video's box is. */
+@utility docs-wall-frame {
+  @apply absolute inset-0 overflow-hidden bg-primary-fixed-dim;
+  container-type: size;
+}
+
+/* The frame's size in pixels, for the wall's scale: WebKit takes a container unit in atan2()
+ * as a pixel, so the units are resolved in these first. */
+@property --docs-wall-frame-width {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --docs-wall-frame-height {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+/* The wall: five columns of screens 412px wide, 40px apart. Its middle 2000 by 1000px is as
+ * large as covers the frame, as a video covers its box, and the rest is cut off. A layer of
+ * its own, so that a component's stacking stays in it. */
+@utility docs-wall {
+  @apply absolute top-1/2 left-1/2 flex h-250 w-555 -translate-x-1/2 -translate-y-1/2 gap-10;
+  --docs-wall-frame-width: 100cqw;
+  --docs-wall-frame-height: 100cqh;
+  scale: max(
+    tan(atan2(var(--docs-wall-frame-width), 2000px)),
+    tan(atan2(var(--docs-wall-frame-height), 1000px))
+  );
+  isolation: isolate;
+}
+
+/* The wall paused: every animation in it holds where it is, a loading indicator's too. Above
+ * a component's own `animation`, whichever of the two utilities sorts last. */
+@utility docs-wall-still {
+  & * {
+    animation-play-state: paused !important;
+  }
+}
+
+/* A column of the wall: a screen whose bottom is in view over one whose top is. Its own top
+ * margin sets it higher or lower than the next. */
+@utility docs-wall-column {
+  @apply flex w-103 shrink-0 flex-col gap-10;
+}
+
+/* A screen on the wall (wall/screen.tsx): an app in its scheme, round at its corners, taller
+ * than the wall, which shows an end of it. */
+@utility docs-wall-screen {
+  @apply relative box-border flex h-215 w-103 shrink-0 flex-col overflow-hidden rounded-shape-2xl bg-surface text-on-surface;
+}
+
+/* Across the top of a screen on the wall, where m3's screens have it: the time 32px in from
+ * the left and the signals 32px in from the right, on a line 33px down. */
+@utility docs-wall-status {
+  @apply relative flex h-16.5 shrink-0 items-center justify-between px-space-400 text-label-lg;
+}
+
+/* The hole of a phone's camera, 30px across, in the middle of its status bar. */
+@utility docs-wall-camera {
+  @apply absolute top-1/2 left-1/2 size-7.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-scrim;
+}
+
+/* The signal, the wifi and the battery, filled, each sized (screen.tsx) so that its mark is
+ * 12px tall, as m3's are; the glyphs' own margins and this gap set the marks 6.5px apart. */
+@utility docs-wall-signals {
+  @apply flex items-center gap-space-50 icon-filled;
+}
+
+/* The music player's cover on the wall, cut to its cookie (wall/player.tsx). */
+@utility docs-wall-album {
+  clip-path: url(#docs-wall-album);
+}
+
+/* The cookie, turning once in three of the wall's 9s loops, so each loop ends as it began.
+ * `rotate` and `translate` apply outside the path's own `transform`, which `transform` would
+ * replace: it turns about its own middle, then moves to the middle of the cover's 260px box. */
+@utility docs-wall-album-outline {
+  translate: 130px 130px;
+  animation: docs-turn 27s linear infinite;
+}
+
+@keyframes docs-turn {
+  to {
+    rotate: 1turn;
+  }
+}
+
+/* The button that pauses the wall and plays it again, in the frame's corner. */
+@utility docs-wall-pause {
+  @apply absolute end-space-200 bottom-space-200;
+}
+
+/* The tabs of a page (shell.tsx), which stay at the window's top as the page scrolls under
+ * them, on a band of the page's ground across the page down to their middle. Stuck there,
+ * they are lower, and the bar keeps its room in the page. */
+@utility docs-tab-bar {
+  @apply sticky top-0 z-app-bar box-border h-22 pt-space-100 duration-spring-default-spatial ease-spring-default-spatial;
+  transition-property: height, margin-bottom;
+
+  /* The band, under the tabs: half the bar and half the 8px over the tabs, so it ends at
+   * the tabs' middle. */
+  &::before {
+    @apply docs-ground absolute inset-x-0 top-0 -z-1 box-content h-1/2 pb-space-50;
+    content: '';
+  }
+}
+
+@utility docs-tab-bar-stuck {
+  &.docs-tab-bar {
+    @apply mb-space-200 h-18;
+  }
+}
+
+/* One round bar of tabs, the tab shown a pill in it. Stuck, it narrows to the article's width
+ * on the default spatial spring and is lifted to the first level on the fast effects one. */
+@utility docs-tab-list {
+  @apply mx-auto box-border scrollbar-hidden flex h-full w-full max-w-full overflow-x-auto rounded-shape-full bg-surface-container-low;
+  transition-property: width, box-shadow;
+  transition-duration:
+    var(--md-sys-motion-spring-default-spatial-duration),
+    var(--md-sys-motion-spring-fast-effects-duration);
+  transition-timing-function:
+    var(--md-sys-motion-spring-default-spatial-easing),
+    var(--md-sys-motion-spring-fast-effects-easing);
+}
+
+@utility docs-tab-list-stuck {
+  &.docs-tab-list {
+    @apply w-256 shadow-elevation-1;
+  }
+}
+
+@utility docs-tab {
+  @apply relative isolate box-border flex min-w-40 flex-1 cursor-pointer items-center justify-center gap-space-100 rounded-shape-full px-space-300 text-title-md text-on-surface-variant transition-colors duration-spring-fast-effects ease-spring-fast-effects outline-none hover:bg-on-surface/state-hover focus-visible:focus-ring-inset selected:text-on-secondary-container selected:icon-filled;
+
+  /* The pill, under the icon and label: the tab shown has it whole, another has it at 32% of
+   * its width and clear, so it grows and fades in from the middle as the tab is picked. */
+  &::before {
+    @apply absolute inset-0 -z-1 scale-x-32 rounded-inherit bg-secondary-container opacity-0 duration-spring-default-spatial ease-spring-default-spatial;
+    content: '';
+    transition-property: scale, opacity;
+  }
+
+  @variant selected {
+    &::before {
+      @apply scale-x-100 opacity-100;
+    }
+  }
+}
+
+@utility docs-tab-panel {
+  @apply rounded-shape-md focus-visible:focus-ring;
+}
+
+/* A written page under its header: the article in the middle, as wide as an example is drawn
+ * at most, and its contents list over it, or in the margin beside it where there is one. */
+@utility docs-page {
+  @apply mx-auto box-content grid max-w-256 grid-cols-1 gap-y-space-400 px-space-200 pt-space-600 pb-space-800 medium-screen:px-space-400 expanded-screen:px-20;
+
+  /* A window with room for the contents in a margin beside the article. Not a container
+   * query: a container is a stacking context, which an example's own layers must not be in. */
+  @media (width >= 81rem) {
+    @apply max-w-none px-0;
+    grid-template-columns: minmax(12.25rem, 1fr) minmax(0, 64rem) minmax(12.25rem, 1fr);
+  }
+}
+
+@utility docs-article {
+  @apply min-w-0;
+
+  @media (width >= 81rem) {
+    @apply col-start-2 row-start-1;
+  }
+}
+
+/* In the margin, the contents stay beside the article as the page scrolls, and scroll
+ * themselves where the window is shorter than they are. */
+@utility docs-contents {
+  @apply flex flex-col;
+
+  @media (width >= 81rem) {
+    @apply sticky top-28 col-start-3 row-start-1 ms-space-300 box-border w-39 self-start justify-self-start overflow-y-auto;
+    max-height: calc(100dvh - 8rem);
+  }
+}
+
+@utility docs-contents-label {
+  @apply m-0 px-space-200 text-label-md text-on-surface-variant;
+}
+
+@utility docs-contents-title {
+  @apply docs-display m-0 mb-space-100 px-space-200 text-headline-sm;
+}
+
+@utility docs-contents-link {
+  @apply box-border flex min-h-9 items-center rounded-shape-lg px-space-200 py-space-75 text-body-lg text-primary no-underline hover:bg-on-surface/state-hover focus-visible:focus-ring-inset;
+
+  @media (width >= 81rem) {
+    @apply text-body-md text-on-surface-variant;
+  }
+}
+
+@utility docs-contents-link-current {
+  @apply font-medium text-on-surface inset-ring-1 inset-ring-outline;
+}
+
+@utility docs-page-turn {
+  @apply mt-space-900 grid grid-cols-2 gap-space-100;
+}
+
+@utility docs-page-turn-link {
+  @apply docs-display box-border flex min-w-0 flex-col items-start gap-space-50 rounded-shape-xl bg-surface-container-low p-space-300 text-headline-sm no-underline hover:bg-surface-container-high focus-visible:focus-ring;
+}
+
+@utility docs-page-turn-label {
+  @apply mt-space-200 font-plain text-label-lg text-on-surface-variant;
+}
+
+/* The footer: one panel under the page, as wide as the page is. */
+@utility docs-footer {
+  @apply docs-enter mx-auto box-border w-full p-space-100 pt-0;
+}
+
+@utility docs-footer-panel {
+  @apply box-border flex flex-wrap items-center justify-between gap-space-200 rounded-shape-xl bg-surface-container-low px-space-400 py-space-300 text-body-md text-on-surface-variant;
+}
+
+/* A page of the site's own (home.tsx, section.tsx): its header, then its parts, each under a
+ * title as large as a written page's, in a column a little wider than a written page's. */
+@utility docs-wide {
+  @apply mx-auto box-content max-w-300 px-space-100 pt-14 pb-28 medium-screen:px-space-400 expanded-screen:px-20 expanded-screen:pt-28;
+}
+
+/* A part's title: close over its own cards, and far under the cards of the part before it. */
+@utility docs-wide-heading {
+  @apply docs-display relative mx-space-300 mt-20 mb-space-300 text-display-sm first:mt-space-300 expanded-screen:mt-26 expanded-screen:text-display-lg large-screen:mt-30;
+}
+
+/* A grid of cards, each a link to a page: a picture over the page's name and what it is. In one
+ * column until two leave a card's picture the 280px its composition is drawn for. */
+@utility docs-cards {
+  @apply m-0 grid list-none grid-cols-1 gap-space-100 p-0 expanded-screen:grid-cols-2 large-screen:grid-cols-3;
+}
+
+@utility docs-card {
+  @apply relative box-border flex h-full flex-col overflow-hidden rounded-shape-xl bg-surface-container-low text-on-surface no-underline focus-visible:focus-ring;
+}
+
+@utility docs-card-picture {
+  @apply relative box-border flex h-50 items-center justify-center overflow-hidden rounded-shape-xl bg-secondary-container p-space-300 text-on-secondary-container;
+}
+
+/* A component's picture on its card (thumbnails/): the component drawn large on a ground no
+ * component has, cut off at the card picture's edges. Its `inert` keeps the pointer out of it:
+ * `pointer-events: none` would hand the card's presses to the ripples in it (Ripple's host). */
+@utility docs-thumbnail {
+  @apply absolute inset-0 flex items-center justify-center bg-inverse-primary;
+  /* A layer of its own: a part with a stacking level (an app bar) stays in it, under the
+   * card's state layer and ripple, which cover the whole picture. */
+  isolation: isolate;
+}
+
+/* The colors a component's ground blends with the inverse primary: a deeper violet, a pink and
+ * a coral, of tones near the inverse primary's in either scheme, so the components stand out.
+ * In dark the coral is half rose, as the error palette's own is red there. */
+:root {
+  --docs-gradient-deep: var(--md-ref-palette-primary70);
+  --docs-gradient-pink: var(--md-ref-palette-tertiary80);
+  --docs-gradient-coral: var(--md-ref-palette-error70);
+
+  @media (prefers-color-scheme: dark) {
+    &:not([data-theme='light']) {
+      --docs-gradient-deep: var(--md-ref-palette-primary30);
+      --docs-gradient-pink: var(--md-ref-palette-tertiary60);
+      --docs-gradient-coral: color-mix(
+        in oklab,
+        var(--md-ref-palette-error60),
+        var(--md-ref-palette-tertiary50)
+      );
+    }
+  }
+
+  &[data-theme='dark'] {
+    --docs-gradient-deep: var(--md-ref-palette-primary30);
+    --docs-gradient-pink: var(--md-ref-palette-tertiary60);
+    --docs-gradient-coral: color-mix(
+      in oklab,
+      var(--md-ref-palette-error60),
+      var(--md-ref-palette-tertiary50)
+    );
+  }
+}
+
+/* The grounds of the components' pictures, one for each component in turn, the same on its
+ * card and in its page's header (art/components.tsx), and of the Theme and Get started ones.
+ * Violet going pink across. */
+@utility docs-gradient-blush {
+  @apply bg-inverse-primary;
+  background-image: linear-gradient(
+    135deg,
+    var(--md-sys-color-inverse-primary) 20%,
+    var(--docs-gradient-pink)
+  );
+}
+
+/* A coral glow in the top right corner, a deeper violet in the bottom left one. */
+@utility docs-gradient-ember {
+  @apply bg-inverse-primary;
+  background-image:
+    radial-gradient(circle at 100% 0%, var(--docs-gradient-coral), transparent 60%),
+    radial-gradient(circle at 0% 100%, var(--docs-gradient-deep), transparent 60%);
+}
+
+/* Pink going coral down it. */
+@utility docs-gradient-dawn {
+  @apply bg-inverse-primary;
+  background-image: linear-gradient(var(--docs-gradient-pink), var(--docs-gradient-coral));
+}
+
+/* A deeper violet going pink up across it. */
+@utility docs-gradient-dusk {
+  @apply bg-inverse-primary;
+  background-image: linear-gradient(
+    to top right,
+    var(--docs-gradient-deep),
+    var(--md-sys-color-inverse-primary) 50%,
+    var(--docs-gradient-pink)
+  );
+}
+
+/* A pink glow rising from its bottom, under a deeper violet at its top. */
+@utility docs-gradient-glow {
+  @apply bg-inverse-primary;
+  background-image:
+    radial-gradient(ellipse at 50% 120%, var(--docs-gradient-pink), transparent 70%),
+    linear-gradient(var(--docs-gradient-deep), transparent 70%);
+}
+
+/* The violets of the shapes on those grounds (art/theme.tsx, `onGradient` in art/paint.tsx),
+ * deepest to palest, each darker or lighter than the ground in either scheme, and the pink of
+ * each one's tone. */
+@theme inline {
+  --color-art-deep: var(--md-ref-palette-primary10);
+  --color-art-violet: light-dark(var(--md-ref-palette-primary30), var(--md-ref-palette-primary20));
+  --color-art-soft: var(--md-ref-palette-primary60);
+  --color-art-lavender: light-dark(
+    var(--md-ref-palette-primary90),
+    var(--md-ref-palette-primary80)
+  );
+  --color-art-pale: light-dark(var(--md-ref-palette-primary99), var(--md-ref-palette-primary90));
+  --color-art-deep-mist: var(--md-ref-palette-tertiary10);
+  --color-art-violet-mist: light-dark(
+    var(--md-ref-palette-tertiary30),
+    var(--md-ref-palette-tertiary20)
+  );
+  --color-art-soft-mist: var(--md-ref-palette-tertiary60);
+  --color-art-lavender-mist: light-dark(
+    var(--md-ref-palette-tertiary90),
+    var(--md-ref-palette-tertiary80)
+  );
+  --color-art-pale-mist: light-dark(
+    var(--md-ref-palette-tertiary95),
+    var(--md-ref-palette-tertiary90)
+  );
+  /* The coral of the grounds, for a shape on the page itself (not-found.tsx). */
+  --color-art-coral: var(--docs-gradient-coral);
+}
+
+/* A device's screen in a picture: the theme's surface inside a thick edge. A picture runs it
+ * past its own edges, so that a side or a corner of the device is all that shows. */
+@utility docs-thumbnail-screen {
+  @apply relative box-border flex shrink-0 flex-col overflow-hidden border-4 border-outline/60 bg-surface bg-clip-padding text-on-surface;
+}
+
+/* Across the top of a phone's screen, the time and its signals (phone.tsx). */
+@utility docs-thumbnail-status {
+  @apply flex shrink-0 items-center justify-between px-space-250 pt-space-150 pb-space-50 text-label-lg text-on-surface icon-16 icon-filled;
+}
+
+/* At the bottom of a phone's screen, the line a swipe up starts from. */
+@utility docs-thumbnail-indicator {
+  @apply mx-auto my-space-100 h-1 w-20 shrink-0 rounded-shape-full bg-on-surface;
+}
+
+/* A layer or a panel of a component that only opens over a page, drawn in its place. */
+@utility docs-thumbnail-panel {
+  @apply box-border flex shrink-0 flex-col text-on-surface;
+}
+
+/* The selector of setups (setups.tsx): radio buttons, each a card, the one chosen filled. In a
+ * window wide enough they are a row, each as wide as its name and its share of the room left. */
+@utility docs-setups {
+  @apply my-space-400 flex flex-col gap-space-100 large-screen:flex-row;
+}
+
+/* The radio button is set in from the card's edge by its label, the card's one child, which
+ * fills the card: the room is the label's, so that a press anywhere on the card is on it. */
+@utility docs-setup {
+  @apply flex-auto cursor-pointer rounded-shape-xl bg-surface-container-low transition-colors duration-spring-fast-effects ease-spring-fast-effects *:ps-space-100 selected:bg-secondary-container;
+}
+
+@utility docs-setup-text {
+  @apply min-w-0 py-space-200 ps-space-50 pe-space-300 text-title-md;
+}
+
+@utility docs-setup-title {
+  @apply docs-display text-title-lg;
+}
+
+/* The setup chosen, at a glance: who it is for, over a tile for each part a setup may bring,
+ * over what it requires. */
+@utility docs-setup-summary {
+  @apply my-space-400 flex flex-col gap-space-300;
+}
+
+@utility docs-setup-audience {
+  @apply docs-display m-0 text-title-lg;
+}
+
+@utility docs-setup-parts {
+  @apply m-0 grid list-none grid-cols-1 gap-space-100 p-0 medium-screen:grid-cols-3;
+}
+
+/* A part the setup does not bring: an outline, its text held back. */
+@utility docs-setup-part {
+  @apply box-border flex flex-col gap-space-50 rounded-shape-lg border border-dashed border-outline-variant p-space-250 text-on-surface-variant;
+}
+
+/* One it brings: filled, in another color than the option chosen above it. */
+@utility docs-setup-part-included {
+  @apply border-solid border-transparent bg-tertiary-container text-on-tertiary-container;
+}
+
+@utility docs-setup-part-status {
+  @apply mt-auto flex items-center gap-space-75 pt-space-150 text-label-lg;
+}
+
+@utility docs-setup-requires {
+  @apply m-0 flex flex-wrap items-center gap-space-100 text-label-lg text-on-surface-variant;
+}
+
+@utility docs-setup-requirement {
+  @apply rounded-shape-sm bg-surface-container-high px-space-150 py-space-50 text-on-surface;
+}
+
+@utility docs-feature {
+  @apply box-border flex flex-col gap-space-150 rounded-shape-xl bg-surface-container-low p-space-400;
+}
+
+@utility docs-card-text {
+  @apply flex flex-col gap-space-100 p-space-300;
+}
+
+@utility docs-card-title {
+  @apply docs-display text-headline-sm;
+}
+
+@utility docs-card-description {
+  @apply text-body-lg text-on-surface-variant;
+}
+
+/* The page at an address the site has no page at (not-found.tsx): on the page itself, as tall
+ * as the window leaves it, and in its middle the picture of 404 over the title and the way home. */
+@utility docs-not-found {
+  @apply box-border flex min-h-full flex-col items-center justify-center gap-space-400 px-space-200 py-space-800 text-center;
+}
+
+@utility docs-not-found-text {
+  @apply flex w-full max-w-190 flex-col items-center gap-space-200;
+  /* The width its title's size is measured against (docs-hero-title). */
+  container-type: inline-size;
+}
+
+@utility docs-not-found-picture {
+  @apply relative w-full max-w-110;
+}
+
+@utility docs-not-found-art {
+  @apply block w-full overflow-visible;
+}
+
+/* The grain of the pictures (docs-grain), over the picture's shapes alone: cut to them in the
+ * picture's parts, so the page around them stays plain. */
+@utility docs-not-found-grain {
+  @apply docs-grain;
+  clip-path: url(#not-found-shapes);
+}
+
+/* The Get started page (get-started.tsx). Its header: one panel across the page, the title in
+ * its middle over a picture, and under the title a card for each part of the page. */
+@utility docs-start-hero {
+  @apply docs-gradient-ember relative box-border flex flex-col items-center overflow-hidden rounded-shape-xl px-space-200 py-space-800 text-center medium-screen:px-space-700 large-screen:py-28;
+}
+
+@utility docs-start-hero-text {
+  @apply relative flex w-full max-w-300 flex-col items-center gap-space-200;
+}
+
+@utility docs-start-description {
+  @apply m-0 max-w-190 text-title-lg text-on-surface;
+}
+
+@utility docs-start-jumps {
+  @apply m-0 mt-space-200 grid list-none grid-cols-1 gap-space-100 p-0 text-start expanded-screen:grid-cols-2;
+}
+
+/* The parts of the page, one under the other in its first half, and in its second the picture
+ * of the part the page is at, which stays in the window as the parts scroll by. */
+@utility docs-start-slides {
+  @apply mt-space-100 grid grid-cols-1 gap-x-space-100 large-screen:grid-cols-2;
+}
+
+@utility docs-start-part {
+  @apply mx-auto box-content flex max-w-160 flex-col justify-center px-space-100 py-space-600 medium-screen:px-space-400 large-screen:px-space-200;
+
+  /* Beside the pictures a part is most of a window tall, so that a picture is one part's. */
+  @variant large-screen {
+    min-height: 80dvh;
+  }
+}
+
+/* A part's title and text, set in from the edges of the cards under them. */
+@utility docs-start-text {
+  @apply px-space-300;
+}
+
+@utility docs-start-heading {
+  @apply docs-display mt-0 mb-space-300 text-display-sm expanded-screen:text-display-lg;
+}
+
+@utility docs-start-cards {
+  @apply m-0 mt-space-400 flex list-none flex-col gap-space-100 p-0;
+}
+
+/* A card that is a link: its name over what it leads to, beside the symbol of where that is. */
+@utility docs-start-card {
+  @apply relative box-border flex items-start gap-space-200 overflow-hidden rounded-shape-xl bg-surface-container-low p-space-300 text-on-surface no-underline focus-visible:focus-ring;
+}
+
+@utility docs-start-card-text {
+  @apply flex min-w-0 flex-1 flex-col gap-space-100;
+}
+
+@utility docs-start-badge {
+  @apply relative grid size-10 flex-none place-items-center text-on-surface;
+}
+
+/* The wavy line between two parts. */
+@utility docs-start-squiggle {
+  @apply mx-auto my-space-600 block h-4 w-41 fill-none stroke-outline-variant;
+}
+
+@utility docs-start-pictures {
+  @apply sticky top-space-100 hidden self-start overflow-hidden rounded-shape-xl large-screen:block;
+  height: calc(100dvh - 1rem);
+}
+
+@utility docs-start-picture {
+  @apply absolute inset-0 box-border flex items-center justify-center p-space-400 transition-opacity duration-spring-default-effects ease-spring-default-effects;
+}
+
+/* Where a picture's content stands: over its shapes, at its own size. A scale here would
+ * mislead a component that measures itself, as a button with a label does. */
+@utility docs-start-stage {
+  @apply relative flex max-h-full max-w-full items-center justify-center;
+}
+
+/* What stands on a picture's shapes (pictures/): a few components on a surface of their own,
+ * as the screen of a small app is, or each on a tile. */
+@utility docs-picture-surface {
+  @apply relative box-border max-w-full overflow-hidden rounded-shape-xl bg-surface text-on-surface shadow-elevation-2;
+}
+
+@utility docs-picture-tile {
+  @apply box-border min-w-0 rounded-shape-xl bg-surface p-space-250 text-on-surface shadow-elevation-1;
+}
+
+@utility docs-picture-code {
+  @apply docs-mono text-body-md;
+}
+
+/* What a page writes, its MDX (mdx.tsx): each element takes a class of its own, in the type
+ * scale, so that nothing here reaches into an example drawn in the page. Its text is as wide
+ * as the article, as its headings, code and examples are. */
+@utility docs-h2 {
+  @apply docs-display relative mt-space-900 mb-space-400 text-display-sm first:mt-0 expanded-screen:mt-24 expanded-screen:text-display-lg;
+}
+
+@utility docs-h3 {
+  @apply docs-display relative mt-space-600 mb-space-200 text-headline-md;
+}
+
+@utility docs-h4 {
+  @apply docs-display relative mt-space-400 mb-space-200 text-title-lg;
+}
+
+/* A heading is in a box of its level's class above, which has its type and the room around
+ * it: the heading itself only takes that type. */
+@utility docs-heading {
+  @apply m-0;
+  font: inherit;
+}
+
+/* The button that copies a heading's link: in the margin before the heading, at the middle of
+ * its first line, in a window with a margin wide enough. It is out of sight until the pointer
+ * is over the heading or over it, or the keyboard is on it; its room reaches the heading. */
+@utility docs-heading-copy {
+  @apply absolute end-full top-0 hidden h-lh items-center pe-space-300 opacity-0 transition-opacity duration-spring-fast-effects ease-spring-fast-effects group-hover/heading:opacity-100 has-focus-visible:opacity-100 expanded-screen:flex;
+}
+
+@utility docs-p {
+  @apply my-space-200 first:mt-0;
+}
+
+@utility docs-list {
+  @apply my-space-200 box-border ps-space-300;
+}
+
+@utility docs-list-item {
+  @apply my-space-100 ps-space-50;
+
+  &::marker {
+    @apply text-on-surface-variant;
+  }
+
+  ul > & {
+    @apply docs-bullet ps-0;
+  }
+}
+
+/* An item of a list in no order, dotted as on m3.material.io: a four-pointed star in the text's
+ * color, 8px before the text at the middle of its first line, turned by its place in the list. */
+@utility docs-bullet {
+  @apply relative list-none;
+
+  &::before {
+    @apply absolute end-full top-0 me-space-100 h-lh w-space-100 bg-current;
+    content: '';
+    mask: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'><path d='M4.958.28c.58-.634 1.627-.107 1.462.736l-.365 1.868a.85.85 0 00.26.79L7.72 4.958c.634.58.107 1.627-.736 1.462l-1.868-.365a.85.85 0 00-.79.26L3.042 7.72c-.58.634-1.627.107-1.462-.736l.365-1.868a.85.85 0 00-.26-.79L.28 3.042c-.634-.58-.107-1.627.736-1.462l1.868.365a.85.85 0 00.79-.26L4.958.28z'/></svg>")
+      center / contain no-repeat;
+    rotate: var(--docs-bullet-turn);
+  }
+
+  /* m3's turns, later ones winning, so they come round every twelve items. */
+  &:nth-child(3n) {
+    --docs-bullet-turn: 180deg;
+  }
+
+  &:nth-child(3n + 1) {
+    --docs-bullet-turn: 252deg;
+  }
+
+  &:nth-child(3n + 2) {
+    --docs-bullet-turn: 144deg;
+  }
+
+  &:nth-child(4n) {
+    --docs-bullet-turn: 324deg;
+  }
+
+  &:nth-child(4n + 1) {
+    --docs-bullet-turn: 216deg;
+  }
+
+  &:nth-child(4n + 3) {
+    --docs-bullet-turn: 108deg;
+  }
+}
+
+@utility docs-link {
+  @apply rounded-shape-xs text-primary underline underline-offset-2 focus-visible:focus-ring;
+}
+
+@utility docs-inline-code {
+  @apply docs-mono rounded-shape-xs bg-surface-container-high px-space-50 py-space-25;
+  font-size: 0.875em;
+}
+
+/* A note (mdx.tsx): a tinted box set apart from the text, with a symbol at its start, at the
+ * middle of what the note says, however many lines that is. */
+@utility docs-note {
+  @apply my-space-300 box-border flex items-center gap-space-200 rounded-shape-lg bg-secondary-container py-space-200 ps-space-200 pe-space-300 text-on-secondary-container;
+}
+
+@utility docs-note-text {
+  @apply min-w-0 flex-1;
+
+  /* Its last paragraph ends at the box's padding, as its first one starts at it. */
+  & > .docs-p:last-child {
+    @apply mb-0;
+  }
+}
+
+@utility docs-rule {
+  @apply my-space-600 border-0 border-t border-solid border-outline-variant;
+}
+
+/* A table (mdx.tsx): a round outlined box of its own, which scrolls sideways where the page is
+ * too narrow for it, its header tinted, with a line between its rows and between its columns. */
+@utility docs-table {
+  @apply focus-ring my-space-300 overflow-x-auto rounded-shape-xl border border-solid border-outline-variant;
+}
+
+/* It is never narrower than its columns can be read at: the box scrolls instead. */
+@utility docs-table-grid {
+  @apply w-full min-w-140 border-collapse text-start text-body-lg;
+}
+
+@utility docs-th {
+  @apply border-0 border-e border-solid border-outline-variant bg-surface-container-low px-space-300 py-space-200 text-start align-middle text-title-md text-on-surface-variant last:border-e-0;
+}
+
+@utility docs-td {
+  @apply border-0 border-e border-t border-solid border-outline-variant px-space-300 py-space-200 align-middle last:border-e-0;
+
+  /* In a table of two columns, the second, what the first means, keeps a line's width. */
+  &:nth-child(2):last-child {
+    @apply min-w-48;
+  }
+
+  /* A word of code in a cell stays whole, on one line. */
+  & .docs-inline-code {
+    @apply whitespace-nowrap;
+  }
+}
+
+/* A block of code, a page's own or an example's source, with its copy button at its corner:
+ * the code in it is the block's, not a word of code in a line of text. */
+@utility docs-code {
+  @apply relative my-space-300 rounded-shape-lg bg-surface-container;
+
+  /* Its lines stop short of the copy button. It takes the focus, so that the keyboard can
+   * scroll it, and its ring follows the block's corners; its end border, where the ring is
+   * drawn, keeps its scrollbar beside the ring. */
+  & pre {
+    @apply docs-mono focus-ring-inset m-0 max-h-120 overflow-auto border-e-3 border-transparent p-space-300 pe-space-800 text-body-md;
+    border-radius: inherit;
+  }
+
+  & code {
+    @apply docs-mono bg-transparent p-0;
+    font-size: inherit;
+  }
+}
+
+/* The copy button's place: the end of the block's first line, its middle on the line's, which
+ * is the middle of a block of one line. It floats over the code, which scrolls under it, clear
+ * of the scrollbar along the block's end. */
+@utility docs-code-copy {
+  @apply absolute end-space-200 top-space-300 flex items-center text-body-md;
+  height: 1lh;
+}
+
+/* An example (example.tsx): one round frame, its preview over its source. The preview is on
+ * the surface, the color the components are drawn for. */
+@utility docs-example {
+  @apply my-space-400 overflow-hidden rounded-shape-xl bg-surface;
+
+  & .docs-code {
+    @apply my-0 rounded-none;
+  }
+
+  /* A scrollbar along its bottom edge, the code's or a preview's with no code under it, stops
+   * where the round corners start, which would cut it. Chromium matches nothing for a nested
+   * `& pre::-webkit-scrollbar-track:horizontal`, so the track is the scroller's own `&::` rule. */
+  & > .docs-example-preview:last-child,
+  & .docs-code pre {
+    &::-webkit-scrollbar-track:horizontal {
+      margin-inline: var(--radius-shape-xl);
+    }
+  }
+
+  & .docs-code pre {
+    &::-webkit-scrollbar-track:vertical {
+      margin-block-end: var(--radius-shape-xl);
+    }
+  }
+}
+
+/* Dotted, as a diagram of the spec is: a dot of one pixel every 8px, behind an example's preview
+ * and a slot picture. The dots count from the corner, on whole pixels: from the middle an odd
+ * width blurs them. */
+@utility docs-dotted {
+  background-image: radial-gradient(
+    circle at 3.5px 3.5px,
+    color-mix(in srgb, var(--color-outline) 60%, transparent) 0.5px,
+    transparent 0
+  );
+  background-size: var(--spacing-space-100) var(--spacing-space-100);
+}
+
+/* Text on the outline role (examples/theme/color-roles.tsx), which has no role to pair with:
+ * black or white, whichever reads on it in the scheme and contrast shown. A browser without
+ * contrast-color() keeps the surface's color. */
+@utility docs-on-outline {
+  @apply text-surface;
+
+  @supports (color: contrast-color(red)) {
+    color: contrast-color(var(--color-outline));
+  }
+}
+
+@utility docs-example-preview {
+  @apply docs-dotted focus-ring-inset box-border flex min-h-60 flex-wrap items-center justify-center gap-space-200 overflow-x-auto p-space-500;
+  /* A layer of its own: a component's z-index, an app bar's, ranks it in the preview alone,
+   * not over the page's sticky tabs. */
+  isolation: isolate;
+}
+
+/* A flush example fills the frame, so its scrollers, a page's or its own, run along the frame's
+ * edges: their scrollbars stop short of its round corners, at the top, and at the bottom when no
+ * code is under it. */
+@utility docs-example-flush {
+  &,
+  & * {
+    &::-webkit-scrollbar-track:vertical {
+      margin-block-start: var(--radius-shape-xl);
+    }
+  }
+
+  &:last-child,
+  &:last-child * {
+    &::-webkit-scrollbar-track:vertical {
+      margin-block-end: var(--radius-shape-xl);
+    }
+
+    &::-webkit-scrollbar-track:horizontal {
+      margin-inline: var(--radius-shape-xl);
+    }
+  }
+}
+
+/* A component's props (props-table.tsx), as a segmented list: each prop a tinted box 2dp from
+ * the next, round at the list's ends, its name over its type and default and what it does. */
+@utility docs-api {
+  @apply my-space-300;
+}
+
+@utility docs-props {
+  @apply m-0 flex flex-col gap-space-25;
+}
+
+@utility docs-prop {
+  @apply rounded-shape-xs bg-surface-container-low px-space-300 py-space-250 first:rounded-t-shape-xl last:rounded-b-shape-xl;
+}
+
+@utility docs-prop-term {
+  @apply flex flex-wrap items-center gap-x-space-100 gap-y-space-50;
+}
+
+@utility docs-prop-name {
+  @apply docs-mono bg-transparent p-0 text-title-md text-on-surface;
+}
+
+@utility docs-prop-tag {
+  @apply rounded-shape-xs bg-tertiary-container px-space-75 py-space-25 text-label-md text-on-tertiary-container;
+}
+
+@utility docs-prop-details {
+  @apply m-0 mt-space-50 text-body-md text-on-surface-variant;
+}
+
+@utility docs-prop-signature {
+  @apply m-0 flex flex-wrap items-baseline gap-x-space-300 gap-y-space-50;
+}
+
+@utility docs-prop-type {
+  @apply docs-mono bg-transparent p-0 text-body-md text-tertiary;
+}
+
+@utility docs-prop-default {
+  @apply text-body-md text-on-surface-variant;
+
+  & code {
+    @apply docs-mono text-on-surface;
+  }
+}
+
+/* A prop's description is HTML the build made of its comment: its elements are styled here. */
+@utility docs-prop-description {
+  @apply mt-space-150;
+
+  & :is(p, ul, ol) {
+    @apply my-space-100;
+  }
+
+  & > :first-child {
+    @apply mt-0;
+  }
+
+  & > :last-child {
+    @apply mb-0;
+  }
+
+  & :is(ul, ol) {
+    @apply ps-space-300;
+  }
+
+  & ul > li {
+    @apply docs-bullet;
+  }
+
+  & code {
+    @apply docs-mono rounded-shape-xs bg-surface-container-high px-space-50;
+    font-size: 0.875em;
+  }
+
+  & a {
+    @apply text-primary underline underline-offset-2;
+  }
+}
+
+@utility docs-prop-see {
+  @apply m-0 mt-space-150 flex flex-wrap gap-x-space-300 gap-y-space-100;
+}
+
+/* A page a prop refers to, after an 18 icon: Material's logo for m3.material.io, an arrow else. */
+@utility docs-prop-link {
+  @apply inline-flex items-center gap-space-50 rounded-shape-xs text-label-lg text-primary no-underline icon-18 hover:underline focus-visible:focus-ring;
+}
+
+/* A picture of a component's slots (slot-picture.tsx), drawn as Material's anatomy diagrams are:
+ * on the dotted surface an example's preview is on, each slotted part in a dotted outline,
+ * numbered in an outlined capsule with a dotted line to it, and the numbers' slots listed under
+ * the frame, each by a filled capsule. Its pictures are in a row while there is room, each as wide
+ * as the frame lets it be, with room around it for the numbers. */
+@utility docs-slot-picture {
+  @apply my-space-400 flex flex-col gap-space-100;
+}
+
+@utility docs-slot-picture-frame {
+  @apply docs-dotted box-border flex min-h-75 items-center justify-center rounded-shape-xl bg-surface px-space-200 py-space-300;
+}
+
+@utility docs-slot-picture-row {
+  @apply flex max-w-full flex-wrap items-center justify-center-safe gap-x-space-800 overflow-x-auto;
+  /* A layer of its own, as an example's is: an app bar's z-index ranks it in the picture alone. */
+  isolation: isolate;
+}
+
+@utility docs-slot-canvas {
+  @apply relative max-w-full min-w-0 py-space-600;
+}
+
+@utility docs-slot-lines {
+  @apply pointer-events-none absolute inset-0 size-full overflow-visible text-on-surface;
+}
+
+@utility docs-slot-outline {
+  @apply fill-none;
+  stroke-width: 1;
+  stroke-dasharray: 1 2;
+}
+
+@utility docs-slot-line {
+  @apply stroke-current;
+  stroke-width: 1;
+  stroke-dasharray: 1 2;
+}
+
+/* A slot's number in the picture: a capsule outlined in on-surface, as tall as it is wide and a
+ * third again; in a legend, the same capsule filled. */
+@utility docs-slot-number {
+  @apply box-border inline-flex h-8 min-w-6 shrink-0 items-center justify-center rounded-full border border-solid border-on-surface bg-surface px-space-50 text-body-lg text-on-surface;
+}
+
+@utility docs-slot-key {
+  @apply box-border inline-flex h-8 min-w-6 shrink-0 items-center justify-center rounded-full bg-inverse-surface px-space-50 text-body-md text-inverse-on-surface;
+}
+
+@utility docs-slot-marker {
+  @apply absolute;
+}
+
+@utility docs-slot-legend {
+  @apply m-0 flex list-none flex-col gap-space-100 p-0 ps-space-125;
+}
+
+@utility docs-slot-legend-item {
+  @apply flex items-center gap-space-150 text-body-lg text-on-surface-variant;
+}
+
+@utility docs-api-note {
+  @apply mt-space-300 mb-0 text-body-md text-on-surface-variant;
+}
+
+/* The props of what a component is built on (props-table.tsx): a tinted row with a chevron at
+ * its end, which turns as the row opens into the head of the segmented list of them. */
+@utility docs-details {
+  @apply mt-space-300;
+  interpolate-size: allow-keywords;
+
+  & > summary {
+    @apply relative isolate flex cursor-pointer list-none items-center justify-between gap-space-200 rounded-shape-xl bg-surface-container-low px-space-300 py-space-250 text-title-md text-on-surface duration-spring-fast-spatial ease-spring-fast-spatial focus-visible:focus-ring;
+    @apply after:absolute after:inset-0 after:-z-1 after:rounded-inherit after:bg-on-surface/state-hover after:opacity-0 hover:after:opacity-100;
+    transition-property: border-radius;
+
+    &::-webkit-details-marker {
+      @apply hidden;
+    }
+  }
+
+  &[open] > summary {
+    @apply rounded-b-shape-xs;
+  }
+
+  /* The list grows from nothing to its height on the default spatial spring as it fades in on
+   * the default effects one, and shrinks and fades back with its props drawn until it is shut. */
+  &::details-content {
+    @apply overflow-clip opacity-0;
+    block-size: 0;
+    transition-property: block-size, opacity, content-visibility;
+    transition-duration:
+      var(--md-sys-motion-spring-default-spatial-duration),
+      var(--md-sys-motion-spring-default-effects-duration),
+      var(--md-sys-motion-spring-default-spatial-duration);
+    transition-timing-function:
+      var(--md-sys-motion-spring-default-spatial-easing),
+      var(--md-sys-motion-spring-default-effects-easing), linear;
+    transition-behavior: allow-discrete;
+  }
+
+  &[open]::details-content {
+    @apply opacity-100;
+    block-size: auto;
+  }
+
+  & > .docs-props {
+    @apply mt-space-25;
+  }
+
+  & > .docs-props > .docs-prop:first-child {
+    @apply rounded-t-shape-xs;
+  }
+
+  &[open] > summary > .docs-details-icon {
+    @apply rotate-180;
+  }
+}
+
+@utility docs-details-icon {
+  @apply flex-none text-on-surface-variant transition-transform duration-spring-fast-spatial ease-spring-fast-spatial icon-24;
+}

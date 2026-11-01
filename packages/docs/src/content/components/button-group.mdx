@@ -1,0 +1,173 @@
+import api from 'virtual:api/ButtonGroup'
+import * as actions from '../../examples/button-group/actions.tsx?example'
+import * as basic from '../../examples/button-group/basic.tsx?example'
+import * as buttonVariants from '../../examples/button-group/button-variants.tsx?example'
+import * as connected from '../../examples/button-group/connected.tsx?example'
+import * as connectedSizes from '../../examples/button-group/connected-sizes.tsx?example'
+import * as disabled from '../../examples/button-group/disabled.tsx?example'
+import * as iconButtons from '../../examples/button-group/icon-buttons.tsx?example'
+import * as multiple from '../../examples/button-group/multiple.tsx?example'
+import * as single from '../../examples/button-group/single.tsx?example'
+import * as sizes from '../../examples/button-group/sizes.tsx?example'
+import * as square from '../../examples/button-group/square.tsx?example'
+import * as standard from '../../examples/button-group/standard.tsx?example'
+
+A button group holds related buttons in a row. Use one to:
+
+- Select one of several options, such as a view or a sort order
+- Turn several options on and off
+- Group related actions
+
+For an action with a menu of related options, use a [split button](/components/split-button) in place of a group.
+
+```tsx
+import { Button, ButtonGroup } from '@material-web/react'
+```
+
+## Basic button group
+
+Put [buttons](/components/button) in a `ButtonGroup`. To make a button one of the group's toggle buttons, give it an `id` and `isSelectable`.
+
+<Example {...basic} />
+
+The `ButtonGroup` comes in two variants. Set `variant` to `standard` (the default) or `connected`.
+
+### Standard button group
+
+A standard group is as wide as its buttons, with a space between them that the group's `size` sets.
+
+<Example {...standard} />
+
+### Connected button group
+
+Use a connected group to select options, switch views or sort the elements of a page. It fills the width of its container, and its buttons grow to fill it. In this example the container is 480dp wide at most. The buttons sit close together, and the selected button is fully round. Avoid mixing color styles in a connected group, as it can make selection and emphasis unclear.
+
+<Example {...connected} />
+
+## Button variants
+
+A group has no colors of its own. Set the color style on each button, such as filled, tonal or outlined, with the button's `variant`. Avoid text buttons and standard [icon buttons](/components/icon-button), as they have no container.
+
+<Example {...buttonVariants} />
+
+A toggle `IconButton` is selected by the group as a `Button` is.
+
+<Example {...iconButtons} />
+
+## Selection
+
+The group selects its toggle buttons by their `id`. With `selectionMode="single"` (the default), one button is selected at a time. Control the selection with `selectedKeys` and `onSelectionChange`, or set the initial selection with `defaultSelectedKeys`.
+
+<Example {...single} />
+
+A toggle button outside a group keeps its own selection. See [Toggle button](/components/button#toggle-button).
+
+### Multiple selection
+
+Set `selectionMode="multiple"` to let each button toggle independently.
+
+<Example {...multiple} />
+
+### Empty selection
+
+A press on the selected button of a group deselects it, so a group can have no button selected. Set `disallowEmptySelection` to keep the last selected button from being deselected, as the text alignment group above does.
+
+## Actions
+
+A `Button` without `isSelectable` is an action in the group. With `selectionMode="multiple"`, the group is a toolbar of actions, as in this example.
+
+<Example {...actions} />
+
+## Loading
+
+Any button of the group can be pending, an action or a selectable one. Set `isPending` on the button, as outside a group. A pending selectable button keeps its selection, and pressing it does not change the group's. See [Loading](/components/button#loading).
+
+## Disabled
+
+Set `isDisabled` on the group to disable every button in it. A button with its own `isDisabled` keeps its place in the group, and the arrow keys skip it.
+
+<Example {...disabled} />
+
+## Sizes
+
+Set `size` to `xs`, `s` (the default), `m`, `l` or `xl`. It does not change the size of the buttons, so give each button the same `size` as the group.
+
+In a standard group, `size` sets the space between the buttons: 18dp for `xs`, 12dp for `s`, and 8dp for `m`, `l` and `xl`.
+
+<Example {...sizes} />
+
+In a connected group, `size` sets the inner corners, which are larger for `l` and `xl`. The buttons of an `xs` or `s` connected group are at least 48dp wide. To make a connected group as wide as its buttons, set `className="w-auto"`, as in this example.
+
+<Example {...connectedSizes} />
+
+## Shapes
+
+Set `shape` to `round` (the default) or `square`. In a `square` connected group, the outer corners are squarer as well as the inner ones. In a standard group, each button keeps its own `shape`.
+
+<Example {...square} />
+
+## In a toolbar
+
+Put a `ButtonGroup` in a [toolbar](/components/toolbar) to group some of its elements. The group's toggle buttons take the toolbar's style, whatever their `variant`. The toolbar's arrow keys move through the group, on to the elements after it and back.
+
+## Customization
+
+Pass classes in `className` to restyle the group. A class of yours replaces the group's own class for the same property. Each button keeps its own props and classes: see the Button page's [Customization](/components/button#customization).
+
+- **Spacing:** To change the space between the buttons, pass a gap class, such as `gap-space-50`.
+- **Density:** Add `density-1`, `density-2` or `density-3` to the group to make every button in it shorter. See [Density](/get-started/styling#density).
+- **Functions:** On a `ButtonGroup`, `className`, `style` and `children` can be functions of `orientation`, `isDisabled` and `state`. The state's type is exported as `ButtonGroupRenderProps`. See [Children as a function](/get-started/composition#children-as-a-function).
+
+## Limitations
+
+### Vertical groups
+
+A group lays out its buttons in a row. `orientation="vertical"` does not stack them: it changes only the arrow keys that move the focus, to Up and Down.
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/button-groups/accessibility#1d21a1f1-8d6c-4d8f-90b1-08862914ead7) what people should be able to do with assistive technology:
+
+- Navigate to and interact with each button in the group
+- Identify when buttons are selected
+
+### Interaction and style
+
+- **States:** Each button shows its states as it does outside a group: a state layer on hover, a ripple on a press, and a [focus ring](/theme/accessibility#focus-ring) for keyboard focus alone.
+- **Touch target:** Each button keeps its [touch target](/theme/accessibility#touch-targets) of at least 48dp. In a connected group, the buttons of the `xs` and `s` sizes are at least 48dp wide, so that their targets do not overlap across the 2dp between them. In a standard group, Material [advises](https://m3.material.io/components/button-groups/accessibility#da23410d-7a41-43c2-8bd9-baedc5f150fc) keeping the larger space of the `xs` and `s` sizes, 18dp and 12dp, which is there for accessible targets: don't pass them a smaller gap class.
+- **Density:** A [density](/get-started/styling#density) class on the group makes every button shorter, and their targets stay 48dp.
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), the buttons' changes of shape and color, a connected group's inner corners included, are instant.
+- **Forced colors:** In [forced colors](/theme/accessibility#forced-colors), each button keeps the edge it has outside a group, and a selected toggle button is filled with the system's highlight color.
+- **Right to left:** A connected group's corners are mirrored in a right-to-left layout.
+
+### Focus
+
+- The group is not a tab stop. Tab moves the focus to its first button, as Material [advises](https://m3.material.io/components/button-groups/accessibility#503d4075-8240-4e68-96cb-4489bab82c87), and the arrow keys move it between the buttons.
+- When Tab brings the focus back to the group, it returns to the button that had it last.
+- A disabled button cannot be focused, and the arrow keys skip it. `isDisabled` on the group disables every button.
+
+### Keyboard navigation
+
+| Keys                | Actions                                                          |
+| ------------------- | ---------------------------------------------------------------- |
+| Tab                 | Move the focus into the group, or out of it to the next element  |
+| Left or Right arrow | Move the focus to the previous or next button                    |
+| Space or Enter      | Select or deselect the focused button, or press an action button |
+
+- The arrow keys move the focus without selecting, and stop at the first and the last button.
+- Left and Right arrow are reversed in a right-to-left locale, which is set with an `I18nProvider`, not with `dir`. See [Internationalization](/get-started/react-aria#internationalization).
+- With `orientation="vertical"`, Up and Down arrow move the focus in place of Left and Right. See [Vertical groups](#vertical-groups).
+- In a [toolbar](#in-a-toolbar), the toolbar's arrow keys move through the group and on to the elements after it.
+
+### Labeling elements
+
+- `selectionMode` sets how the group is announced: as a radio group with `single`, and as a toolbar of toggle buttons with `multiple`. In a radio group, each toggle button is a radio that reports whether it is selected with `aria-checked`. In a toolbar, a toggle button reports it with `aria-pressed`.
+- Name the group with an `aria-label` or an `aria-labelledby`, such as View.
+- Label each button as you would outside a group, as Material [advises](https://m3.material.io/components/button-groups/accessibility#7c0dc956-6faf-46e1-86ec-cd39f4e8fa13): give a button with an icon alone an `aria-label`. See [Button](/components/button#labeling-elements) and [Icon button](/components/icon-button#labeling-elements).
+- A disabled group reports it with `aria-disabled`.
+
+## Props
+
+<PropsTable {...api} />

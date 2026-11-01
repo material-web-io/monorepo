@@ -1,0 +1,140 @@
+import api from 'virtual:api/Switch'
+import * as basic from '../../examples/switch/basic.tsx?example'
+import * as controlled from '../../examples/switch/controlled.tsx?example'
+import * as custom from '../../examples/switch/custom.tsx?example'
+import * as disabled from '../../examples/switch/disabled.tsx?example'
+import * as form from '../../examples/switch/form.tsx?example'
+import * as icons from '../../examples/switch/icons.tsx?example'
+import * as label from '../../examples/switch/label.tsx?example'
+import * as list from '../../examples/switch/list.tsx?example'
+
+Switches toggle the selection of an item on and off. They are best used to adjust settings and other standalone options, and their effect should start immediately, without a save. Use them to:
+
+- Toggle a single item on or off
+- Immediately activate or deactivate something
+
+Compared with the other selection controls:
+
+- **Switch or checkbox:** A switch suits a setting or another standalone option that takes effect immediately. When several related options can be selected from a list, use [checkboxes](/components/checkbox), which take up less space.
+- **Switch or radio button:** A switch controls a single option that is either on or off, not a choice between two opposing options. Use switches, and not [radio buttons](/components/radio), when the items of a list can be controlled independently.
+
+```tsx
+import { Switch } from '@material-web/react'
+```
+
+## Basic switch
+
+Use a `Switch` to toggle a single option on or off. Set `defaultSelected` on a switch that starts selected.
+
+<Example {...basic} />
+
+Set `isDisabled` to disable the switch: it cannot be toggled or focused. Set `isReadOnly` so that pressing the switch does not change its selection.
+
+<Example {...disabled} />
+
+## Label
+
+Write the label as the switch's children. Pressing the label toggles the switch. With no label text, set an `aria-label`. Keep the label short and direct: it describes what the switch does when it is on.
+
+The switch adds no space before its label, so add it yourself, as `ps-space-200` does in this example.
+
+<Example {...label} />
+
+The label takes the [type style](/theme/typography#type-scale) of the text around it. To set one, add its class to the switch or to an element around it, as in `text-body-lg`.
+
+## Icons
+
+Set `icons` to choose the icons in the handle:
+
+- `none` (the default) shows no icon.
+- `selected` shows a check in the selected handle.
+- `both` also shows an X in the unselected handle, which is then 24dp instead of 16dp.
+
+The icons are decorative and are not part of the switch's name.
+
+<Example {...icons} />
+
+## Controlled
+
+Control the selection with `isSelected` and `onChange`, which is called with the new selection. Without them, the switch keeps its own selection, starting from `defaultSelected`.
+
+In this example, the switch is controlled, and its children are a function of its state that renders the supporting text for that state.
+
+<Example {...controlled} />
+
+## Forms
+
+Set a `name` to include a switch in a form. It is submitted with the form and reset with it. A selected switch submits its `value`, or `on` with no `value`, and an unselected switch submits nothing.
+
+<Example {...form} />
+
+Set `isRequired` to require the switch to be selected. A required switch blocks its form from being submitted until then. See React Aria's [Forms](https://react-aria.adobe.com/forms#validation) guide.
+
+> **Note:** `isInvalid` does not change how the switch looks.
+
+## In a list
+
+In a [list](/components/list), a `Switch` in an item's slot does not select the item, as a `Checkbox` does. It is a separate control, so give it its own name and state.
+
+<Example {...list} />
+
+## Customization
+
+Pass classes in `className` to restyle one switch. They go on its outermost element, an inline flex box aligned to the middle of its line, as do `style` and `ref`. `inputRef` is the ref of its input. See [Styling](/get-started/styling) for the classes, the states and the theme.
+
+<Example {...custom} />
+
+- **Color:** `className` does not reach the track and the handle. To change their colors, set the color roles they use. See [Theme](/get-started/styling#theme).
+- **States:** On a switch, the variants `selected:`, `invalid:`, `disabled:`, `read-only:` and `required:` style those states. Hover, press and focus are reported on an element inside it, so use their `has-*` form, as in `has-hover:bg-surface-container`. See [States](/get-started/styling#variants).
+- **Functions:** `className` and `style` can be functions of `isSelected`, `isInvalid`, `isDisabled`, `isReadOnly`, `isRequired` and `state`. To read hover, press and focus, pass a function as [children](#children-as-a-function).
+- **Every switch:** To restyle all the switches at once, change the [theme](/get-started/styling#theme).
+
+### Children as a function
+
+Pass a function as children to render the label from the switch's state: `isSelected`, `isHovered`, `isPressed`, `isFocused`, `isFocusVisible`, `isDisabled`, `isReadOnly`, `isInvalid`, `isRequired` and `state`. `isFocused` is any focus, and `isFocusVisible` is keyboard focus only. The state's type is exported as `SwitchRenderProps`. The [controlled](#controlled) example uses one. See [Children as a function](/get-started/composition#children-as-a-function).
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/switch/accessibility#df3ad2df-fe73-4b74-99cb-ad853a60f73f) what people should be able to do with assistive technology:
+
+- Navigate to a switch with a keyboard or switch input
+- Toggle the switch on and off
+- Get appropriate feedback based on input type documented under Interaction & style
+
+### Interaction and style
+
+- **States:** Hovering anywhere on the switch shows a state layer around the handle and darkens the handle, and the pointer is a hand. A press shows a ripple, and a press held for a moment grows the handle to 28dp, the cue Material [uses](https://m3.material.io/components/switch/accessibility#c0e9fae1-48df-428b-b028-4f7be071ada3) to show that the handle is interactive. Keyboard focus shows a [focus ring](/theme/accessibility#focus-ring) around the track, and a press with a mouse or touch does not.
+- **Touch target:** A switch has a [touch target](/theme/accessibility#touch-targets) of 52 by 48dp, centered on its track. Pressing its label toggles it too.
+- **Color contrast:** In the light and dark schemes, at every contrast level, the track's edge keeps 3:1 contrast with the surface, the handle with the track, and an icon with the handle. Keep that contrast when you change the [color roles](/theme/color#color-roles) they use.
+- **Density:** Material [advises](https://m3.material.io/components/switch/accessibility#f86a407f-386d-4d04-a080-975f52183c73) against density that brings a switch's target under 48dp. A switch does not follow the [density](/get-started/styling#density) classes: it keeps its size and its target in a denser layout.
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), the handle and its state layer move and resize instantly.
+- **Forced colors:** In [forced colors](/theme/accessibility#forced-colors), an unselected track is outlined in the system's text color, a selected track is filled with the system's highlight color, and a disabled switch and its label are grayed out.
+- **Right to left:** The switch is mirrored in a right-to-left layout: the handle of an unselected switch is at the right.
+
+### Focus
+
+- Each switch is a tab stop.
+- A disabled switch cannot be focused, and Tab skips it. A read-only switch can still be focused.
+
+### Keyboard navigation
+
+| Keys           | Actions                           |
+| -------------- | --------------------------------- |
+| Tab            | Move the focus to a switch        |
+| Space or Enter | Turn the focused switch on or off |
+
+- Enter does not submit the form the switch is in.
+- To handle Enter yourself, call `preventDefault` on the event in `onKeyDown`. The switch then does not toggle.
+
+### Labeling elements
+
+- A switch has the `switch` role, and is announced as on or off.
+- The label names the switch. With no label, set an `aria-label`.
+- Where the label alone is ambiguous, Material [advises](https://m3.material.io/components/switch/accessibility#30faed8d-5ebe-42cc-87b7-16caba39f0be) a more descriptive name. Make the label more descriptive where you can, or set an `aria-label` that includes it, such as Photo album access for a switch labeled Photo album.
+- The [icons](#icons) in the handle are hidden from assistive technology, and are not part of the name.
+
+## Props
+
+<PropsTable {...api} />

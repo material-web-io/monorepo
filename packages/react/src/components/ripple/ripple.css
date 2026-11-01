@@ -1,0 +1,43 @@
+/* Ripple (ripple.tsx): its layer, the hover and focus overlay. It fills its parent, takes the
+ * parent's text color (the content color) and fades to the state's opacity. Must be a direct child
+ * of the positioned interactive element, or of a wrapper around a control. */
+@utility state-layer {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-color: currentColor;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
+
+  /* Its parent's states, as the plugin's variants read them, spelled out since a variant applies to
+   * the element or any ancestor, never the parent alone. In :where, as specific as the layer's class
+   * alone, so the opacity classes of the states it is given instead (ripple.tsx) outweigh them. */
+  @media (hover: hover) {
+    :where([data-rac][data-hovered], :not([data-rac]):hover) > & {
+      opacity: var(--md-sys-state-hover-state-layer-opacity);
+    }
+
+    /* Not while the pointer is on a control inside the parent with a layer of its own (a
+     * chip's remove button), which shows that one. */
+    :where([data-rac][data-hovered], :not([data-rac]):hover):where(
+        :has(:is([data-rac][data-hovered], :not([data-rac]):hover) > .state-layer)
+      )
+      > & {
+      opacity: 0;
+    }
+  }
+
+  :where([data-rac][data-focus-visible], :not([data-rac]):focus-visible) > & {
+    opacity: var(--md-sys-state-focus-state-layer-opacity);
+  }
+
+  :where([data-dragging]) > & {
+    opacity: var(--md-sys-state-dragged-state-layer-opacity);
+  }
+
+  /* Disabled as the variant has it, or by aria-disabled. */
+  :where([data-rac][data-disabled], :not([data-rac]):disabled, [aria-disabled='true']) > & {
+    opacity: 0;
+  }
+}

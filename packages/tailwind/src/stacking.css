@@ -1,0 +1,23 @@
+/* Stacking order of overlapping surfaces, lowest to highest. M3 defines no z-indexes;
+ * this is this library's order, so any two of them (a menu in a dialog, a snackbar
+ * over a sheet) agree. Utilities: z-fab ... z-tooltip. */
+@theme inline {
+  --z-index-fab: 10;
+  --z-index-app-bar: 20;
+  --z-index-navigation: 30;
+  --z-index-scrim: 40;
+  --z-index-sheet: 50;
+  --z-index-dialog: 60;
+  --z-index-menu: 70;
+  --z-index-snackbar: 80;
+  --z-index-tooltip: 90;
+}
+
+/* Stacking order inside a component, lowest to highest, all below the surfaces: a
+ * part behind its content, a part raised above its siblings, the focused element,
+ * whose ring nothing next to it may cover. Utilities: z-behind ... z-focus-ring. */
+@theme inline {
+  --z-index-behind: -1;
+  --z-index-raised: 1;
+  --z-index-focus-ring: 5;
+}

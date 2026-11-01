@@ -1,0 +1,46 @@
+/* Progress indicators (linear-progress-indicator.tsx, circular-progress-indicator.tsx). A linear
+ * one is as tall as its track, or its wave when it has one, and as wide as what it is in; a
+ * circular one is its size across, both numbers set by the component. */
+
+/* A block as wide as its parent, mirrored in right-to-left text. */
+@utility progress-indicator-linear {
+  @apply relative block w-full shrink-0;
+  @variant rtl {
+    & > :is(.progress-indicator-track, .progress-indicator-active, .progress-indicator-stop) {
+      @apply -scale-x-100;
+    }
+  }
+  height: calc(var(--progress-indicator-height) * 1px);
+}
+
+/* An inline box of its size, drawn at that size by the parts, which fill it. */
+@utility progress-indicator-circular {
+  @apply relative inline-block shrink-0 align-middle;
+  width: calc(var(--progress-indicator-size) * 1px);
+  height: calc(var(--progress-indicator-size) * 1px);
+}
+
+/* The element a circular drawing turns, reaching past the box by the wave's amplitude, where
+ * the crests go: the parts are drawn at the full size inside it, as WebKit rasters a layer that
+ * moves at its laid-out size and would blur a scaled one. */
+@utility progress-indicator-turning {
+  @apply absolute inset-0;
+}
+
+/* Each part is a fill clipped to its outline. Forced colors would drop the fills, so there the
+ * active indicator and the stop indicator take the system's text color and the track its
+ * disabled text color. */
+@utility progress-indicator-track {
+  @apply pointer-events-none absolute inset-0 bg-secondary-container;
+  @apply forced-colors:bg-gray-text forced-colors:forced-color-adjust-none;
+}
+
+@utility progress-indicator-active {
+  @apply pointer-events-none absolute inset-0 bg-current;
+  @apply forced-colors:bg-canvas-text forced-colors:forced-color-adjust-none;
+}
+
+@utility progress-indicator-stop {
+  @apply pointer-events-none absolute inset-0 bg-current;
+  @apply forced-colors:bg-canvas-text forced-colors:forced-color-adjust-none;
+}

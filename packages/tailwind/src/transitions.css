@@ -1,0 +1,109 @@
+/* Tailwind spring utilities over the theme-default.css spring tokens: pair
+ * duration-spring-<name> with ease-spring-<name>, e.g. `transition
+ * duration-spring-default-spatial ease-spring-default-spatial`. */
+@theme inline {
+  --ease-spring-fast-spatial: var(--md-sys-motion-spring-fast-spatial-easing);
+  --ease-spring-default-spatial: var(--md-sys-motion-spring-default-spatial-easing);
+  --ease-spring-slow-spatial: var(--md-sys-motion-spring-slow-spatial-easing);
+  --ease-spring-fast-effects: var(--md-sys-motion-spring-fast-effects-easing);
+  --ease-spring-default-effects: var(--md-sys-motion-spring-default-effects-easing);
+  --ease-spring-slow-effects: var(--md-sys-motion-spring-slow-effects-easing);
+
+  --transition-duration-spring-fast-spatial: var(--md-sys-motion-spring-fast-spatial-duration);
+  --transition-duration-spring-default-spatial: var(
+    --md-sys-motion-spring-default-spatial-duration
+  );
+  --transition-duration-spring-slow-spatial: var(--md-sys-motion-spring-slow-spatial-duration);
+  --transition-duration-spring-fast-effects: var(--md-sys-motion-spring-fast-effects-duration);
+  --transition-duration-spring-default-effects: var(
+    --md-sys-motion-spring-default-effects-duration
+  );
+  --transition-duration-spring-slow-effects: var(--md-sys-motion-spring-slow-effects-duration);
+}
+
+/* Transition presets on the spring tokens, one per component surface:
+ * a plain transition-* utility can't mix the spatial and effects springs, so
+ * each property bundle is its own utility. */
+
+@utility transition-shape-color-shadow {
+  transition-property: border-radius, background-color, color, box-shadow;
+  transition-duration:
+    var(--transition-duration-spring-fast-spatial), var(--transition-duration-spring-fast-effects),
+    var(--transition-duration-spring-fast-effects), var(--transition-duration-spring-fast-effects);
+  transition-timing-function:
+    var(--ease-spring-fast-spatial), var(--ease-spring-fast-effects),
+    var(--ease-spring-fast-effects), var(--ease-spring-fast-effects);
+}
+
+@utility transition-shape-color {
+  transition-property: border-radius, background-color, color;
+  transition-duration:
+    var(--transition-duration-spring-fast-spatial), var(--transition-duration-spring-fast-effects),
+    var(--transition-duration-spring-fast-effects);
+  transition-timing-function:
+    var(--ease-spring-fast-spatial), var(--ease-spring-fast-effects),
+    var(--ease-spring-fast-effects);
+}
+
+/* FAB: its corner is fixed per size, so its padding (only the large size's
+ * moves, see fab.tsx) is its spatial dimension; the width follows the label's
+ * slot below. Color and shadow are effects. */
+@utility transition-space-color-shadow {
+  transition-property: padding, background-color, color, box-shadow;
+  transition-duration:
+    var(--transition-duration-spring-fast-spatial), var(--transition-duration-spring-fast-effects),
+    var(--transition-duration-spring-fast-effects), var(--transition-duration-spring-fast-effects);
+  transition-timing-function:
+    var(--ease-spring-fast-spatial), var(--ease-spring-fast-effects),
+    var(--ease-spring-fast-effects), var(--ease-spring-fast-effects);
+}
+
+/* The FAB label's slot (fab.tsx): its measured width, so a changed label resizes it smoothly,
+ * and the end margin that pulls it under the trailing edge, both on the spatial spring;
+ * transition-fade and transition-fade-visibility fade the label on the effects one. */
+@utility transition-reveal {
+  transition-property: width, margin-inline-end;
+  transition-duration:
+    var(--transition-duration-spring-fast-spatial), var(--transition-duration-spring-fast-spatial);
+  transition-timing-function: var(--ease-spring-fast-spatial), var(--ease-spring-fast-spatial);
+}
+
+@utility transition-fade {
+  transition-property: opacity;
+  transition-duration: var(--transition-duration-spring-fast-effects);
+  transition-timing-function: var(--ease-spring-fast-effects);
+}
+
+/* The collapsed FAB's label (fab.tsx): its fade, and its visibility over the same time, linear, so
+ * that it is hidden once it has faded out. */
+@utility transition-fade-visibility {
+  transition-property: opacity, visibility;
+  transition-duration:
+    var(--transition-duration-spring-fast-effects), var(--transition-duration-spring-fast-effects);
+  transition-timing-function: var(--ease-spring-fast-effects), linear;
+}
+
+@utility transition-color-shadow {
+  transition-property: background-color, color, box-shadow;
+  transition-duration:
+    var(--transition-duration-spring-fast-effects), var(--transition-duration-spring-fast-effects),
+    var(--transition-duration-spring-fast-effects);
+  transition-timing-function:
+    var(--ease-spring-fast-effects), var(--ease-spring-fast-effects),
+    var(--ease-spring-fast-effects);
+}
+
+/* A FAB menu item's reveal (fab-menu.tsx `fabMenuItemOverride`): animates the
+ * real width to a pre-measured --fab-menu-item-width, so the spring overshoots
+ * the box itself (clip-path can't) and nothing drifts mid-frame (0fr/1fr did). */
+@utility transition-width-fade-color-shadow {
+  transition-property: width, opacity, background-color, color, box-shadow;
+  transition-duration:
+    var(--transition-duration-spring-fast-spatial), var(--transition-duration-spring-fast-effects),
+    var(--transition-duration-spring-fast-effects), var(--transition-duration-spring-fast-effects),
+    var(--transition-duration-spring-fast-effects);
+  transition-timing-function:
+    var(--ease-spring-fast-spatial), var(--ease-spring-fast-effects),
+    var(--ease-spring-fast-effects), var(--ease-spring-fast-effects),
+    var(--ease-spring-fast-effects);
+}

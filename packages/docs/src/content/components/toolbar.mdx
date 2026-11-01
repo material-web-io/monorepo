@@ -1,0 +1,168 @@
+import api from 'virtual:api/Toolbar'
+import * as basic from '../../examples/toolbar/basic.tsx?example'
+import * as buttonGroup from '../../examples/toolbar/button-group.tsx?example'
+import * as colors from '../../examples/toolbar/colors.tsx?example'
+import * as disabled from '../../examples/toolbar/disabled.tsx?example'
+import * as dockedSpacing from '../../examples/toolbar/docked-spacing.tsx?example'
+import * as emphasis from '../../examples/toolbar/emphasis.tsx?example'
+import * as floating from '../../examples/toolbar/floating.tsx?example'
+import * as noElevation from '../../examples/toolbar/no-elevation.tsx?example'
+import * as overflowMenu from '../../examples/toolbar/overflow-menu.tsx?example'
+import * as vertical from '../../examples/toolbar/vertical.tsx?example'
+import * as withFab from '../../examples/toolbar/with-fab.tsx?example'
+
+Toolbars display frequently used actions relevant to the current page. A toolbar holds controls such as:
+
+- [Icon buttons](/components/icon-button)
+- [Buttons](/components/button)
+- A [button group](/components/button-group)
+- Fields of your own
+
+For the headline and navigation of a page, use an [app bar](/components/app-bar) instead.
+
+```tsx
+import { Icon, IconButton, Toolbar } from '@material-web/react'
+```
+
+## Basic toolbar
+
+Write the actions of a toolbar as its children. Choose its look with `variant` and `color`, and its direction with `orientation`.
+
+<Example {...basic} isFlush />
+
+The toolbar has no interactions of its own. Handle each action on its element, such as in the `onPress` of an `IconButton`. See [Handling presses](/components/button#handling-presses).
+
+The `Toolbar` comes in two variants. Set `variant` to `docked` (the default) for a toolbar across the bottom of the window, or to `floating` for a pill over the content.
+
+### Docked toolbar
+
+A docked toolbar is best for global actions that remain the same across multiple pages. It is 64dp tall and as wide as its container.
+
+It is not positioned for you. Place it at the bottom of the window yourself: as the last row of a column, as in the first example, or with `className="fixed inset-x-0 bottom-0 z-navigation"`. Do not use a docked toolbar with another element at the bottom of the window, such as a [navigation bar](/components/navigation-bar).
+
+A docked toolbar spaces its elements evenly, with the first and the last 16dp from its ends.
+
+- **Other spacing:** To space the elements another way, such as in a wider window, set `className`. For example, `justify-center gap-x-space-400` centers them 32dp apart.
+- **Flex row:** Set `className="flex"` to lay them out as a flex row instead, where each element is as wide as its content. Use it for a `Divider` between groups, or for an element that grows.
+
+<Example {...dockedSpacing} isFlush />
+
+### Floating toolbar
+
+A floating toolbar is best for contextual actions relevant to the body content or the specific page. It is only as big as its elements.
+
+It is not positioned for you either. Float it yourself, such as with `className="fixed bottom-space-200 left-1/2 -translate-x-1/2 z-fab"`, and keep it 16dp or more from the window's edge, or 24dp for a vertical one. See [Stacking order](/theme/layout#stacking-order).
+
+<Example {...floating} isFlush />
+
+## Elements
+
+A toolbar shows its children in the order written. They can be [icon buttons](/components/icon-button), `Button`s, fields of your own, or a [button group](/components/button-group). Each element takes at least 48dp of the row, and a wider one takes its own width.
+
+<Example {...buttonGroup} />
+
+> **Note:** Avoid square icon buttons in a floating toolbar. Their shape conflicts with the fully rounded shape of its container.
+
+## Disabled
+
+Set `isDisabled` on an element of the toolbar to disable it. The arrow keys skip a disabled element.
+
+<Example {...disabled} />
+
+## Color
+
+Set `color` to choose between two color schemes:
+
+- `standard` (the default) is a low-emphasis scheme, which keeps the attention on the body content.
+- `vibrant` is a high-emphasis scheme that draws attention to the controls, and shows the toolbar in the primary container color. It can also indicate a temporary change in the page, such as entering edit mode.
+
+<Example {...colors} />
+
+The toolbar colors every toggle in it, whatever the toggle's own `variant`: an `IconButton` or a `Button` with `isSelectable`, and the buttons of a `ButtonGroup`. A toggle is flat until it is selected. A selected toggle is shown in a container and keeps its round shape.
+
+## Emphasis
+
+A button that is not a toggle keeps the colors of its own `variant`. To emphasize an action, use a `filled` `IconButton` or a `text` `Button`.
+
+<Example {...emphasis} />
+
+## Elevation
+
+A floating toolbar has a shadow. Set `className="shadow-none"` to remove it, such as over content that is visually distinct.
+
+<Example {...noElevation} />
+
+## Orientation
+
+Set `orientation="vertical"` on a floating toolbar to make it a column, 64dp wide. The up and down arrow keys then move between its elements.
+
+<Example {...vertical} />
+
+- **Width:** To keep a vertical toolbar compact, do not use wide icon buttons in it.
+- **Window size:** A vertical toolbar is not recommended for a compact window.
+
+## Toolbar with FAB
+
+To present one high-priority action alongside the actions of a floating toolbar, put a [`Fab`](/components/fab) beside the toolbar, not in it, 8dp away (`gap-space-100`). Choose the FAB's `color`, such as `secondary-container` or `tertiary-container`.
+
+<Example {...withFab} />
+
+## Toolbar with menu
+
+Elements that do not fit are not moved into an overflow menu. If more actions are needed, add the [menu](/components/menu) yourself: wrap the last `IconButton` and a `MenuPopover` in a `MenuTrigger`.
+
+<Example {...overflowMenu} />
+
+## Customization
+
+Pass classes in `className` to restyle one toolbar. A class of yours replaces the toolbar's own class for the same property. See [Styling](/get-started/styling) for the classes and the theme.
+
+- **Functions:** The `className`, `style` and `children` of a toolbar can be functions of its `orientation`. See [Children as a function](/get-started/composition#children-as-a-function).
+- **Every toolbar:** To restyle all the toolbars at once, change the [theme](/get-started/styling#theme).
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/toolbars/accessibility#2a8a51ec-8795-46ed-8dd9-87083af17059) what people should be able to do with assistive technology:
+
+- Navigate and activate any actions in the toolbar
+- Select a destination from a menu
+- Activate a back button
+- Maintain access to toolbar controls when the content is scrolled or collapsed
+
+### Interaction and style
+
+- **States:** The toolbar has no states of its own, as Material [notes](https://m3.material.io/components/toolbars/accessibility#b03ebe57-4cae-4b0e-9ea0-93be3a0fbe46): each element shows its own state layer, ripple and [focus ring](/theme/accessibility#focus-ring). An arrow key that moves the focus shows the ring on the element it reaches.
+- **Touch target:** Each element is centered in a cell at least 48dp wide and tall, so that the 48dp [touch targets](/theme/accessibility#touch-targets) of its elements do not overlap.
+- **Color contrast:** In both `color` schemes, the elements keep 3:1 contrast with what they are on and their labels 4.5:1, a selected toggle on its container included, in the light and dark schemes at every contrast level.
+- **Forced colors:** In [forced colors](/theme/accessibility#forced-colors), a floating toolbar keeps an edge, and a selected toggle in it is filled with the system's highlight color.
+- **Right to left:** The elements are laid out from the right in a right-to-left direction.
+
+### Focus
+
+- Tab moves the focus into the toolbar once: to its first element, as Material [advises](https://m3.material.io/components/toolbars/accessibility#7d1f56cb-c43c-4d1f-9bfe-696bc77321ac), or to the element focused last. The next Tab leaves the toolbar, and Shift+Tab comes back to the element it left.
+- The focus moves through the elements in the order written, which is the order shown.
+
+### Keyboard navigation
+
+| Keys                | Actions                                                              |
+| ------------------- | -------------------------------------------------------------------- |
+| Tab                 | Move the focus into the toolbar, or out of it                        |
+| Left or Right arrow | Move the focus to the previous or next element                       |
+| Up or Down arrow    | Move the focus to the previous or next element of a vertical toolbar |
+| Space or Enter      | Activate the focused element                                         |
+
+- The arrow keys move between its elements, a text field included. They skip a disabled element, and stop at the first and the last. In a vertical toolbar, the left and right arrow keys do not move the focus.
+- The left and right arrow keys are reversed in a right-to-left locale, which is set with an `I18nProvider`, not with `dir`.
+- The same keys move through the buttons of a `ButtonGroup` in the toolbar, on to the elements after it and back.
+
+### Labeling elements
+
+- The toolbar has the toolbar role, as Material [advises](https://m3.material.io/components/toolbars/accessibility#3b6eda3b-99a9-463d-96af-0919193b1c19) on the web, and reports its orientation with `aria-orientation`. Name the toolbar with `aria-label` or `aria-labelledby`.
+- Label each element as its own component asks, as Material also advises. An `IconButton` needs an `aria-label`: see [Icon button](/components/icon-button#labeling-elements).
+- A `ButtonGroup` in the toolbar is a group, or a radio group with single selection. Name it with an `aria-label`.
+
+## Props
+
+<PropsTable {...api} />

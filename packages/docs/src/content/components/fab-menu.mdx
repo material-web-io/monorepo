@@ -1,0 +1,226 @@
+import fabMenuApi from 'virtual:api/FabMenu'
+import fabMenuButtonApi from 'virtual:api/FabMenuButton'
+import fabMenuItemApi from 'virtual:api/FabMenuItem'
+import fabMenuPopoverApi from 'virtual:api/FabMenuPopover'
+import * as actions from '../../examples/fab-menu/actions.tsx?example'
+import * as basic from '../../examples/fab-menu/basic.tsx?example'
+import * as colors from '../../examples/fab-menu/colors.tsx?example'
+import * as controlled from '../../examples/fab-menu/controlled.tsx?example'
+import * as disabled from '../../examples/fab-menu/disabled.tsx?example'
+import * as loading from '../../examples/fab-menu/loading.tsx?example'
+import * as sizes from '../../examples/fab-menu/sizes.tsx?example'
+import * as withoutIcons from '../../examples/fab-menu/without-icons.tsx?example'
+
+A FAB menu opens from a [FAB](/components/fab) to show multiple related actions. It can hold two to six items, closely related under a single action, like Share.
+
+For a single action, use a [FAB](/components/fab) alone. For a menu opened from another button, use a [menu](/components/menu).
+
+A FAB menu is written as a [menu](/components/menu), with these parts in a `MenuTrigger`:
+
+| Part             | In               | Use                                                                                                                   |
+| ---------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `FabMenuButton`  | `MenuTrigger`    | The FAB, first in the trigger. Write its icon as its children. While the menu is open, it shows a close icon instead. |
+| `FabMenuPopover` | `MenuTrigger`    | Holds the menu, after the `FabMenuButton`                                                                             |
+| `FabMenu`        | `FabMenuPopover` | The list of items                                                                                                     |
+| `FabMenuItem`    | `FabMenu`        | One item of the list                                                                                                  |
+
+```tsx
+import { FabMenu, FabMenuButton, FabMenuItem, FabMenuPopover, Icon } from '@material-web/react'
+import { MenuTrigger } from 'react-aria-components'
+```
+
+## Basic FAB menu
+
+Put a `FabMenuButton` first in a `MenuTrigger`, and a `FabMenuPopover` after it. In the popover, write a `FabMenu` with a `FabMenuItem` for each action.
+
+<Example {...basic} isFlush />
+
+Press the FAB to open the menu. Press the close button, Escape or anywhere outside the menu to close it.
+
+## Items
+
+Write an item's icon and then its label as its children. An item looks like a tonal medium [button](/components/button).
+
+Typing finds an item by its `textValue`. An item whose children are a plain string uses that string. Any other item, such as one with an icon, requires a `textValue`.
+
+Only the label is required on an item. The icons make each item easy to identify and tell the items apart, so remove them only if necessary.
+
+<Example {...withoutIcons} isFlush />
+
+## Handling actions
+
+Give each item an `id`. The `onAction` of the `FabMenu` is called with the `id` of the item that is chosen, and the item's own `onAction` is called too. Choosing an item closes the menu. Give an item an `href` to make it a link.
+
+<Example {...actions} isFlush />
+
+## Opening and closing
+
+A FAB menu opens and closes as a [menu](/components/menu) does. To control it, set `isOpen` and `onOpenChange` on the `MenuTrigger`.
+
+<Example {...controlled} isFlush />
+
+While the menu is open, the rest of the page is inert and hidden from assistive technology.
+
+Tab keeps the focus in the menu. Escape, choosing an item or a press outside the menu closes it, and the focus returns to the FAB.
+
+## Loading
+
+Set `isPending` on the `FabMenuButton` while an action from the menu is in progress, as on a [FAB](/components/fab#loading). A pending FAB shows a [loading indicator](/components/loading-indicator) in place of its icon, sized to the FAB. It keeps its size and colors, so the layout around it does not shift.
+
+<Example {...loading} isFlush />
+
+- **Presses:** A pending FAB ignores presses and shows no hover, so it does not open the menu.
+- **Focus:** It keeps the focus, so a keyboard user who chose an item stays on the FAB while the action runs.
+- **Children:** Its icon is hidden while it is pending. See [Pending content](#pending-content).
+
+## Disabled
+
+Set `isDisabled` on the `FabMenuButton` to disable the whole menu: the FAB cannot open it. Set `isDisabled` on a `FabMenuItem` to disable that item: the keyboard skips it, and it cannot be pressed.
+
+<Example {...disabled} isFlush />
+
+## Color
+
+Set `color` to `primary` (the default), `secondary` or `tertiary`. Set it on the `FabMenuButton` and on the `FabMenu`, which colors its items, and give both the same value. Use `primary` with the primary or primary container [FAB](/components/fab#color) color styles, `secondary` with the secondary ones and `tertiary` with the tertiary ones.
+
+<Example {...colors} isFlush />
+
+## Sizes
+
+Set `size` on the `FabMenuButton` to `baseline` (the default), `medium` or `large`, the [sizes](/components/fab#sizes) of a `Fab`. It sets the size of the FAB only: the close button and the items are the same size for all three.
+
+<Example {...sizes} isFlush />
+
+## Placement
+
+The `FabMenuButton` does not position itself. Place it with its `className`, such as `fixed right-space-200 bottom-space-200 z-fab` for the corner of the window. The examples on this page put it at the end of a box instead.
+
+```tsx
+<MenuTrigger>
+  <FabMenuButton
+    aria-label="Create"
+    color="tertiary"
+    className="fixed right-space-200 bottom-space-200 z-fab"
+  >
+    <Icon name="add" />
+  </FabMenuButton>
+  <FabMenuPopover>
+    <FabMenu color="tertiary">
+      <FabMenuItem id="email" textValue="Email" onAction={compose}>
+        <Icon name="mail" />
+        Email
+      </FabMenuItem>
+      <FabMenuItem id="message" textValue="Message" href="/chats/new">
+        <Icon name="chat" />
+        Message
+      </FabMenuItem>
+    </FabMenu>
+  </FabMenuPopover>
+</MenuTrigger>
+```
+
+The `FabMenuPopover` opens above the end of the FAB. Set its `placement` to change that: it is `top end` by default. It does not flip below the FAB.
+
+> **Note:** The FAB must stay above the items. Place the `FabMenuButton` where none of its ancestors creates a stacking context, such as `fixed` at the corner of the window.
+
+## Size and scrolling
+
+The menu is as tall as the room above the FAB allows, up to the top edge of the window. When the items do not fit, the list scrolls behind the close button, which stays in view.
+
+The list opens scrolled to the item nearest the FAB, unless the keyboard opened it with the first item focused.
+
+## Customization
+
+Pass classes in the `className` of a part to restyle it. A class of yours replaces the part's own class for the same property. See [Styling](/get-started/styling) for the classes, the states and the theme.
+
+- **Transitions:** To style the `FabMenuPopover` while it opens or closes, use the `entering:` and `exiting:` variants, or its `data-entering` and `data-exiting` attributes in your own CSS.
+- **Every FAB menu:** To restyle all the FAB menus at once, change the [theme](/get-started/styling#theme).
+
+### Children as a function
+
+Pass a function as the children of a part to render them from its state:
+
+- `FabMenuButton`: `isHovered`, `isPressed`, `isFocused`, `isFocusVisible`, `isDisabled` and `isPending`. `isPressed` is also `true` while the menu is open. Its `className` and `style` can be functions of the same state.
+- `FabMenuPopover`: `isEntering`, `isExiting`, `placement` and `trigger`.
+- `FabMenuItem`: `isHovered`, `isPressed`, `isFocused`, `isFocusVisible`, `isSelected`, `isDisabled`, `hasSubmenu` and `isOpen`. On an item, `isFocused` is focus from the keyboard or the pointer, and `isFocusVisible` is keyboard focus only.
+- `FabMenu`: with `items`, pass a function that renders each item.
+
+The states' types are exported as `FabMenuButtonRenderProps` and `FabMenuItemRenderProps`. See [Children as a function](/get-started/composition#children-as-a-function).
+
+## Limitations
+
+### Presses on the FAB
+
+The `onPress` of the `FabMenuButton` is not called for every press. A mouse or the keyboard opens the menu without calling it, and a press on the close button closes the menu without calling it. To run code when the menu opens or closes, use `onOpenChange` on the `MenuTrigger`.
+
+### Pending content
+
+A pending FAB shows only its loading indicator. Children written for the pending state, such as a different icon, are hidden too. For a button that shows other content while pending, build a [complex button](/components/button#complex-button).
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/fab-menu/accessibility#c129cd10-faac-4727-a2c0-eddeb0507f62) what people should be able to do with assistive technology:
+
+- Navigate and interact with the FAB menu
+- Ensure focus is correct when navigating through the menu
+
+### Interaction and style
+
+- **States:** The FAB and the items show a state layer on hover and a ripple on a press. Keyboard focus shows a [focus ring](/theme/accessibility#focus-ring) on the FAB, and then on the item it moves to, never on the menu itself. An item that the pointer hovers takes the focus, without the ring.
+- **Touch target:** The FAB and the close button are 56dp or larger, and every item is 56dp tall, above the 48dp minimum of a [touch target](/theme/accessibility#touch-targets).
+- **Color contrast:** In every `color` set, the FAB's icon keeps 3:1 contrast or more with its container, and an item's label 4.5:1 or more, in the light and dark schemes at every contrast level.
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), the FAB turns into the close button, and the items open and close, without animating.
+- **Forced colors:** In [forced colors](/theme/accessibility#forced-colors), the FAB and every item keep an edge.
+- **Scrolling:** When the items do not fit in the room above the FAB, the list scrolls behind the close button, which stays in view over the items, as Material [advises](https://m3.material.io/components/fab-menu/accessibility#d5545330-e571-48e4-b773-0ff4c8bdeb90). See [Size and scrolling](#size-and-scrolling).
+
+### Focus
+
+- Opened with the keyboard, the menu moves the focus to its first item, or to its last with Up arrow. Opened with a pointer, it moves the focus to the menu itself, and Down arrow or Up arrow then moves it to the first or the last item.
+- While the menu is open, the FAB, now the close button, is inert with the rest of the page, so the focus stays in the menu.
+- Escape, choosing an item or a press outside the menu closes it, and the focus returns to the FAB.
+- A pending FAB keeps the focus, so a keyboard user who chose an item stays on the FAB while the action runs.
+
+### Keyboard navigation
+
+| Keys           | Actions                                                                          |
+| -------------- | -------------------------------------------------------------------------------- |
+| Tab            | Move the focus to the FAB                                                        |
+| Space or Enter | Open the menu with the first item focused, or select the focused item            |
+| Down arrow     | Open the menu with the first item focused, or move the focus to the next item    |
+| Up arrow       | Open the menu with the last item focused, or move the focus to the previous item |
+| Home           | Move the focus to the first item                                                 |
+| End            | Move the focus to the last item                                                  |
+| Letter keys    | Move the focus to the next item that starts with the typed letters               |
+| Escape         | Close the menu and return the focus to the FAB                                   |
+
+- The arrow keys go round from the last item to the first, and back.
+- Tab does not leave the menu. Leave it by selecting an item, with Escape, or with a press outside it.
+
+### Labeling elements
+
+- The FAB has no visible text, so an `aria-label` or an `aria-labelledby` is required on the `FabMenuButton`. Describe the menu that the FAB opens, such as Create, as Material [advises](https://m3.material.io/components/fab-menu/accessibility#689a82eb-dc96-4ed3-ba6f-183e72767594).
+- The FAB reports whether the menu is open with `aria-expanded`, and that it opens one with `aria-haspopup`. The list has the `menu` role and is named by the FAB, and each item has the `menuitem` role.
+- An item is named by its label, and its icon is hidden from assistive technology. Typing finds an item by its `textValue`, which an item with an icon requires. See [Items](#items).
+- While the menu is open, the rest of the page, the FAB with it, is hidden from assistive technology.
+- A pending FAB reports that it is unavailable with `aria-disabled`. Its loading indicator is hidden from assistive technology, so its `aria-label` still names it.
+- When a focused FAB becomes pending, or stops being pending, screen readers announce it.
+
+## Props
+
+### FabMenuButton
+
+<PropsTable {...fabMenuButtonApi} />
+
+### FabMenuPopover
+
+<PropsTable {...fabMenuPopoverApi} />
+
+### FabMenu
+
+<PropsTable {...fabMenuApi} />
+
+### FabMenuItem
+
+<PropsTable {...fabMenuItemApi} />

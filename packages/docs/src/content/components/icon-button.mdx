@@ -1,0 +1,248 @@
+import api from 'virtual:api/IconButton'
+import * as basic from '../../examples/icon-button/basic.tsx?example'
+import * as colors from '../../examples/icon-button/colors.tsx?example'
+import * as density from '../../examples/icon-button/density.tsx?example'
+import * as filled from '../../examples/icon-button/filled.tsx?example'
+import * as functionChildren from '../../examples/icon-button/function-children.tsx?example'
+import * as link from '../../examples/icon-button/link.tsx?example'
+import * as loading from '../../examples/icon-button/loading.tsx?example'
+import * as menu from '../../examples/icon-button/menu.tsx?example'
+import * as outlined from '../../examples/icon-button/outlined.tsx?example'
+import * as shapes from '../../examples/icon-button/shapes.tsx?example'
+import * as sizes from '../../examples/icon-button/sizes.tsx?example'
+import * as standard from '../../examples/icon-button/standard.tsx?example'
+import * as svgIcon from '../../examples/icon-button/svg-icon.tsx?example'
+import * as toggle from '../../examples/icon-button/toggle.tsx?example'
+import * as toggleLoading from '../../examples/icon-button/toggle-loading.tsx?example'
+import * as tonal from '../../examples/icon-button/tonal.tsx?example'
+import * as variants from '../../examples/icon-button/variants.tsx?example'
+import * as widths from '../../examples/icon-button/widths.tsx?example'
+
+An icon button is a button with an icon and no label. Icon buttons are typically placed in places like:
+
+- [App bars](/components/app-bar)
+- [Toolbars](/components/toolbar)
+- [Search bars](/components/search)
+- [Input chips](/components/chip), as the remove button
+
+For an action that needs a visible label, use a [button](/components/button) instead.
+
+```tsx
+import { Icon, IconButton } from '@material-web/react'
+```
+
+## Basic icon button
+
+Write the icon as the button's child. An icon button has no visible text, so an `aria-label` or an `aria-labelledby` is required.
+
+<Example {...basic} />
+
+The `IconButton` comes in four variants. Set `variant` to `filled`, `tonal`, `outlined` or `standard` (the default), from the most emphasis to the least.
+
+<Example {...variants} />
+
+Each variant is shown below enabled, disabled with `isDisabled`, and as a [link](#links) with `elementType="a"`. A disabled button cannot be pressed or focused.
+
+### Filled icon button
+
+A filled icon button is for visual impact and key actions that require high emphasis. Use it sparingly.
+
+<Example {...filled} />
+
+### Tonal icon button
+
+A tonal icon button is a middle ground between filled and outlined, useful for a secondary action paired with a high emphasis one.
+
+<Example {...tonal} />
+
+### Outlined icon button
+
+An outlined icon button is for medium emphasis, when the button is not the main focus of the interaction.
+
+<Example {...outlined} />
+
+### Standard icon button
+
+A standard icon button is for low emphasis, or for buttons placed on a colorful surface. It has no container.
+
+<Example {...standard} />
+
+## Icons
+
+Any icon works as the button's child: [`Icon`](/components/icon), an icon from an SVG library, or your own component. Give an icon that is not an `Icon` the size listed under [Sizes](#sizes), as `size-6` and `size-8` do in this example. See [Composition](/get-started/composition#icons).
+
+<Example {...svgIcon} />
+
+## Handling presses
+
+Handle a press with `onPress`, in place of `onClick`. An icon button takes the same press events as a `Button`. See [Handling presses](/components/button#handling-presses).
+
+## Toggle button
+
+A toggle icon button lets a single choice be selected or deselected, such as adding or removing something from favorites. Set `isSelectable` to make one. Control its selection with `isSelected` and `onChange`, or set its initial state with `defaultSelected`.
+
+A selected button changes its colors and swaps its shape: a round button becomes square, and a square one round. Every variant can be a toggle. A selected `standard` button changes only its icon color.
+
+The button does not change its icon when it is selected. Show a filled icon for the selected state yourself, from the state you hold or from the `isSelected` passed to a function as children. If the icon has no filled version, use a semibold weight instead.
+
+<Example {...toggle} />
+
+- Without `isSelectable`, `isSelected`, `defaultSelected` and `onChange` are type errors.
+- A disabled toggle keeps the shape of its selection, as the last button of the example does.
+- To let people choose among several toggle buttons, put them in a [button group](/components/button-group).
+
+## Loading
+
+Set `isPending` while the button's action is in progress, as on a [button](/components/button#loading). A pending icon button shows a [loading indicator](/components/loading-indicator) in place of its icon, sized to the button. It keeps its size and colors, so the layout around it does not shift.
+
+<Example {...loading} />
+
+- **Presses:** A pending icon button ignores presses and shows no hover. As a submit button, it does not submit its form, and as a [link](#links), it does not navigate.
+- **Focus:** It keeps the focus, so a keyboard user stays on it while the action runs.
+- **Children:** Its children are hidden while it is pending. See [Pending content](#pending-content).
+
+A [toggle button](#toggle-button) can be pending too. It keeps its selection, and the colors and shape that show it, and pressing it does not toggle it. Here, a press makes the button pending while the change is saved, and the button shows its new state once it is.
+
+<Example {...toggleLoading} />
+
+## Color
+
+A variant sets the button's colors. To use other [color roles](/theme/color#color-roles), pass their classes in `className`: a container color, and the on-color of that container for the icon. A `standard` button has no container, so it takes the icon color alone. The hover, focus and press states follow the icon color.
+
+<Example {...colors} />
+
+## Sizes
+
+For larger or smaller icon buttons, set `size` to `xs`, `s` (the default), `m`, `l` or `xl`. An `Icon` child is sized to match.
+
+| Size | Height | Icon |
+| ---- | ------ | ---- |
+| `xs` | 32dp   | 20dp |
+| `s`  | 40dp   | 24dp |
+| `m`  | 56dp   | 24dp |
+| `l`  | 96dp   | 32dp |
+| `xl` | 136dp  | 40dp |
+
+<Example {...sizes} />
+
+## Shapes
+
+Set `shape` to `round` (the default) or `square`. With `hasShapeMorph`, the corners tighten while the button is pressed. Press and hold the last two buttons to see it.
+
+<Example {...shapes} />
+
+## Widths
+
+Set `width` to `narrow`, `default` or `wide`. It changes only how wide the button is: `size` sets the height, and the `default` width makes a square.
+
+| Size | Narrow | Default | Wide  |
+| ---- | ------ | ------- | ----- |
+| `xs` | 28dp   | 32dp    | 40dp  |
+| `s`  | 32dp   | 40dp    | 52dp  |
+| `m`  | 48dp   | 56dp    | 72dp  |
+| `l`  | 64dp   | 96dp    | 128dp |
+| `xl` | 104dp  | 136dp   | 184dp |
+
+<Example {...widths} />
+
+## Rendering non-native buttons
+
+Set `elementType` to render the icon button as an element other than a `<button>`. The element gets the `button` role and a tab stop, as on a [button](/components/button#rendering-non-native-buttons).
+
+### Links
+
+Set `elementType="a"` to render the button as a link, with `href`, `target` and `rel`. The browser follows it as a native link, without a client-side router. To follow it through a router, see [Third-party routing library](/components/button#third-party-routing-library).
+
+<Example {...link} />
+
+## Triggers and slots
+
+An icon button can be the button of a trigger. In a `MenuTrigger`, put it first, before the [menu](/components/menu)'s `MenuPopover`.
+
+<Example {...menu} />
+
+- **Tooltips:** In a `TooltipTrigger`, put the icon button first, before the [tooltip](/components/tooltip).
+- **Files:** To choose files with an icon button, wrap it in React Aria's [`FileTrigger`](https://react-aria.adobe.com/FileTrigger). See [File upload](/components/button#file-upload).
+- **Slots:** Set `slot` to place an icon button in a slot of another component. The remove button of an input [chip](/components/chip) is an `IconButton` with `slot="remove"`.
+
+See [Triggers](/get-started/composition#triggers) for the other triggers.
+
+## Customization
+
+Pass classes in `className` to restyle one icon button. A class of yours replaces the button's own class for the same property. See [Styling](/get-started/styling) for the classes, the states and the theme.
+
+- **States:** Style a state with its variant, such as `hover:`, `pressed:` or `selected:`. In your own CSS, select the same states by their data attributes: `data-hovered`, `data-pressed`, `data-focused`, `data-focus-visible` and `data-disabled`, and `data-selected` on a toggle. See [States](/get-started/styling#states).
+- **Every icon button:** To restyle all the icon buttons at once, change the [theme](/get-started/styling#theme).
+
+### Density
+
+Add one of the theme's [density](/theme/spacing#density) classes, `density-1`, `density-2` or `density-3`, to the button or to an element around it. Each step makes the button 4dp shorter. Its width does not change.
+
+<Example {...density} />
+
+### Children as a function
+
+Pass a function as children to render the icon from the button's state: `isHovered`, `isPressed`, `isFocused`, `isFocusVisible`, `isDisabled` and `isPending`. A toggle also has `isSelected`. `isFocused` is any focus, and `isFocusVisible` is keyboard focus only.
+
+<Example {...functionChildren} />
+
+`className` and `style` can be functions of the same state. See [Children as a function](/get-started/composition#children-as-a-function).
+
+## Limitations
+
+### Link role
+
+An icon button rendered as an `<a>` keeps the `button` role, so assistive technology announces it as a button and not as a link. A disabled one has no `href`.
+
+### Disabled buttons
+
+A disabled icon button cannot be focused and reports no hover, so it shows no [tooltip](/components/tooltip#opening-and-closing).
+
+### Pending content
+
+A pending icon button shows only its loading indicator. Children written for the pending state, such as a different icon, are hidden too. For a button that shows other content while pending, build a [complex button](/components/button#complex-button).
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/icon-buttons/accessibility#d96aea1d-70f6-4f66-8d59-c002a782c57d) what people should be able to do with assistive technology:
+
+- Understand meaning of the icon
+- Navigate to and activate an icon button
+- When applicable, a tooltip should be available to help describe the icon button's purpose
+
+### Interaction and style
+
+- **States:** Hovering shows a state layer, and a press shows a ripple. Keyboard focus shows a [focus ring](/theme/accessibility#focus-ring), and a press with a mouse or touch does not.
+- **Touch target:** Every size and width has a [touch target](/theme/accessibility#touch-targets) of at least 48dp, an extra small or narrow button included, at every density.
+- **Color contrast:** The icon [needs](https://m3.material.io/components/icon-buttons/accessibility#20d164cd-c111-470f-824f-3be6ba242625) 3:1 contrast with its container, or with the background for a `standard` button. Every variant has it in its default colors, selected or not, in the light and dark schemes at every contrast level. Keep that contrast when you change its [colors](#color).
+- **Density:** Material [advises](https://m3.material.io/components/icon-buttons/accessibility#3b452053-f73a-4f4b-bc69-42ac53b99363) against applying density to icon buttons by default. Add a [density](#density) class where people have chosen a denser layout, such as with a setting.
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), the changes of shape and color are instant.
+- **Forced colors:** In [forced colors](/theme/accessibility#forced-colors), every variant but `standard` keeps an edge, and a selected toggle button is filled with the system's highlight color.
+- **Tooltip:** On the web, Material [advises](https://m3.material.io/components/icon-buttons/accessibility#cab255ae-30d8-41fd-aa6f-e45048f1a5d7) a tooltip that shows the button's label on hover. Put the icon button first in a `TooltipTrigger`, and write the text of its `aria-label` in the [tooltip](/components/tooltip).
+
+### Focus
+
+- A disabled icon button cannot be focused.
+- A pending button keeps the focus, so a keyboard user stays on it while the action runs.
+
+### Keyboard navigation
+
+| Keys           | Actions                                                              |
+| -------------- | -------------------------------------------------------------------- |
+| Tab            | Move the focus to an icon button                                     |
+| Space or Enter | Press the focused icon button, or select or deselect a toggle button |
+
+### Labeling elements
+
+- An icon button has no visible text, so an `aria-label` or an `aria-labelledby` is required. Set an `aria-label` that describes the action the button performs, such as Add to favorites, Bookmark or Send message, as Material [advises](https://m3.material.io/components/icon-buttons/accessibility#a5b945ae-d453-424b-ae70-e008a5ebfdd1).
+- An `Icon` child is hidden from assistive technology, so the label alone names the button.
+- A tooltip describes the button and does not name it, so an icon button with a tooltip still needs its `aria-label`. See [Labels and descriptions](/components/tooltip#labels-and-descriptions).
+- A toggle button reports whether it is selected with `aria-pressed`. Keep its label the same in both states.
+- A pending button reports that it is unavailable with `aria-disabled`. Its loading indicator is hidden from assistive technology, so the `aria-label` still names the button.
+- When a focused button becomes pending, or stops being pending, screen readers announce it.
+
+## Props
+
+<PropsTable {...api} />

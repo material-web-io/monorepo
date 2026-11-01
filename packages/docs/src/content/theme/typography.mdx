@@ -1,0 +1,225 @@
+import * as emphasized from '../../examples/theme/type-emphasized.tsx?example'
+import * as scale from '../../examples/theme/type-scale.tsx?example'
+
+Set a Material 3 [type style](https://m3.material.io/styles/typography/overview) with one class, such as `text-headline-sm` or `text-body-lg`. The class sets the font size, the line height, the tracking and the weight together. The typefaces, Roboto by default, and the font weights have classes of their own.
+
+## Type scale
+
+The theme's type follows Material's [type scale](https://m3.material.io/styles/typography/type-scale-tokens): fifteen baseline styles, five roles in three sizes each, and an [emphasized style](/theme/typography#emphasized-styles) for each of them. A style's class is `text-<role>-<size>`, with `lg`, `md` or `sm` for the size.
+
+<Example {...scale} showCode={false} hasThemeTracking />
+
+A type style is one of Tailwind's [font size utilities](https://tailwindcss.com/docs/font-size), and is used like any other:
+
+- **Color:** A style sets no color. Add a [color role](/theme/color#color-roles) next to it, as in `text-title-md text-on-surface`. Material's [default color for text](https://m3.material.io/styles/typography/applying-type#61727d32-f46f-4b0f-b5b1-5e58396f6f57) is `on-surface`, with `on-surface-variant` for less emphasis.
+- **Window size:** Add a [breakpoint variant](/theme/layout#breakpoints) for another style in a larger window, as in `text-headline-lg expanded-screen:text-display-sm`.
+- **Single properties:** To change the weight, the line height or the tracking of a style on one element, add that property's own class, in any order: a [font weight](/theme/typography#font-weights), or one of Tailwind's [`leading-*`](https://tailwindcss.com/docs/line-height) and [`tracking-*`](https://tailwindcss.com/docs/letter-spacing) classes. Use the class in place of a [line height modifier](https://tailwindcss.com/docs/font-size#setting-the-line-height), such as `text-body-lg/7`, which sets the size and the line height alone.
+- **Your own CSS:** Apply a style with Tailwind's [`@apply`](https://tailwindcss.com/docs/functions-and-directives#apply-directive), as in `@apply text-title-md`.
+- **Merged classes:** [tailwind-merge](https://github.com/dcastil/tailwind-merge) reads a type style as a text color, and keeps only the last of the two. To merge them, use the [`tv` or the `twMerge`](/get-started/styling#custom-components) that `@material-web/react` exports, which keep both.
+
+### Type roles
+
+A role is named after its use. Each has a large, a medium and a small size.
+
+| Role       | Use                                                                               |
+| ---------- | --------------------------------------------------------------------------------- |
+| `display`  | The largest text on the screen, reserved for short, important text or numerals    |
+| `headline` | Short, high-emphasis text on smaller screens                                      |
+| `title`    | Medium-emphasis text that remains relatively short                                |
+| `body`     | Longer passages of text                                                           |
+| `label`    | Text inside components, and very small text in the content body, such as captions |
+
+### Type styles
+
+| Class              | Size | Line height | Tracking | Weight  |
+| ------------------ | ---- | ----------- | -------- | ------- |
+| `text-display-lg`  | 57px | 64px        | -0.25px  | regular |
+| `text-display-md`  | 45px | 52px        | 0        | regular |
+| `text-display-sm`  | 36px | 44px        | 0        | regular |
+| `text-headline-lg` | 32px | 40px        | 0        | regular |
+| `text-headline-md` | 28px | 36px        | 0        | regular |
+| `text-headline-sm` | 24px | 32px        | 0        | regular |
+| `text-title-lg`    | 22px | 28px        | 0        | regular |
+| `text-title-md`    | 16px | 24px        | 0.15px   | medium  |
+| `text-title-sm`    | 14px | 20px        | 0.1px    | medium  |
+| `text-body-lg`     | 16px | 24px        | 0.5px    | regular |
+| `text-body-md`     | 14px | 20px        | 0.25px   | regular |
+| `text-body-sm`     | 12px | 16px        | 0.4px    | regular |
+| `text-label-lg`    | 14px | 20px        | 0.1px    | medium  |
+| `text-label-md`    | 12px | 16px        | 0.5px    | medium  |
+| `text-label-sm`    | 11px | 16px        | 0.5px    | medium  |
+
+The sizes and the line heights are in `rem`, so they follow the reader's font size. The pixel values in the table are those at the browser's default of 16px.
+
+To change a style's values, see [Custom type styles](/theme/typography#custom-type-styles).
+
+## Emphasized styles
+
+Every style has an emphasized one, with the same size, line height and tracking in a heavier weight. Add `-emphasized` to the style's class, as in `text-title-md-emphasized`.
+
+<Example {...emphasized} hasThemeTracking />
+
+| Styles                                      | Weight  | Emphasized weight |
+| ------------------------------------------- | ------- | ----------------- |
+| Display, headline, body and `text-title-lg` | regular | medium            |
+| Label, `text-title-md` and `text-title-sm`  | medium  | bold              |
+
+Use the emphasized styles together with the baseline ones, for the text that should stand out. Material [recommends](https://m3.material.io/styles/typography/type-scale-tokens) them for selection, actions and headlines.
+
+## Typefaces
+
+A type style sets no typeface. Use `font-brand` or `font-plain`, the theme's two [font families](https://tailwindcss.com/docs/font-family), both Roboto by default.
+
+| Class and token                             | Use                                                                   |
+| ------------------------------------------- | --------------------------------------------------------------------- |
+| `font-brand`<br />`--md-ref-typeface-brand` | Larger type styles, like headline and display, to focus on expression |
+| `font-plain`<br />`--md-ref-typeface-plain` | Smaller type styles, like body and label, to focus on readability     |
+
+The theme does not set the page's typeface. Add the plain typeface and a body style to the `body`, next to the page's [color roles](/theme/color#color-roles):
+
+```html
+<body class="bg-surface font-plain text-body-lg text-on-surface"></body>
+```
+
+No font is bundled. Load Roboto in the weights 400, 500 and 700, as [Installation](/get-started/installation#load-the-styles-and-fonts) shows. To use other typefaces, see [Custom fonts](/theme/typography#custom-fonts).
+
+## Font weights
+
+Use `font-regular`, `font-medium` and `font-bold` for the three weights of the type scale, alone or over the weight of a type style, as in `text-body-lg font-medium`.
+
+| Class          | Token                              | Weight |
+| -------------- | ---------------------------------- | ------ |
+| `font-regular` | `--md-ref-typeface-weight-regular` | 400    |
+| `font-medium`  | `--md-ref-typeface-weight-medium`  | 500    |
+| `font-bold`    | `--md-ref-typeface-weight-bold`    | 700    |
+
+`font-medium` and `font-bold` are Tailwind's own [font weight](https://tailwindcss.com/docs/font-weight) classes, which follow the tokens here. Tailwind's other weights, such as `font-semibold`, are unchanged.
+
+To change the weights, see [Custom weights](/theme/typography#custom-weights).
+
+## Icon font
+
+Use `font-icon` for the icon font, [Material Symbols](https://m3.material.io/styles/icons/overview) Outlined by default. Like Roboto, it is not bundled: load it as [Installation](/get-started/installation#load-the-styles-and-fonts) shows.
+
+The theme has a font size for each Material icon size, with a line height of 1, and a tracking of exactly 0, which the ligature of an icon needs. Each is a Tailwind [theme variable](https://tailwindcss.com/docs/theme), and a size has a second one for its line height, as a [type style](/theme/typography#custom-type-styles) has:
+
+| Class          | Theme variables                                     | Default                   |
+| -------------- | --------------------------------------------------- | ------------------------- |
+| `font-icon`    | `--font-icon`                                       | Material Symbols Outlined |
+| `text-icon-18` | `--text-icon-18`<br />`--text-icon-18--line-height` | 1.125rem, 18px<br />1     |
+| `text-icon-20` | `--text-icon-20`<br />`--text-icon-20--line-height` | 1.25rem, 20px<br />1      |
+| `text-icon-24` | `--text-icon-24`<br />`--text-icon-24--line-height` | 1.5rem, 24px<br />1       |
+| `text-icon-28` | `--text-icon-28`<br />`--text-icon-28--line-height` | 1.75rem, 28px<br />1      |
+| `text-icon-32` | `--text-icon-32`<br />`--text-icon-32--line-height` | 2rem, 32px<br />1         |
+| `text-icon-36` | `--text-icon-36`<br />`--text-icon-36--line-height` | 2.25rem, 36px<br />1      |
+| `text-icon-40` | `--text-icon-40`<br />`--text-icon-40--line-height` | 2.5rem, 40px<br />1       |
+| `text-icon-48` | `--text-icon-48`<br />`--text-icon-48--line-height` | 3rem, 48px<br />1         |
+| `tracking-0`   | `--tracking-0`                                      | 0px                       |
+
+For the classes that set an icon's size, fill and weight, see the [Icon](/components/icon) component. To use another icon font, see [Custom fonts](/theme/typography#custom-fonts).
+
+## Custom typography
+
+Every typeface, weight and type style is a custom property, so your own CSS can set it after the import. A value set before the import is replaced by the theme's.
+
+To change the type of one component instead, pass a type style, a typeface or a weight class in its [`className`](/get-started/styling#classes), as in `<Button className="font-brand">`.
+
+### Custom fonts
+
+To change the typefaces, set `--md-ref-typeface-brand` and `--md-ref-typeface-plain` on the root. For another icon font, set `--font-icon`:
+
+```css
+@import 'tailwindcss';
+@import '@material-web/tailwind';
+
+:root {
+  --md-ref-typeface-brand: 'Google Sans', sans-serif;
+  --md-ref-typeface-plain: 'Inter', sans-serif;
+  --font-icon: 'Material Symbols Rounded';
+}
+```
+
+| Token and theme variable                      | Default                                                             |
+| --------------------------------------------- | ------------------------------------------------------------------- |
+| `--md-ref-typeface-brand`<br />`--font-brand` | `Roboto, ui-sans-serif, system-ui, sans-serif`                      |
+| `--md-ref-typeface-plain`<br />`--font-plain` | `Roboto, ui-sans-serif, system-ui, sans-serif`                      |
+| `--font-icon`                                 | `'Material Symbols Outlined Variable', 'Material Symbols Outlined'` |
+
+Under a typeface's token is its Tailwind [theme variable](https://tailwindcss.com/docs/theme), which gives the token its class. In your own CSS, read the token, as in `var(--md-ref-typeface-brand)`: a theme variable has the root's value, and does not follow a token set on an element. The icon font is a theme variable alone.
+
+No font is bundled, so load the ones you name. The components are set in the plain typeface, so the brand typeface shows only where you add `font-brand`.
+
+### Custom weights
+
+For a typeface that comes in other weights, set the weight tokens on the root as well:
+
+```css
+:root {
+  --md-ref-typeface-weight-regular: 400;
+  --md-ref-typeface-weight-medium: 600;
+  --md-ref-typeface-weight-bold: 800;
+}
+```
+
+| Token and theme variable                                        | Default |
+| --------------------------------------------------------------- | ------- |
+| `--md-ref-typeface-weight-regular`<br />`--font-weight-regular` | 400     |
+| `--md-ref-typeface-weight-medium`<br />`--font-weight-medium`   | 500     |
+| `--md-ref-typeface-weight-bold`<br />`--font-weight-bold`       | 700     |
+
+Every type style and weight class follows them. As with the typefaces, read a weight's token in your own CSS, not its theme variable. Load the font in the weights you set. With a variable font, a weight can be any number in the font's range, such as `450`.
+
+### Custom type styles
+
+A type style is four [theme variables](https://tailwindcss.com/docs/font-size#customizing-your-theme). Its font size is `--text-` and the style's name, and the other three add `--line-height`, `--letter-spacing` or `--font-weight` to that, as in `--text-body-lg--letter-spacing`.
+
+Set them in `@theme`. An emphasized style has four variables of its own, so set both styles. Another typeface may need another tracking, for example:
+
+```css
+@import 'tailwindcss';
+@import '@material-web/tailwind';
+
+@theme {
+  --text-body-lg--letter-spacing: 0;
+  --text-body-lg-emphasized--letter-spacing: 0;
+}
+```
+
+The table lists every style's font size variable with its default, then the defaults of its `--line-height`, `--letter-spacing` and `--font-weight` variables. The weights are the [weight tokens](/theme/typography#custom-weights): regular is `var(--md-ref-typeface-weight-regular)`.
+
+| Variable                        | Font size | Line height | Letter spacing | Font weight |
+| ------------------------------- | --------- | ----------- | -------------- | ----------- |
+| `--text-display-lg`             | 3.5625rem | 4rem        | -0.25px        | regular     |
+| `--text-display-md`             | 2.8125rem | 3.25rem     | 0              | regular     |
+| `--text-display-sm`             | 2.25rem   | 2.75rem     | 0              | regular     |
+| `--text-headline-lg`            | 2rem      | 2.5rem      | 0              | regular     |
+| `--text-headline-md`            | 1.75rem   | 2.25rem     | 0              | regular     |
+| `--text-headline-sm`            | 1.5rem    | 2rem        | 0              | regular     |
+| `--text-title-lg`               | 1.375rem  | 1.75rem     | 0              | regular     |
+| `--text-title-md`               | 1rem      | 1.5rem      | 0.15px         | medium      |
+| `--text-title-sm`               | 0.875rem  | 1.25rem     | 0.1px          | medium      |
+| `--text-body-lg`                | 1rem      | 1.5rem      | 0.5px          | regular     |
+| `--text-body-md`                | 0.875rem  | 1.25rem     | 0.25px         | regular     |
+| `--text-body-sm`                | 0.75rem   | 1rem        | 0.4px          | regular     |
+| `--text-label-lg`               | 0.875rem  | 1.25rem     | 0.1px          | medium      |
+| `--text-label-md`               | 0.75rem   | 1rem        | 0.5px          | medium      |
+| `--text-label-sm`               | 0.6875rem | 1rem        | 0.5px          | medium      |
+| `--text-display-lg-emphasized`  | 3.5625rem | 4rem        | -0.25px        | medium      |
+| `--text-display-md-emphasized`  | 2.8125rem | 3.25rem     | 0              | medium      |
+| `--text-display-sm-emphasized`  | 2.25rem   | 2.75rem     | 0              | medium      |
+| `--text-headline-lg-emphasized` | 2rem      | 2.5rem      | 0              | medium      |
+| `--text-headline-md-emphasized` | 1.75rem   | 2.25rem     | 0              | medium      |
+| `--text-headline-sm-emphasized` | 1.5rem    | 2rem        | 0              | medium      |
+| `--text-title-lg-emphasized`    | 1.375rem  | 1.75rem     | 0              | medium      |
+| `--text-title-md-emphasized`    | 1rem      | 1.5rem      | 0.15px         | bold        |
+| `--text-title-sm-emphasized`    | 0.875rem  | 1.25rem     | 0.1px          | bold        |
+| `--text-body-lg-emphasized`     | 1rem      | 1.5rem      | 0.5px          | medium      |
+| `--text-body-md-emphasized`     | 0.875rem  | 1.25rem     | 0.25px         | medium      |
+| `--text-body-sm-emphasized`     | 0.75rem   | 1rem        | 0.4px          | medium      |
+| `--text-label-lg-emphasized`    | 0.875rem  | 1.25rem     | 0.1px          | bold        |
+| `--text-label-md-emphasized`    | 0.75rem   | 1rem        | 0.5px          | bold        |
+| `--text-label-sm-emphasized`    | 0.6875rem | 1rem        | 0.5px          | bold        |
+
+For another weight, use a weight token as well, as in `--text-title-lg--font-weight: var(--md-ref-typeface-weight-medium)`, so that the style follows your custom weights.
+
+Material [advises against](https://m3.material.io/styles/typography/type-scale-tokens#9b6acd0c-8fb2-4524-882a-0f9a638d6fc8) changing the sizes, which changes how the components lay out.

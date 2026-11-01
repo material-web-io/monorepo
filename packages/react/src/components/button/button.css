@@ -1,0 +1,35 @@
+/* React Aria's Button, or its ToggleButton given isSelectable: the container, with focus ring and
+ * 48dp target, holding the ripple and the button's children. Its colors, size and shape are the
+ * M3 props', in button.tsx. Pending, it keeps its colors and shows the progress cursor. */
+@utility button-container {
+  @apply touch-target relative m-0 inline-flex shrink-0 touch-manipulation appearance-none items-center justify-center border-0 font-plain whitespace-nowrap no-underline outline-none select-none;
+  @apply focus-ring button-pending not-disabled:cursor-pointer pending:cursor-progress;
+  @apply transition-shape-color-shadow;
+  /* Forced colors drop shadows and backgrounds, so the container gets a border of its own. */
+  @apply forced-colors:container-border;
+}
+
+/* The disabled colors and no shadow, applied as disabled:button-disabled: a variant class sorts
+ * after the hover shadows, where a plain utility sorts before them. A selected toggle's colors sort
+ * after it, so a toggle names both (selected:disabled:button-disabled). */
+@utility button-disabled {
+  @apply bg-on-surface/disabled-container text-on-surface/disabled-content shadow-none;
+}
+
+/* Pending, a button shows its loading indicator alone. Its children keep their room and still name
+ * it: its text is left unpainted and the rest faded out. On every button that takes isPending. */
+@utility button-pending {
+  &[data-pending] {
+    -webkit-text-fill-color: transparent;
+  }
+
+  &[data-pending] > :not(.button-pending-indicator) {
+    opacity: 0;
+  }
+}
+
+/* The loading indicator a pending button draws at its center, over its children (PendingIndicator).
+ * Flex centers it even where it is taller than the button, as on an xs split button's trailing one. */
+@utility button-pending-indicator {
+  @apply pointer-events-none absolute inset-0 flex items-center justify-center;
+}

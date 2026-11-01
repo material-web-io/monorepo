@@ -1,0 +1,19 @@
+/* Entry point of the stylesheet for an app's own Tailwind build (dist/tailwind.css): the M3
+ * theme, the components' own CSS, and the built components, next to this file in dist, as
+ * the source of the classes they use. Import it after `tailwindcss`. */
+@import '@material-web/tailwind';
+@import './components/index.css';
+
+/* The state variants, React Aria's: hover:, focus-visible:, disabled:, ... read the attributes its
+ * components report (data-hovered, ...), and pressed:, selected:, dragging:, ... are added. */
+@plugin 'tailwindcss-react-aria-components';
+
+@source './**/*.js';
+
+/* Material draws a press with the ripple, so the browser's own tap highlight is cleared.
+ * It inherits from the root, and the `base` layer keeps it below any utility. */
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+}

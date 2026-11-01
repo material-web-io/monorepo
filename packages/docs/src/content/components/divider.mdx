@@ -1,0 +1,110 @@
+import api from 'virtual:api/Divider'
+import * as basic from '../../examples/divider/basic.tsx?example'
+import * as custom from '../../examples/divider/custom.tsx?example'
+import * as flexItem from '../../examples/divider/flex-item.tsx?example'
+import * as fullWidth from '../../examples/divider/full-width.tsx?example'
+import * as hierarchy from '../../examples/divider/hierarchy.tsx?example'
+import * as iconGrouping from '../../examples/divider/icon-grouping.tsx?example'
+import * as inset from '../../examples/divider/inset.tsx?example'
+import * as listItem from '../../examples/divider/list-item.tsx?example'
+import * as middleInset from '../../examples/divider/middle-inset.tsx?example'
+import * as vertical from '../../examples/divider/vertical.tsx?example'
+
+Dividers are thin lines that group content in lists or other containers. Use them to group components visually, to create hierarchy, and to imply nested parent and child relationships.
+
+To separate the items of a [list](/components/list#dividers) or a [menu](/components/menu), use their own dividers instead.
+
+```tsx
+import { Divider } from '@material-web/react'
+```
+
+## Basic divider
+
+Put a `Divider` between the content it separates. In this example, a full-width divider separates the content of a card from its actions.
+
+<Example {...basic} />
+
+A divider comes in three variants. Set `variant` to `full-width` (the default), `inset` or `middle-inset`.
+
+### Full-width divider
+
+Use a full-width divider to separate larger sections of unrelated content, such as the messages of an inbox in this example. It can go directly on a surface, or inside another component such as a card or a list.
+
+<Example {...fullWidth} />
+
+### Inset divider
+
+An `inset` divider starts 16dp in from the leading edge. Use it to separate related items within a section, next to an anchoring element such as an icon or an avatar.
+
+<Example {...inset} />
+
+### Middle-inset divider
+
+A `middle-inset` divider is inset 16dp on both sides. Use it to separate elements in the middle of a layout, such as body text from a row of actions.
+
+<Example {...middleInset} />
+
+## Hierarchy
+
+When you use full-width and inset dividers in one UI, put full-width dividers between sections of different content, and inset dividers between the nested items of a section.
+
+<Example {...hierarchy} />
+
+## Orientation
+
+Set `orientation="vertical"` to separate content that is side by side. A vertical divider is a `<div>`, where a horizontal one is an `<hr>`.
+
+<Example {...vertical} />
+
+On a vertical divider, `inset` adds 16dp at its top, and `middle-inset` adds 16dp at both ends.
+
+## Flex item
+
+A divider is only as long as its container. It needs no prop in a flex or grid container, and it stretches even where the container centers its items.
+
+| Orientation | Length                                                                                   |
+| ----------- | ---------------------------------------------------------------------------------------- |
+| Horizontal  | The width of its container, as a block or as a stretched item of a flex column or a grid |
+| Vertical    | The height of the flex or grid row it is in                                              |
+
+<Example {...flexItem} />
+
+> **Note:** A vertical divider has no height in a block container, and a horizontal one has no width in a flex row.
+
+## In a list
+
+A list holds only list items, and a divider is not one. To divide a list into groups, make each group a list of its own, with the divider between them, and name each list with an `aria-label`.
+
+<Example {...listItem} />
+
+A [List](/components/list#dividers) and a [menu](/components/menu) draw their own dividers. See their pages.
+
+## Icon grouping
+
+Combine `orientation="vertical"` with `variant="middle-inset"` for a short divider between groups of controls in a row.
+
+<Example {...iconGrouping} />
+
+## Customization
+
+Pass classes in `className` to restyle a divider. The line is a 1dp border, so change its color with a border color class, and add space around it with a margin. See [Styling](/get-started/styling) for the classes and the theme.
+
+<Example {...custom} />
+
+The `className` and `style` of a divider are plain values, not functions.
+
+## Accessibility
+
+### Interaction and style
+
+- **Color contrast:** Material [treats](https://m3.material.io/components/divider/accessibility#452c6146-3cb1-43ea-81fc-a5d1e795306d) dividers as decorative elements, which have no contrast minimum.
+
+### Labeling elements
+
+- A divider has the `separator` role. To name it, set `aria-label` or `aria-labelledby`.
+- A vertical divider reports its orientation with `aria-orientation`.
+- A divider takes no `aria-hidden`: it is always exposed as a separator.
+
+## Props
+
+<PropsTable {...api} />

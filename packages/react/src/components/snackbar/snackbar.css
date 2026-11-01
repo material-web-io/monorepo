@@ -1,0 +1,183 @@
+/* SnackbarRegion, Snackbar and SnackbarContent (snackbar.tsx): Compose's layout, but for two lines of
+ * text, centered, as its fix behind a flag has them. They come and go as the guidelines' video draws
+ * them, measured frame by frame; a SnackbarQueue hides them in a view transition. */
+
+/* React Aria's ToastRegion: at the bottom of the window, centered, 12dp from its edges and up to
+ * 600dp wide, in front of the page. F6 focuses it: its ring, in front all the same. */
+@utility snackbar-region {
+  @apply fixed inset-x-space-150 bottom-space-150 z-snackbar mx-auto flex max-w-150 flex-col gap-space-100 outline-none;
+  @apply focus-ring;
+  @variant focus-visible {
+    @apply z-snackbar;
+  }
+}
+
+/* React Aria's Toast: inverse-surface, 4dp corners, elevation 3, its text body medium in
+ * inverse-on-surface. Its parts in a row that wraps, the buttons at its end: 16dp before the text,
+ * 8dp at its end, 4dp after a close button, and 4dp above and below. */
+@utility snackbar {
+  @apply box-border flex flex-wrap items-center justify-end rounded-shape-xs bg-inverse-surface py-space-50 ps-space-200 pe-space-100 font-plain text-body-md text-inverse-on-surface shadow-elevation-3 outline-none;
+  @apply focus-ring forced-colors:container-border;
+  view-transition-class: snackbar;
+  /* Shown, it grows from a line 2.7dp below its bottom edge, both edges on the M3 emphasized easing
+   * (the path, not the cubic-bezier that stands in for it) over 450ms, in its place all along. */
+  --snackbar-easing: linear(
+    0,
+    0.0018 1.5%,
+    0.0077 3.1%,
+    0.0166 4.5%,
+    0.0292 5.9%,
+    0.0447 7.2%,
+    0.0627 8.4%,
+    0.0829 9.5%,
+    0.105 10.5%,
+    0.1283 11.4%,
+    0.1523 12.2%,
+    0.1801 13%,
+    0.2083 13.7%,
+    0.2359 14.3%,
+    0.262 14.8%,
+    0.2915 15.3%,
+    0.3255 15.8%,
+    0.3569 16.2%,
+    0.3836 16.5%,
+    0.4519 17.2%,
+    0.4876 17.6%,
+    0.5198 18%,
+    0.5486 18.4%,
+    0.5801 18.9%,
+    0.6074 19.4%,
+    0.6357 20%,
+    0.66 20.6%,
+    0.6845 21.3%,
+    0.7113 22.2%,
+    0.7341 23.1%,
+    0.7578 24.2%,
+    0.7814 25.5%,
+    0.8044 27%,
+    0.8249 28.6%,
+    0.8465 30.6%,
+    0.8663 32.8%,
+    0.8857 35.4%,
+    0.9046 38.5%,
+    0.9224 42.1%,
+    0.9389 46.3%,
+    0.9537 51.1%,
+    0.9669 56.7%,
+    0.9788 63.5%,
+    0.9881 71.3%,
+    0.995 80.4%,
+    0.9991 91.4%,
+    1
+  );
+  animation: snackbar-enter var(--md-sys-motion-duration-long1) var(--snackbar-easing);
+  /* Named by its key (snackbar.tsx) in its queue's view transitions only: in another, such as a
+   * calendar's page turning, a name would take it out of hit testing meanwhile. */
+  :root:active-view-transition-type(snackbar) & {
+    view-transition-name: var(--snackbar-key);
+  }
+  /* What it holds, cut to it, starts 10dp up in it, its first line at its top edge, and fades in
+   * from 2 frames in over 11, easing in and out. Of no specificity, so that an animation of yours on
+   * one of them wins. */
+  :where(&) > * {
+    animation:
+      snackbar-part-enter var(--md-sys-motion-duration-long1) var(--snackbar-easing),
+      snackbar-part-fade-in calc(var(--md-sys-motion-duration-short1) * 11 / 3)
+        cubic-bezier(0.33, 0, 0.67, 1) calc(var(--md-sys-motion-duration-short1) * 2 / 3) backwards;
+  }
+  /* The action's label 20dp from the end; the close button's icon 12dp from it, and 24dp after the
+   * action's label. */
+  &:has(> [slot='close']) {
+    @apply pe-space-50;
+  }
+  /* The two wrap as one: the action keeps the close button's 40dp and the 4dp before it in its
+   * margin, which the close button sits in, and short of its row by as much. */
+  & > :is(button, [role='button']):has(+ [slot='close']) {
+    margin-inline-end: calc(var(--spacing-space-500) + var(--spacing-space-50));
+    max-width: calc(100% - var(--spacing-space-500) - var(--spacing-space-50));
+  }
+  & > :is(button, [role='button']) + [slot='close'] {
+    @apply -ms-space-500;
+  }
+}
+
+/* SnackbarAction, its own text button, on Button's container: 40dp and round, its label label
+ * large in inverse-primary 12dp from its sides, as Compose's TextButton is, with its state layers;
+ * disabled, on-surface at 38%, as Compose's. It has no container, so no border in forced colors. */
+@utility snackbar-action {
+  @apply button-container rounded-full bg-transparent px-space-150 py-space-125 text-label-lg text-inverse-primary forced-colors:border-0;
+  @apply disabled:text-on-surface/disabled-content;
+  /* A label longer than its row wraps in it, as Compose's does; its focus ring in its own color,
+   * which keeps 3:1 on the snackbar, where the theme's secondary does not. */
+  @apply max-w-full min-w-0 wrap-break-word whitespace-normal focus-visible:outline-inverse-primary;
+}
+
+/* SnackbarCloseButton, its own icon button, on IconButton's container: 40dp and round, its 24dp
+ * icon in inverse-on-surface, with its state layers and focus ring; disabled, on-surface at 38%. */
+@utility snackbar-close-button {
+  @apply icon-button-container size-space-500 rounded-full bg-transparent text-inverse-on-surface icon-24 forced-colors:border-0;
+  @apply disabled:text-on-surface/disabled-content;
+  @apply focus-visible:outline-inverse-on-surface;
+}
+
+/* React Aria's ToastContent, the text: 10dp above and below it, 8dp before the buttons, which
+ * have the row but for 128dp: longer, they go below it, at the end, as Android's do. */
+@utility snackbar-content {
+  @apply me-space-100 min-w-0 py-space-125 wrap-break-word;
+  flex: 1 1 calc(100% - --spacing(32) - var(--spacing-space-100));
+  /* Its title and description, React Aria's Texts, each on a line of its own. Of no specificity,
+   * so that a class of yours on one of them wins. */
+  :where(&) > :where([slot='title'], [slot='description']) {
+    @apply block;
+  }
+}
+
+/* A snackbar shown: from a line, its height at rest (--snackbar-height, snackbar.tsx) held by its
+ * margin, unpadded, what it holds packed at its top and cut to it, 2.7dp low. */
+@keyframes snackbar-enter {
+  from {
+    height: 0;
+    margin-top: var(--snackbar-height);
+    padding-block: 0;
+    translate: 0 2.7px;
+    overflow: clip;
+    align-content: flex-start;
+  }
+  to {
+    height: var(--snackbar-height);
+    overflow: clip;
+    align-content: flex-start;
+  }
+}
+@keyframes snackbar-part-enter {
+  from {
+    translate: 0 calc(var(--spacing-space-125) * -1);
+  }
+}
+@keyframes snackbar-part-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* A SnackbarQueue's view transitions, of the type snackbar: one hidden fades out over 150ms, easing
+ * in and out, and one shown draws itself. Nothing else takes part, a part named inline neither (so
+ * important), so all the page stays in use, and the pointer goes through. */
+:root:active-view-transition-type(snackbar),
+:root:active-view-transition-type(snackbar) :not(.snackbar) {
+  view-transition-name: none !important;
+}
+:root:active-view-transition-type(snackbar)::view-transition {
+  pointer-events: none;
+}
+::view-transition-new(.snackbar):only-child {
+  animation: none;
+}
+::view-transition-old(.snackbar):only-child {
+  animation: snackbar-exit var(--md-sys-motion-duration-short3) cubic-bezier(0.33, 0, 0.67, 1) both;
+}
+@keyframes snackbar-exit {
+  to {
+    opacity: 0;
+  }
+}

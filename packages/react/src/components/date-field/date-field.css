@@ -1,0 +1,113 @@
+/* Date field (date-field.tsx), React Aria's DateField drawn as an outlined text field, the one the
+ * date pickers' input mode draws (../date-picker). Its outline's parts are a TextField's. */
+
+/* DateField, React Aria's DateField: a column of the container and, below it, the supporting
+ * text. Top-aligned, so that the line it is on is no taller than it is. */
+@utility date-field {
+  @apply inline-flex min-w-0 flex-col text-start align-top font-plain;
+}
+
+/* The container, an outlined text field's: 56dp of the date's line, its parts behind the text
+ * (isolate). A plain box around React Aria's DateInput, whose hover and focus its parts read; the
+ * error and disabled colors are its own classes. */
+@utility date-field-container {
+  @apply relative isolate box-border flex h-14 min-w-0 cursor-text items-center rounded-shape-xs text-body-lg text-on-surface;
+  &.date-field-container-disabled {
+    @apply cursor-default;
+  }
+}
+
+/* The date, React Aria's DateInput: its segments on one line 16dp in from its ends, filling the
+ * container up to the trailing icon, so that a press anywhere there focuses a segment, as React
+ * Aria's does. Unseen while the label rests on that line: labelled, empty and unfocused. */
+@utility date-field-input {
+  @apply flex min-w-0 flex-1 items-center self-stretch px-space-200 whitespace-nowrap transition-text-field outline-none;
+  .date-field-container-empty:not(:focus-within) > & {
+    opacity: 0;
+  }
+}
+
+/* A segment of the date, React Aria's DateSegment: on-surface, set close as text, the one being
+ * edited on primary, disabled at 38%. A placeholder is in capitals, on-surface-variant, as are the
+ * slashes until a part is typed: Compose's placeholder, the pattern. */
+@utility date-field-segment {
+  @apply rounded-shape-xs text-on-surface tabular-nums caret-transparent outline-none;
+  &[data-placeholder] {
+    text-transform: uppercase;
+  }
+  &[data-placeholder],
+  :where(.date-field-input:not(:has(> :not([data-type='literal'], [data-placeholder])))) > & {
+    @apply text-on-surface-variant;
+  }
+  @apply focus:bg-primary focus:text-on-primary;
+  @apply disabled:text-on-surface/disabled-content disabled:forced-colors:text-gray-text;
+  @apply focus:forced-colors:bg-highlight focus:forced-colors:text-highlight-text;
+}
+
+/* The trailing icon's 24dp box, 12dp from the container's end and 16dp after the date, an icon
+ * button centered on it; on-surface-variant, error while invalid, at 38% disabled. */
+@utility date-field-trailing {
+  @apply relative me-space-150 flex size-6 shrink-0 items-center justify-center text-on-surface-variant;
+  .date-field-container-invalid > & {
+    @apply text-error;
+  }
+  .date-field-container-disabled > & {
+    @apply text-on-surface/disabled-content forced-colors:text-gray-text;
+  }
+}
+
+/* The outline. Its text color is its parts' border color, outline, on-surface while hovered and
+ * primary and 2dp thick while the focus is in the field, as Compose's, error with its own hover,
+ * and 12% of on-surface disabled; its notch open for the label on it, closed while it rests. */
+@utility date-field-outline {
+  @apply pointer-events-none absolute inset-0 flex text-outline transition-text-field field-notch-open;
+  @apply group-hover/md-date-field:text-on-surface;
+  @apply group-focus-within/md-date-field:text-primary group-focus-within/md-date-field:date-field-outline-focused;
+  @apply group-focus-within/md-date-field:forced-colors:text-highlight;
+  .date-field-container-empty:not(:focus-within) > & {
+    --text-field-notch-edge: 50%;
+  }
+  .date-field-container-invalid > & {
+    @apply text-error;
+    @apply group-focus-within/md-date-field:text-error group-hover/md-date-field:text-on-error-container;
+  }
+  .date-field-container-disabled > & {
+    @apply text-on-surface/disabled-container forced-colors:text-gray-text;
+  }
+}
+@utility date-field-outline-focused {
+  --text-field-outline-width: 2px;
+}
+
+/* The label, React Aria's Label, on the outline 16dp in: body-small on-surface-variant, primary
+ * while focused, error or disabled with the outline; resting on the date's line in body-large
+ * while the field is empty and unfocused. A click on it focuses the date, as React Aria has it. */
+@utility date-field-label {
+  @apply absolute start-space-200 -top-2 max-w-[calc(100%-2*var(--spacing-space-200))] cursor-text truncate text-body-sm text-on-surface-variant transition-text-field select-none;
+  @apply group-focus-within/md-date-field:text-primary;
+  .date-field-container-empty:not(:focus-within) > & {
+    @apply top-space-200 text-body-lg;
+  }
+  .date-field-container-invalid > & {
+    @apply text-error group-focus-within/md-date-field:text-error group-hover/md-date-field:text-on-error-container;
+  }
+  .date-field-container-disabled > & {
+    @apply text-on-surface/disabled-content forced-colors:text-gray-text;
+  }
+}
+
+/* Below the container, 4dp from it and 16dp in: the supporting text, React Aria's Text in the
+ * `description` slot, and the error text, its FieldError, while the field is invalid. */
+@utility date-field-supporting {
+  @apply flex flex-col px-space-200 pt-space-50 text-body-sm text-on-surface-variant;
+  @apply in-invalid:text-error in-disabled:text-on-surface/disabled-content in-disabled:forced-colors:text-gray-text;
+  &:empty {
+    display: none;
+  }
+}
+@utility date-field-supporting-text {
+  @apply m-0;
+}
+@utility date-field-error {
+  @apply text-error;
+}

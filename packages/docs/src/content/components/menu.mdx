@@ -1,0 +1,329 @@
+import menuApi from 'virtual:api/Menu'
+import { MenuItemSlots } from '../../slot-pictures/menu.tsx'
+import menuItemApi from 'virtual:api/MenuItem'
+import menuPopoverApi from 'virtual:api/MenuPopover'
+import * as account from '../../examples/menu/account.tsx?example'
+import * as actions from '../../examples/menu/actions.tsx?example'
+import * as basic from '../../examples/menu/basic.tsx?example'
+import * as colors from '../../examples/menu/colors.tsx?example'
+import * as context from '../../examples/menu/context.tsx?example'
+import * as custom from '../../examples/menu/custom.tsx?example'
+import * as dense from '../../examples/menu/dense.tsx?example'
+import * as disabled from '../../examples/menu/disabled.tsx?example'
+import * as instant from '../../examples/menu/instant.tsx?example'
+import * as items from '../../examples/menu/items.tsx?example'
+import * as links from '../../examples/menu/links.tsx?example'
+import * as multiSelect from '../../examples/menu/multi-select.tsx?example'
+import * as placement from '../../examples/menu/placement.tsx?example'
+import * as scrolling from '../../examples/menu/scrolling.tsx?example'
+import * as sectionSelection from '../../examples/menu/section-selection.tsx?example'
+import * as sections from '../../examples/menu/sections.tsx?example'
+import * as singleSelect from '../../examples/menu/single-select.tsx?example'
+import * as submenu from '../../examples/menu/submenu.tsx?example'
+
+Menus display a list of choices on a temporary surface. Use a menu to show a temporary set of actions, opened from a button or another control. To show actions on screen at all times, use a [toolbar](/components/toolbar) instead.
+
+A menu is composed of these parts:
+
+| Part                    | Use                                                              |
+| ----------------------- | ---------------------------------------------------------------- |
+| `MenuTrigger`           | Holds the element that opens the menu, and the menu's popover    |
+| `MenuPopover`           | The panel of the menu, placed by its trigger                     |
+| `Menu`                  | The list of items in the panel                                   |
+| `MenuItem`              | A row of the menu: an action, a choice or a link                 |
+| `MenuSection`, `Header` | A group of items, and its name                                   |
+| `Separator`             | A divider between items or sections                              |
+| `SubmenuTrigger`        | Holds an item and the popover of the submenu it opens            |
+| `Text`, `Keyboard`      | The label, the supporting text and the keyboard command of a row |
+
+Import `MenuPopover`, `Menu` and `MenuItem` from `@material-web/react`, and `MenuTrigger`, `SubmenuTrigger`, `MenuSection`, `Header`, `Separator`, `Text` and `Keyboard` from `react-aria-components`, as for React Aria's [Menu](https://react-aria.adobe.com/Menu).
+
+```tsx
+import { Menu, MenuItem, MenuPopover } from '@material-web/react'
+import {
+  Header,
+  Keyboard,
+  MenuSection,
+  MenuTrigger,
+  Separator,
+  SubmenuTrigger,
+  Text,
+} from 'react-aria-components'
+```
+
+## Basic menu
+
+Wrap the element that opens the menu and a `MenuPopover` in a `MenuTrigger`. Put a `Menu` in the popover, and write each row as a `MenuItem`. Selecting an item closes the menu.
+
+<Example {...basic} />
+
+Write the parts of a menu in this order:
+
+- In the `MenuTrigger`, put the element that opens the menu first: an `IconButton`, a `Button` or any other React Aria button.
+- After it, put the `MenuPopover`.
+- In the `MenuPopover`, put the `Menu`.
+- In the `Menu`, put a `MenuItem` for each row.
+
+To open the menu from an element of your own, wrap the element in React Aria's `Pressable`, and give it an interactive role, such as `role="button"`. See [Custom trigger](https://react-aria.adobe.com/Menu#custom-trigger).
+
+To render the items from data, pass `items` to the `Menu` and a function as its children. See [Collections](/get-started/composition#collections).
+
+Typing a letter moves the focus to an item by its `textValue`. An item whose children are a plain string, as in `<MenuItem>Preview</MenuItem>`, uses that string. Set a `textValue` on an item that holds anything else, such as an icon or a `Keyboard`: its types require one.
+
+A menu is 112dp to 280dp wide. A label that is wider wraps onto more lines.
+
+## Slots
+
+<MenuItemSlots showLegend />
+
+| Slot          | Child                                                                             | Use                                                                                            |
+| ------------- | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `leading`     | An `Icon`, a `Text` or an element of your own, such as an image or a color swatch | Before the label                                                                               |
+| `label`       | A `Text`                                                                          | The label, which names the item                                                                |
+| `description` | A `Text`                                                                          | The supporting text, under the label. Together with a keyboard command, it describes the item. |
+| `trailing`    | An `Icon`, a `Text` badge, a `Keyboard` or an element of your own                 | The item's end, in the order written. Several trailing parts follow each other.                |
+
+Write an item's parts as its children, and place each one with a `slot`. An `Icon` or a `Keyboard` may also have no slot. A `Keyboard` with no slot, the keyboard command, is placed at the item's end, in the order written.
+
+<Example {...items} />
+
+Write an item's label as its text, as in `<MenuItem>Preview</MenuItem>`. The text names the item, also when an `Icon` is beside it.
+
+For an item with a description, a keyboard command or other text, put the label in a `Text` with `slot="label"`. The label then names the item, even when the item has an `aria-label`. Without a `label` slot, all of the item's text names it. Set an `aria-label` on an item with no label.
+
+```tsx
+<MenuItem textValue="Copy" onAction={copy}>
+  <Icon slot="leading" name="content_copy" />
+  <Text slot="label">Copy</Text>
+  <Text slot="description">Copies the selection</Text>
+  <Keyboard>⌘C</Keyboard>
+</MenuItem>
+```
+
+For a text badge, write `<Text slot="trailing">New</Text>`. A `Text`, an `Icon` or a `Keyboard` with a slot it does not take throws an `Invalid slot` error. For an element of your own in a slot, see [Account menu](#account-menu).
+
+## Account menu
+
+The `leading` and `trailing` slots of an item take elements of your own too, such as an avatar, an image or a color swatch. Your own element is placed by its `slot` attribute, which is not checked. It takes the item's text color unless you set another.
+
+<Example {...account} />
+
+## Sections
+
+Group items in a `MenuSection`, and name the group with a `Header` inside it. Separate items or sections with a `Separator`. A header or a divider does not take the focus.
+
+<Example {...sections} />
+
+## Submenus
+
+To open a submenu from an item, wrap the item and a second `MenuPopover` in a `SubmenuTrigger`: the item first, then the popover with a `Menu` in it. Submenus nest to any depth. The item shows an arrow at its end, and its submenu opens beside it, at the item's end and aligned to its top (`end top`).
+
+- A submenu opens after the pointer has rested on its item for 200ms, on a press, and with Space, Enter or the arrow key toward it. Set `delay` on the `SubmenuTrigger` to change the 200ms.
+- The arrow key back or Escape closes the submenu. Selecting one of its items closes the whole menu.
+- A submenu opens on the side of its item that has room.
+
+<Example {...submenu} />
+
+## Handling actions
+
+Handle an item's press with its own `onAction`, or with the `Menu`'s `onAction`, which is called with the item's `id`.
+
+<Example {...actions} />
+
+## Selection
+
+Set `selectionMode` on the `Menu` to `single` or `multiple`. Control the selection with `selectedKeys` and `onSelectionChange`, or set the initial selection with `defaultSelectedKeys`. The keys are the items' `id`s. See React Aria's [Selection](https://react-aria.adobe.com/selection) guide.
+
+A selected item changes its shape and color and shows a checkmark before its text. The checkmark takes the place of the item's `leading` part, if it has one.
+
+A menu with a selection opens with the focus on its selected item. With several selected, that is the first key of `selectedKeys` as you pass it, not the first in the items' order.
+
+<Example {...singleSelect} />
+
+A click selects an item and closes a single-select menu, but leaves a multi-select menu open. Space selects and leaves either menu open, and Enter selects and closes it. Set `shouldCloseOnSelect` on the `Menu`, a `MenuSection` or a `MenuItem` to choose whether a selection closes the menu. Set `disallowEmptySelection` to keep a click on the selected item from clearing the selection.
+
+### Checkbox and radio menu items
+
+The items of a menu with `selectionMode="single"` are radio items: choosing one clears the others. The items of a menu with `selectionMode="multiple"` are checkbox items: each one is turned on and off by itself.
+
+A multi-select menu stays open while its items are clicked.
+
+<Example {...multiSelect} />
+
+Set a `selectionMode` on a `MenuSection` to select its items separately from the menu's, or not at all. A section takes `selectedKeys`, `onSelectionChange`, `defaultSelectedKeys` and `disallowEmptySelection` as the `Menu` does, and a click in it closes the menu as in a menu of its `selectionMode`. See [Section-level selection](https://react-aria.adobe.com/Menu#section-level-selection).
+
+<Example {...sectionSelection} />
+
+## Opening and closing
+
+A press on the trigger opens the menu. Control the open state with `isOpen` and `onOpenChange` on the `MenuTrigger`, or set `defaultOpen` to start with the menu open.
+
+Selecting an item, Escape or a click outside closes the menu and returns the focus to the trigger. While the menu is open, the rest of the page does not scroll, and a click outside closes the menu without reaching what was clicked.
+
+Set `trigger="longPress"` to open the menu with a long press, for a trigger that has an action of its own: a short press runs the trigger's `onPress`. Alt with Enter, Space or an arrow key opens the menu from the keyboard. See [Long press](https://react-aria.adobe.com/Menu#long-press). To open the menu with a right click, see [Context menu](#context-menu).
+
+### Context menu
+
+Set `trigger="contextMenu"` on the `MenuTrigger` to open the menu with a right click, a long press on a touch screen, or the system's keyboard shortcut for a context menu, such as Control+Enter on macOS. The menu opens at the pointer. See React Aria's [Context menu](https://react-aria.adobe.com/Menu#context-menu).
+
+<Example {...context} />
+
+## Disabled
+
+Set `isDisabled` on an item to disable it. The keyboard skips it, and it ignores clicks. To disable items by their `id`s, set `disabledKeys` on the `Menu`.
+
+<Example {...disabled} />
+
+## Color
+
+Set `color` on the `Menu` to `standard` (the default) or `vibrant`. Standard is the surface-colored style with lower emphasis, and vibrant is the tertiary-colored style with higher emphasis. A vibrant menu is more prominent: use it sparingly.
+
+A submenu's `Menu` uses the color of the `Menu` it is in unless you set its own.
+
+<Example {...colors} />
+
+## Placement
+
+Place the menu with these props of the `MenuPopover`:
+
+- `placement` is the side of the trigger the menu opens on: `bottom start` (the default), below the trigger and aligned to its start, or any other of React Aria's [placements](https://react-aria.adobe.com/Popover#api).
+- `offset` is the distance between the menu and the trigger: 0 (the default) keeps them flush.
+- `containerPadding` is the distance the menu keeps from the window's edges: 8dp (the default).
+- `shouldFlip` controls whether the menu turns to the side with more room, which it does unless you turn it off.
+
+<Example {...placement} />
+
+To make the menu as wide as its trigger, set `className="w-(--trigger-width)"` on the `MenuPopover`.
+
+## Size and scrolling
+
+When its items do not fit, the menu takes the room there is in the window and scrolls. To make it shorter, set `maxHeight` on the `MenuPopover`, in pixels.
+
+<Example {...scrolling} />
+
+## Links
+
+Give an item an `href` to make it a link. It also takes `target` and `rel`. To follow the link with a client-side router, wrap the app in React Aria's `RouterProvider`. See [Routing](/get-started/react-aria#routing).
+
+<Example {...links} />
+
+## Right to left
+
+A menu's direction follows the locale, not the page's `dir`. For a right-to-left menu, set the locale with `I18nProvider`. The arrow keys follow the locale too. See [Internationalization](/get-started/react-aria#internationalization).
+
+## Customization
+
+Pass classes in `className` to restyle a part of a menu: the `MenuPopover` is the panel, with its corners, shadow and width, the `Menu` is the list, with its background color, and a `MenuItem` is a row. A class of yours replaces the part's own class for the same property. See [Styling](/get-started/styling) for the classes, the states and the theme.
+
+<Example {...custom} />
+
+In a standard menu, an item's icons, supporting text and keyboard command keep a color of their own: to recolor them with the item, give them the class too.
+
+- **States:** Style a state of an item with its variant, such as `focus:`, `selected:` or `disabled:`. See [States](/get-started/styling#states).
+- **Functions:** Pass a function as an item's children to render them from the item's state: `isHovered`, `isPressed`, `isFocused`, `isFocusVisible`, `isSelected`, `isDisabled`, `hasSubmenu` and `isOpen`. On an item, `isFocused` is true for the keyboard or the pointer, and `isFocusVisible` for the keyboard only. `className` and `style` take a function too, on each of the three parts. See [Children as a function](/get-started/composition#children-as-a-function).
+- **Ancestors:** The menu is rendered at the end of the page, not next to its trigger. A density class, a color role or a `data-theme` on an element around the trigger does not reach it. Set it on the `MenuPopover` itself, or on the root element.
+- **Every menu:** To restyle all the menus at once, change the [theme](/get-started/styling#theme).
+
+### Density
+
+Add `density-1`, `density-2` or `density-3` to the `MenuPopover` to make each item 4dp shorter for each step. See [Density](/get-started/styling#density).
+
+<Example {...dense} />
+
+> **Note:** The menu is rendered at the end of the page, not next to its trigger. A density class on an element around the trigger does not reach it. Add the class to the `MenuPopover`, or to an element that contains it, such as the document's root element.
+
+### Transitions
+
+Set `shouldSkipAnimation` on the `MenuPopover` to open and close the menu instantly, as in a dense product on desktop.
+
+<Example {...instant} />
+
+## Limitations
+
+### Controls in items
+
+An item takes every press on its row, and Tab does not move the focus into it, so a button, a switch or another control in an item cannot be used. An item performs one action. For items that turn on and off, use [checkbox items](#checkbox-and-radio-menu-items).
+
+### Uncontrolled selection
+
+A selection set with `defaultSelectedKeys` starts over each time the menu opens. Control it with `selectedKeys` to keep it.
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/menus/accessibility#4417785a-985b-45de-8c12-ecaa200c7184) what people should be able to do with assistive technology:
+
+- Navigate to, open, and close a menu
+- Navigate between and select menu items
+
+### Interaction and style
+
+- **States:** Hovering an item shows a state layer, and the pointer focuses it. Keyboard focus shows a [focus ring](/theme/accessibility#focus-ring) inside the item, and a press with a mouse or touch does not. The trigger keeps its pressed state layer while the menu is open. A selected item changes its shape and color and shows a checkmark, so that color is not its only cue, as Material [advises](https://m3.material.io/components/menus/accessibility#149778c9-eb42-4a56-8a0b-9932181ac2cd).
+- **Touch target:** An item can be pressed anywhere in its 48dp row, the 2dp above and below it included.
+- **Color contrast:** Every text in a standard or a vibrant menu has 4.5:1 contrast or more with its fill, and its icons and checkmarks 3:1, in light and dark schemes at every [contrast level](/theme/color#contrast). Keep that contrast when you change its [colors](#customization).
+- **Density:** A [density](/get-started/styling#density) class on the `MenuPopover` makes each item and its row 4dp shorter for each step, so that the row is less than 48dp tall. See [Density](#density).
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), the menu opens and closes at once, and a selected item's checkmark is drawn at once.
+- **Forced colors:** In [forced colors](/theme/accessibility#forced-colors), the panel keeps an edge, a selected item is filled with the system's highlight color, and a disabled item takes the system's color for disabled text.
+- **Right to left:** A menu's direction and its arrow keys follow the locale. See [Right to left](#right-to-left).
+- **Slots:** Material [advises](https://m3.material.io/components/menus/accessibility#d028d2b4-d39d-4f3d-80f2-4608697937d1) that what you put in a slot keep the item's padding and its 48dp target, and that it be no button, switch or other control. An item takes every press on its row, and Tab does not move the focus into it. See [Controls in items](#controls-in-items).
+
+### Focus
+
+- Space, Enter or Down arrow on the trigger opens the menu with the first item focused, as Material [advises](https://m3.material.io/components/menus/accessibility#8b4c6c67-5112-4849-b160-a3a913efec79), and Up arrow with the last. A click opens it with the focus on the menu itself, and Down arrow or Up arrow then moves the focus to the first or the last item.
+- A menu with a selection opens with the focus on its selected item.
+- Tab and Shift+Tab leave the focus on the item it is on, and do not reach the page behind the menu.
+- Selecting an item, Escape or a click outside closes the menu and returns the focus to the trigger.
+- A `Separator` and a `Header` take no focus, as Material [advises](https://m3.material.io/components/menus/accessibility#b496a9ab-e091-4eac-93c6-0fb93b478121) for dividers, and the keyboard skips a disabled item.
+
+### Keyboard navigation
+
+| Keys             | Actions                                                                                           |
+| ---------------- | ------------------------------------------------------------------------------------------------- |
+| Space or Enter   | Open the menu from the trigger with the first item focused, or select the focused item            |
+| Down arrow       | Open the menu from the trigger with the first item focused, or move the focus to the next item    |
+| Up arrow         | Open the menu from the trigger with the last item focused, or move the focus to the previous item |
+| Home             | Move the focus to the first item                                                                  |
+| End              | Move the focus to the last item                                                                   |
+| Page Up          | Move the focus up by a page of items                                                              |
+| Page Down        | Move the focus down by a page of items                                                            |
+| Right arrow      | Open the focused item's submenu, with its first item focused                                      |
+| Left arrow       | Close the submenu, with the focus back on its item                                                |
+| Letter keys      | Move the focus to the next item that starts with the typed letters                                |
+| Escape           | Close the menu, or the open submenu alone                                                         |
+| Tab or Shift+Tab | Leave the focus where it is                                                                       |
+
+- Down arrow and Up arrow go round from either end of the menu.
+- In a menu with a `selectionMode`, Space selects an item and leaves the menu open, and Enter selects it and closes the menu. See [Selection](#selection).
+- Space and Enter open the submenu of the focused item too.
+- In a right-to-left locale, Right arrow and Left arrow swap.
+- Typing finds an item by its `textValue`. Set a `textValue` on an item that holds more than its text.
+- With `trigger="longPress"`, Alt with Space, Enter or an arrow key opens the menu. See [Opening and closing](#opening-and-closing).
+
+### Labeling elements
+
+- The menu has the `menu` role, named by its trigger. The trigger reports the menu with `aria-haspopup`, and whether it is open with `aria-expanded`.
+- A trigger with an icon alone, such as an `IconButton`, needs an `aria-label`, which names the menu too.
+- An item has the `menuitem` role. In a single-select menu it has the `menuitemradio` role, and in a multi-select menu the `menuitemcheckbox` role, either of which reports whether the item is selected with `aria-checked`.
+- The label names the item: its text, or the `Text` in its `label` slot. An icon beside a label is decorative, and so is the checkmark, so that the name matches the item's text, as Material [advises](https://m3.material.io/components/menus/accessibility#e9cd430b-6117-47b1-9afa-0eb691db7273). Set an `aria-label` on an item with no label.
+- The description and the keyboard command describe the item.
+- Name a `MenuSection` with a `Header`.
+- An item that opens a submenu reports it with `aria-haspopup`, and whether the submenu is open with `aria-expanded`. The item names the submenu.
+- A disabled item reports it with `aria-disabled`.
+- While the menu is open, the rest of the page is hidden from assistive technology.
+
+## Props
+
+### MenuPopover
+
+These defaults differ from the ones in the table: `placement` is `bottom start` in a `MenuTrigger` and `end top` in a `SubmenuTrigger`, `offset` is 0 and `containerPadding` is 8.
+
+<PropsTable {...menuPopoverApi} />
+
+### Menu
+
+<PropsTable {...menuApi} />
+
+### MenuItem
+
+<PropsTable {...menuItemApi} />

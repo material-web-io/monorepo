@@ -1,0 +1,219 @@
+import bottomSheetApi from 'virtual:api/BottomSheet'
+import { BottomSheetSlots } from '../../slot-pictures/bottom-sheet.tsx'
+import sheetTriggerApi from 'virtual:api/SheetTrigger'
+import * as basic from '../../examples/bottom-sheet/basic.tsx?example'
+import * as expanded from '../../examples/bottom-sheet/expanded.tsx?example'
+import * as fullScreen from '../../examples/bottom-sheet/full-screen.tsx?example'
+import * as preventDismissal from '../../examples/bottom-sheet/prevent-dismissal.tsx?example'
+import * as scrolling from '../../examples/bottom-sheet/scrolling.tsx?example'
+import * as snapPoints from '../../examples/bottom-sheet/snap-points.tsx?example'
+import * as standard from '../../examples/bottom-sheet/standard.tsx?example'
+import * as withoutDragHandle from '../../examples/bottom-sheet/without-drag-handle.tsx?example'
+
+Bottom sheets show secondary content anchored to the bottom of the screen. Use them in compact and medium windows.
+
+A `BottomSheet` comes in two variants:
+
+- **Standard** (the default): The sheet stays at the bottom of the window while the page behind it remains in use. Use it for content that complements the screen's primary content, such as an audio player in a music app.
+- **Modal**, with `isModal`: The sheet opens in front of the page over a scrim and stays until it is closed. Use it as an alternative to an inline menu or a simple dialog on mobile, especially for a long list of actions, or for items that need longer descriptions and icons.
+
+In expanded windows, use a [side sheet](/components/side-sheet) instead.
+
+A bottom sheet is composed of these parts:
+
+| Part           | Use                                                                                                                                                              |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SheetTrigger` | The trigger. Wraps the button that opens the sheet and the `BottomSheet`, with the button first. Without it, control the sheet with `isOpen` and `onOpenChange`. |
+| `BottomSheet`  | The sheet: a standard sheet (the default) or, with `isModal`, a [modal sheet](#modal-bottom-sheet)                                                               |
+
+```tsx
+import { BottomSheet, SheetTrigger } from '@material-web/react'
+```
+
+## Basic bottom sheet
+
+Wrap the button that opens the sheet and the sheet in a `SheetTrigger`. Write the sheet's content as its children. The sheet shows a [drag handle](#drag-handle) above them, which `hasDragHandle` turns off. This sheet is a [modal sheet](#modal-bottom-sheet).
+
+<Example {...basic} />
+
+## Modal bottom sheet
+
+Set `isModal` for a modal sheet. Without a trigger, control the sheet with `isOpen` and `onOpenChange`, or set `defaultOpen` to start with it open, as with React Aria's [Sheet](https://react-aria.adobe.com/Sheet#api).
+
+While a modal sheet is open, the page behind it cannot be used or scrolled, and the focus stays in the sheet. A [menu](/components/menu) in a modal sheet opens in front of it. Another [dialog](/components/dialog) or modal sheet opened from it shows in front of it, and Escape closes the one in front.
+
+### Dismissal
+
+A click on the scrim, Escape, a swipe down past where the sheet opened, and a press on the drag handle close a modal sheet. Set `preventDismissal` to turn all of these off. The drag handle is then decorative, and a button in the sheet with `slot="close"` still closes it.
+
+<Example {...preventDismissal} />
+
+The sheet in this example has `role="alertdialog"` in place of the default `dialog`, and a `Text` in the `description` slot describes it.
+
+To close the sheet from your own code, such as when an item is chosen, pass a function as the sheet's children and call `state.close()`.
+
+To decide for each press outside the sheet whether it closes the sheet, pass a function as `shouldCloseOnInteractOutside`. It receives the pressed element, and the sheet stays open when it returns `false`.
+
+## Standard bottom sheet
+
+Without `isModal`, a sheet is a standard sheet. It is fixed to the bottom of the window with no scrim, and the page behind it still scrolls and takes clicks. Leave room at the end of the page for the part of the sheet that shows.
+
+A standard sheet shows unless `isOpen` is `false`. Pass `onOpenChange` to let it be dismissed: a swipe down or a scroll up that takes the sheet out of sight, Escape in the sheet, a press on the drag handle at the sheet's full height, and a button with `slot="close"` each call `onOpenChange` with `false`. The sheet stays until you set `isOpen` to `false`. Without `onOpenChange`, the sheet rests no lower than its lowest snap point, and Escape and a button with `slot="close"` do nothing in it.
+
+When a standard sheet is shown, the focus moves to its drag handle, or to the first focusable element in it when it has no drag handle. Tab then moves the focus out to the page. When the sheet is hidden, the focus returns to where it was.
+
+Name a standard sheet with an `aria-label`, or with a `Heading` from `react-aria-components` in the `title` slot.
+
+In this example, a swipe down, Escape in the sheet, or the drag handle at its full height dismisses the sheet.
+
+<Example {...standard} isFlush />
+
+> **Note:** The standard sheet examples on this page render the sheet in a box that stands in for the window. The box is the container of an `UNSAFE_PortalProvider` from `react-aria` and has `contain-layout`. In an app, write the sheet without either.
+
+## Slots
+
+<BottomSheetSlots showLegend />
+
+| Slot          | Child                      | Use                                                                  |
+| ------------- | -------------------------- | -------------------------------------------------------------------- |
+| `title`       | A `Heading`                | Names the sheet. It is a level 2 heading unless you set its `level`. |
+| `description` | A `Text`, in a modal sheet | Describes the sheet                                                  |
+| `close`       | Any button                 | Closes the sheet after its own `onPress`                             |
+
+> **Note:** A `Heading` or a button with a slot the sheet does not have throws an `Invalid slot` error, as in a React Aria `Dialog`.
+
+## Drag handle
+
+A sheet shows a drag handle at its top: a button named "Drag handle". Set `dragHandleLabel` to name it in another language.
+
+A click, Space or Enter on the drag handle closes a modal sheet. On a standard sheet, it raises the sheet to the next of its `snapPoints` up, or else to its full height. At the full height, it dismisses a sheet that has an `onOpenChange`, and lowers any other to its lowest snap point.
+
+Set `hasDragHandle={false}` to leave the drag handle out. A sheet without one can still be swiped, and a modal sheet is still closed by its scrim and Escape. Give such a modal sheet an action that closes it, as in this example. Give a sheet with more than one height and no drag handle your own action that changes its height.
+
+<Example {...withoutDragHandle} />
+
+## Swiping
+
+A sheet moves between its heights in these ways:
+
+- **Swipe:** A finger swipes the sheet anywhere on it: up to raise it, and down to lower it once the content under the finger is scrolled to its top.
+- **Wheel:** Scrolling down over a partially expanded sheet raises it. Scrolling up at the sheet's full height, once the content is at its top, lowers the sheet to its snap point, and scrolling further closes a modal sheet.
+- **Focus:** Moving the focus to an element below the part of the sheet that shows raises it.
+- **Mouse or pen:** A mouse or a pen drags the sheet by its drag handle.
+
+A sheet let go part way settles at the nearer of its heights, or at the next one in the direction of a fast drag.
+
+## Snap points
+
+Set `snapPoints` to the heights at which a sheet rests partially expanded, as with React Aria's [snap points](https://react-aria.adobe.com/Sheet#snap-points). Each one is how much of the sheet shows: a number in pixels, or a length, where a percentage is of the sheet's own height. The sheet also rests at its full height. A sheet no taller than a snap point is at its full height there.
+
+- A modal sheet opens at the first snap point, half the window's height by default.
+- A standard sheet is shown at the first snap point, 56dp by default. Its drag handle raises it to the next snap point up.
+- Set `snapPoints={[]}` to keep a sheet at its full height.
+
+At its full height, the sheet has `data-expanded`. In this example, the sheet rests with its headline showing, at half of its height, and at its full height.
+
+<Example {...snapPoints} isFlush />
+
+### Expanded state
+
+A standard sheet keeps track of whether it is at its full height. Set `defaultExpanded` to start at the full height each time the sheet is shown, or control it with `isExpanded` and `onExpandedChange`, for example from your own collapse button. `onExpandedChange` is called once a swipe, the wheel, the drag handle or a focus move has raised or lowered the sheet. A controlled sheet stays at the height `isExpanded` sets until you change it.
+
+<Example {...expanded} isFlush />
+
+## Size and scrolling
+
+A sheet is as tall as its content, up to 72dp short of the top of the window. It spans the window up to 640dp wide. In a window wider than 640dp, it keeps 56dp from each side and from the top.
+
+- Set `className="max-w-none"` to remove the 640dp limit.
+- Add a `bottom-sheet-top-*` class to set how far short of the top of the window the sheet is at its full height, in place of 72dp and 56dp, for example to keep it under an app's top bar. The value is a number on Tailwind's spacing scale (`bottom-sheet-top-29`), a spacing token or any length.
+
+The sheet's content is laid out in a column below the drag handle. Give the element that should scroll, such as a list, `overflow-y-auto`: it shrinks to fit and scrolls, and what is above it stays in place. When no element scrolls, the whole content scrolls below the drag handle. The content scrolls only when the sheet is at its full height. Below that, a swipe or the wheel raises the sheet.
+
+A modal sheet taller than half the window opens with half the window's height showing. A swipe up, a scroll down over the sheet, or moving the focus to an item below the fold raises it to its full height, where its list scrolls.
+
+<Example {...scrolling} />
+
+## Full-screen
+
+Set `isFullScreen` to make a standard sheet full-screen at its full height. Such a sheet is always as tall as its full height, whatever its content. While it is full-screen, its fill covers everything above it, up to the top of the window, and the bar of its drag handle is hidden. The drag handle stays in the tab order and shows its bar while it has the keyboard focus.
+
+The sheet stops being full-screen as soon as a swipe moves it down, and is full-screen again once a swipe up brings it back near its full height. While it is full-screen, the sheet has `data-full-screen`. Target it to restyle what is above the sheet, such as an app's search bar.
+
+A full-screen sheet has no collapse button. Add your own, such as an icon button in an app bar at the top of the sheet, and control the sheet with `isExpanded`.
+
+<Example {...fullScreen} isFlush />
+
+## Customization
+
+Pass classes in `className` to restyle one sheet. `className`, `style` and `ref` apply to the sheet's container. See [Styling](/get-started/styling) for the classes, the states and the theme.
+
+- **States:** While a standard sheet appears and leaves, it has `data-entering` and `data-exiting`. See [States](/get-started/styling#states).
+- **Functions:** `className`, `style` and `children` can be functions of the sheet's state, on a standard sheet and a modal one alike: `state`, whose `close()` closes the sheet, `isEntering`, `isExiting`, `isExpanded` (true at the sheet's full height), `position`, `swipeDirection`, `stackIndex` and `hasDescendants`. See [Children as a function](/get-started/composition#children-as-a-function).
+- **Ancestors:** A bottom sheet of either variant is rendered at the end of the page, not inside the element it is written in. A class or a `data-theme` on an element around it does not reach it: set it on the `BottomSheet` itself, or on the root element. See [Theme](/get-started/styling#theme).
+- **Attributes:** A `BottomSheet` also takes attributes and events of its `<div>`, such as `id` and `onClick`.
+
+## Limitations
+
+### Modal sheets
+
+`isFullScreen`, `isExpanded`, `defaultExpanded` and `onExpandedChange` have no effect on a modal sheet.
+
+### Variant changes
+
+Changing `isModal` while a sheet is shown remounts its content, so the content's scroll position and state are lost.
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/bottom-sheets/accessibility#df84219d-44ef-49ed-ac4a-66eeef14c12a) what people should be able to do with assistive technology:
+
+- Resize bottom sheets without having to rely on touch gestures
+
+### Interaction and style
+
+- **States:** Keyboard focus on the drag handle shows a [focus ring](/theme/accessibility#focus-ring) around its bar, and a press with a mouse or touch does not.
+- **Touch target:** The drag handle is the top 48dp of the sheet, across its whole width, and takes a press anywhere in it, as Material [advises](https://m3.material.io/components/bottom-sheets/accessibility#c489be7c-9c37-46e5-9639-e9180a8a5bfb).
+- **Color contrast:** The drag handle's bar and its focus ring have 3:1 contrast or more with the sheet, and the sheet's text 4.5:1, in light and dark schemes at every [contrast level](/theme/color#contrast).
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), a sheet opens, and moves between its heights, at once.
+- **Forced colors:** A sheet keeps an edge in [forced colors](/theme/accessibility#forced-colors), and the drag handle's bar takes a system color.
+- **Dragging:** Material [requires](https://m3.material.io/components/bottom-sheets/accessibility#559f4bb8-07ee-4164-97d8-99a98e11452b) a single-pointer alternative to dragging. The drag handle is that alternative: a press on it raises or lowers a standard sheet through its heights, and closes a modal sheet. See [Drag handle](#drag-handle). Without a drag handle, give a sheet with more than one height your own action that changes its height, and a modal sheet an action that closes it.
+
+### Focus
+
+- The drag handle is first in the tab order, so that a keyboard or a switch control reaches it, as Material [advises](https://m3.material.io/components/bottom-sheets/accessibility#d5f6502b-7e28-4837-963a-004ab4d8f3c4).
+- When a modal sheet opens, the focus moves to the sheet itself, and Tab then moves it to the drag handle. To focus an element as the sheet opens, give it `autoFocus`.
+- While a modal sheet is open, the focus stays in the sheet. When the sheet closes, the focus returns to its trigger.
+- When a standard sheet is shown, the focus moves to its drag handle, or to the first focusable element in it when it has no drag handle. When the sheet is hidden, the focus returns to where it was.
+- A standard sheet does not keep the focus: Tab moves it out to the page.
+- Moving the focus to an element below the part of the sheet that shows raises the sheet, so that the keyboard reaches all of its content.
+
+### Keyboard navigation
+
+| Keys           | Actions                                                                                 |
+| -------------- | --------------------------------------------------------------------------------------- |
+| Tab            | Move the focus to the drag handle, then through the sheet's content                     |
+| Space or Enter | Press the drag handle: close a modal sheet, or raise, lower or dismiss a standard sheet |
+| Escape         | Close a modal sheet, or a standard sheet that has an `onOpenChange`                     |
+
+- Escape closes a modal sheet, or the one in front when one is over another, unless `preventDismissal` is set.
+- Escape dismisses a standard sheet only while the focus is in the sheet, and only one that has an `onOpenChange`.
+
+### Labeling elements
+
+- A sheet has the `dialog` role. Set `role` to `alertdialog` to change it.
+- Name the sheet with an `aria-label` or a `Heading` in the `title` slot. Describe a modal sheet that has `role="alertdialog"` with a `Text` in the `description` slot.
+- The drag handle is a button, as Material [advises](https://m3.material.io/components/bottom-sheets/accessibility#f0a8d001-8f37-4e7b-88ee-05fb5836264d), named Drag handle, or what `dragHandleLabel` sets. With `preventDismissal` on a modal sheet, the drag handle is decorative: it has no name and takes no focus.
+- The button of a `SheetTrigger` reports whether the modal sheet is open with `aria-expanded`.
+- While a modal sheet is open, the page behind it is hidden from assistive technology.
+
+## Props
+
+### BottomSheet
+
+<PropsTable {...bottomSheetApi} />
+
+### SheetTrigger
+
+<PropsTable {...sheetTriggerApi} />

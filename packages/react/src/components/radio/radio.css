@@ -1,0 +1,54 @@
+/* Radio (radio.tsx). The inner circle's radius, 0 to 6dp, registered so that it runs on the
+ * fast spatial spring; the circle is drawn 1dp short of it, as on Android. */
+@property --radio-inner-circle-radius {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+/* React Aria's RadioButton, the <label> that is pressed, with the hidden <input>; the named
+ * group its parts style from, group/md-radio, is on it in radio.tsx, since @apply takes no group. */
+@utility radio-button {
+  @apply inline-flex cursor-pointer items-center text-on-surface select-none;
+  @apply disabled:cursor-default disabled:text-on-surface/disabled-content disabled:forced-colors:text-gray-text;
+}
+
+/* The 40dp state layer host, with focus ring, ripple and 48dp target. Its text color is the hover
+ * and focus layer's, primary once selected; the press ripple's is the other one of the pair,
+ * passed to Ripple in radio.tsx. */
+@utility radio-state-layer-host {
+  @apply touch-target relative inline-flex size-10 shrink-0 touch-manipulation items-center justify-center rounded-full;
+  @apply text-on-surface group-selected/md-radio:text-primary;
+  @apply group-focus-visible/md-radio:focus-indicator;
+}
+
+/* The 20dp outer circle. Its text color is its own and the inner one's, faded on the default
+ * effects spring, as on Android. The groups below keep this order: disabled after the states,
+ * forced colors last. */
+@utility radio-outer-circle {
+  @apply pointer-events-none box-border size-5 rounded-full border-2 border-current text-on-surface-variant;
+  @apply transition-colors duration-spring-default-effects ease-spring-default-effects forced-colors:transition-none;
+  @apply group-selected/md-radio:text-primary;
+  /* Unselected, it darkens while hovered, focused or pressed, stacked on the state to outweigh it. */
+  @apply group-not-selected/md-radio:group-hover/md-radio:text-on-surface group-not-selected/md-radio:group-focus-visible/md-radio:text-on-surface group-not-selected/md-radio:group-pressed/md-radio:text-on-surface;
+  /* Disabled, it rests, stacked on unselected as well to outweigh those. */
+  @apply group-disabled/md-radio:text-on-surface/disabled-content group-disabled/md-radio:transition-none group-disabled/md-radio:group-not-selected/md-radio:text-on-surface/disabled-content;
+  @apply group-disabled/md-radio:forced-colors:text-gray-text group-disabled/md-radio:group-not-selected/md-radio:forced-colors:text-gray-text;
+}
+
+/* The 10dp inner circle grows from the center and shrinks back into it on the fast spatial spring,
+ * as on Android, in the outer one's color at every frame of its fade. Disabled, nothing animates. */
+@utility radio-inner-circle {
+  scale: max(0, calc((var(--radio-inner-circle-radius) - 1) / 5));
+  transition-property: --radio-inner-circle-radius;
+  transition-duration: var(--md-sys-motion-spring-fast-spatial-duration);
+  transition-timing-function: var(--md-sys-motion-spring-fast-spatial-easing);
+  @apply pointer-events-none absolute inset-0 m-auto size-2.5 rounded-full bg-current;
+  @apply group-selected/md-radio:radio-inner-circle-selected;
+  @apply group-disabled/md-radio:transition-none;
+  @apply forced-colors:bg-canvas-text forced-colors:forced-color-adjust-none group-disabled/md-radio:forced-colors:bg-gray-text;
+}
+
+@utility radio-inner-circle-selected {
+  --radio-inner-circle-radius: 6;
+}

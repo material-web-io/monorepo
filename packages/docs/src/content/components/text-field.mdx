@@ -1,0 +1,294 @@
+import api from 'virtual:api/TextField'
+import * as basic from '../../examples/text-field/basic.tsx?example'
+import * as controlled from '../../examples/text-field/controlled.tsx?example'
+import * as counter from '../../examples/text-field/counter.tsx?example'
+import * as customInput from '../../examples/text-field/custom-input.tsx?example'
+import * as density from '../../examples/text-field/density.tsx?example'
+import * as error from '../../examples/text-field/error.tsx?example'
+import * as filled from '../../examples/text-field/filled.tsx?example'
+import * as form from '../../examples/text-field/form.tsx?example'
+import * as fullWidth from '../../examples/text-field/full-width.tsx?example'
+import * as icons from '../../examples/text-field/icons.tsx?example'
+import * as inputTypes from '../../examples/text-field/input-types.tsx?example'
+import * as label from '../../examples/text-field/label.tsx?example'
+import * as lines from '../../examples/text-field/lines.tsx?example'
+import * as noLabel from '../../examples/text-field/no-label.tsx?example'
+import * as outlined from '../../examples/text-field/outlined.tsx?example'
+import * as prefixSuffix from '../../examples/text-field/prefix-suffix.tsx?example'
+import * as readOnly from '../../examples/text-field/read-only.tsx?example'
+import * as renderProps from '../../examples/text-field/render-props.tsx?example'
+import * as required from '../../examples/text-field/required.tsx?example'
+import * as variants from '../../examples/text-field/variants.tsx?example'
+
+Text fields let people enter text into a UI, such as contact or payment information. They commonly appear in [forms](#forms) and [dialogs](/components/dialog#forms).
+
+To type a date, use a [date field](/components/date-field), and to search, a [search bar](/components/search).
+
+```tsx
+import { TextField } from '@material-web/react'
+```
+
+## Basic text field
+
+Set the label text with `label` and the supporting text with `description`, and put icons around the input with `leading` and `trailing`. A text field takes no children.
+
+<Example {...basic} />
+
+The `TextField` comes in two variants: set `variant` to `filled` (the default) or `outlined`. Both work the same way, so choose between them by style. Use one variant within a region, and do not mix the two there.
+
+<Example {...variants} />
+
+### Filled text field
+
+A filled text field has more visual emphasis than an outlined one, which makes it stand out among other content and components.
+
+<Example {...filled} />
+
+### Outlined text field
+
+An outlined text field has less visual emphasis, which helps simplify a layout where many fields are placed together, such as a form.
+
+<Example {...outlined} />
+
+## Label and supporting text
+
+Set `label` to the label text, which names the field. The label rests on the input's line until the field is focused or holds text, and then moves to the top of the field. Set `description` to the supporting text, which is shown under the field and describes it.
+
+Set `placeholder` to show a hint while the field is empty. In a field with a `label`, the placeholder shows only once the field is focused.
+
+Pressing the label focuses the input, and so does pressing anywhere in the field that is not another control, such as an icon button.
+
+<Example {...label} />
+
+### Without a label
+
+A field with no `label` can be named by a separate, adjacent label: set `aria-labelledby` to that label's `id`. With neither, set an `aria-label`. Without a `label`, the placeholder shows whenever the field is empty.
+
+<Example {...noLabel} />
+
+## Icons
+
+Set `leading` and `trailing` to the field's leading and trailing icons. Each takes one icon, icon button or 24dp image, and shows it at the start or the end of the field.
+
+- An [icon button](/components/icon-button) is a tab stop after the input. Give it an `aria-label` that says what it does. It is disabled with the field, unless it sets `isDisabled={false}` itself.
+- A value that renders nothing shows no icon, so an icon can be conditional: `trailing={invalid && <Icon name="error" />}`. In this example, the clear icon appears only while there is text to clear.
+
+<Example {...icons} />
+
+### Prefix and suffix
+
+Set `prefix` and `suffix` to show text on the input's line, before and after the input text: `prefix="€"`, `suffix="@gmail.com"`. In a field with a `label`, they show once the field is focused or holds text. They are shown as written and do not describe the input.
+
+<Example {...prefixSuffix} />
+
+### State functions
+
+Pass a function as `leading`, `trailing`, `prefix` or `suffix` to render it from the field's state: `isHovered`, `isFocusWithin`, `isFocusVisible`, `isDisabled` and `isInvalid`. `isFocusWithin` is true while the input has the focus, from the pointer too. The state's type is exported as `TextFieldRenderProps`.
+
+<Example {...renderProps} />
+
+## Multiline
+
+Set `lines` to choose how the field displays its text:
+
+- `single` (the default) displays one line of text.
+- `multi` starts at the height of its `rows` and grows with its text.
+- `area` keeps the height of its `rows` and scrolls.
+
+<Example {...lines} />
+
+Without `rows`, a `multi` field starts as one line and an `area` is two lines tall.
+
+## Controlled
+
+Set the initial text with `defaultValue`, and the field keeps its text itself. To keep the text in your own state, control the field with `value` and `onChange`, which is called with the new text and not with an event.
+
+<Example {...controlled} />
+
+## Color
+
+A focused field draws its label, its caret and its active indicator or outline in the `primary` [color role](/theme/color#color-roles). To use another color, set that role on the field in your own CSS. The value applies to everything inside the field. See [Theme](/get-started/styling#theme).
+
+```css
+.field-tertiary {
+  --md-sys-color-primary: var(--md-sys-color-tertiary);
+}
+```
+
+```tsx
+<TextField label="Name" className="field-tertiary" />
+```
+
+## Widths
+
+Set the field's width in `className`, such as `w-64`, or `w-full` to make the field as wide as the element it is in. Without a width, the field is as wide as the browser's default input.
+
+<Example {...fullWidth} />
+
+## Form props
+
+A text field takes the standard form props, such as `name`, `type`, `placeholder`, `isRequired`, `isReadOnly`, `isDisabled`, `maxLength` and `autoFocus`. For the error state, see [Validation](#validation).
+
+### Required
+
+Set `isRequired` to end the label with an asterisk, which becomes part of the field's name. Use the supporting text to say what the asterisk means.
+
+<Example {...required} />
+
+### Read-only and disabled
+
+Set `isReadOnly` to make the field read-only. A read-only field looks the same as any other, so label it as read-only. Set `isDisabled` to disable the field and any icon button in it.
+
+<Example {...readOnly} />
+
+### Character counter
+
+Set `maxLength` to also show a character counter after the supporting text: the characters used over the limit. It counts a controlled field's `value`, or an uncontrolled field's `defaultValue` and what is typed into it.
+
+Set `counterLabel` to the text a screen reader reads before the counter's numbers. It is `Character count` by default.
+
+<Example {...counter} />
+
+## Controlling the HTML input
+
+The props of an `<input>` that a text field takes go to its `<input>`: `id`, `name`, `type`, `inputMode`, `autoComplete`, `autoCapitalize`, `pattern`, `minLength`, `maxLength`, `enterKeyHint` and `spellCheck`. Set `inputRef` for a ref to the `<input>`, or to the `<textarea>` when `lines` is `multi` or `area`.
+
+```tsx
+<TextField label="Amount" inputMode="decimal" enterKeyHint="done" inputRef={inputRef} />
+```
+
+`className`, `style`, `ref` and a `data-*` attribute go to the field's outermost element instead. See [Customization](#customization).
+
+### Input types
+
+Set `type` to the type of the input. With `text`, `search`, `url`, `tel`, `email`, `password` and `number`, the label rests on the input's line while the field is empty. With any other type, such as `date` or `time`, the label stays at the top of the field.
+
+A `search` input does not show the browser's own clear button or magnifier. Add these icons with `leading` and `trailing`.
+
+<Example {...inputTypes} />
+
+## Validation
+
+Set `isInvalid` to put the field in the error state. Pass the error text as `description` while the field is invalid: it replaces the supporting text and is announced as an alert. Add an error icon as a second cue. A `trailing` icon takes the error color, and one that is not a button needs an `aria-label`, such as `Error`.
+
+In this example, the field is controlled, and is invalid while its text is not an email address.
+
+<Example {...error} />
+
+The field also shows the messages of React Aria's [validation](https://react-aria.adobe.com/forms#validation): those that `validate` returns, and the browser's own for native constraints such as `isRequired`. They show once the form is submitted, or as the text changes when `validationBehavior` is `aria`. While the field is invalid, they replace the supporting text as the error text and are announced as an alert. A field that is invalid with no message shows its `description` as the error text.
+
+```tsx
+<TextField
+  label="Username"
+  description="At least 3 characters"
+  validationBehavior="aria"
+  validate={(text) => (text.length < 3 ? 'Enter at least 3 characters' : null)}
+/>
+```
+
+A field in a form is also validated when the form is submitted. See [Forms](#forms).
+
+## Forms
+
+Set a `name` to include the field in a form. It is submitted and validated with the form, and its text and counter are reset with it.
+
+Validation is native unless `validationBehavior` is `aria`. A required field left empty, or a field that is `isInvalid`, blocks its form from being submitted. A field its form finds invalid on submit shows the error state, with the browser's validation message as the error text, until its text is changed and the field loses the focus, or until the form is reset. See React Aria's [Forms](https://react-aria.adobe.com/forms#validation) guide.
+
+<Example {...form} />
+
+## Customization
+
+Pass classes in `className` to size and place one field. See [Styling](/get-started/styling) for the classes, the states and the theme.
+
+- **Element:** A text field is an inline flex box, aligned to the top of its line. `className`, `style` and `ref` apply to its outermost element, so set its width and position there. `inputRef` applies to its `<input>`, or to its `<textarea>` when `lines` is `multi` or `area`.
+- **States:** On the field, style the disabled, invalid, read-only and required states with their variants, such as `invalid:`. Hover and focus are reported inside the field: use the `has-*` form for them, as in `has-hover:bg-surface-container`. See [Variants](/get-started/styling#variants).
+- **Text inputs:** The `populated:` variant matches a text input that holds text, that is, one not showing its placeholder.
+- **Functions:** `className` and `style` can be functions of `isDisabled`, `isInvalid`, `isReadOnly` and `isRequired`. For hover and focus, pass a [state function](#state-functions) as `leading`, `trailing`, `prefix` or `suffix`.
+- **Every field:** To restyle all the text fields at once, change the [theme](/get-started/styling#theme).
+
+In your own CSS, target these attributes:
+
+| Element                                  | Attributes                                                                                                                                   |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Outermost element                        | `data-disabled`, `data-invalid`, `data-readonly` and `data-required`                                                                         |
+| Container around the input and its icons | `data-hovered`, `data-focus-within`, `data-focus-visible`, `data-disabled` and `data-invalid`                                                |
+| Input                                    | `data-focused` whenever it has the focus, from the pointer too, and `data-hovered`, `data-focus-visible`, `data-disabled` and `data-invalid` |
+
+### Density
+
+A text field is 56dp tall, and has no `size` prop. Add the `density-1`, `density-2` or `density-3` class of the theme's [spacing](/theme/spacing#density) to the field, or to an element around it, to make the field 4dp shorter for each step.
+
+<Example {...density} />
+
+Don't apply density to text fields by default: this lowers their targets below the recommended 48 by 48 CSS pixels. Instead, give people a way to choose a higher density, like selecting a denser layout or changing the theme.
+
+### Custom input
+
+Pass a function to `input` to render an `<input>` of your own in place of the field's, such as one with an attribute that the field does not take, like `list`. It is called with the props to spread on your element, including `ref`, and with the input's state, such as `isFocused` and `isInvalid`. When `lines` is `multi` or `area`, it renders the `<textarea>` instead.
+
+In this example, the input suggests values from a list.
+
+<Example {...customInput} />
+
+## Limitations
+
+### Floating label
+
+The raised label of an outlined field extends above the field's top edge. If a scrolling box starts with an outlined field, give the box `pt-space-100` so that the label is not cut off.
+
+A label wider than the field is cut off with an ellipsis, so keep it short.
+
+### Supporting text
+
+Supporting text and the character counter make the field taller. In a row where only some fields have them, align the fields to the top, as with `items-start`, so that their containers line up.
+
+### Disabled fieldset
+
+A field in a disabled `<fieldset>` cannot be edited, but its label and text keep their enabled colors, and it does not report the disabled state. Set `isDisabled` on the field as well.
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/text-fields/accessibility#af499149-18f0-4d6f-88ae-79293260efd1) what people should be able to do with assistive technology:
+
+- Navigate to and activate a text field with assistive technology
+- Input information into the text field
+- Receive and understand supporting text and error messages
+- Navigate to and select interactive icons
+
+### Interaction and style
+
+- **States:** Hovering a filled field shows a state layer, and hovering an outlined field darkens its outline. A focused field raises its label and draws its active indicator or outline 3dp thick in the primary color, whether the focus comes from the keyboard or a press. An invalid field draws them in the error color.
+- **Touch target:** An [icon button](/components/icon-button) in the field keeps its 48dp [touch target](/theme/accessibility#touch-targets), inside the field.
+- **Color contrast:** With the default color roles, the active indicator and the outline keep 3:1 contrast with the surface in every scheme, and the label, the input text and the supporting text keep 4.5:1. Material [advises](https://m3.material.io/components/text-fields/accessibility#bed72f5e-f232-40c9-b215-2fdc2fefdf45) at least 3:1 between an outline and the background. Keep it when you change the field's [colors](#color).
+- **Density:** Each [density](#density) step makes the field 4dp shorter, down to 44dp at the third.
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), the label moves and the colors change at once.
+- **Forced colors:** In [forced colors](/theme/accessibility#forced-colors), a filled field keeps an edge, a focused field draws its indicator or outline in the system's highlight color, and a disabled field is grayed out.
+- **Right to left:** The layout is mirrored in a right-to-left direction, with the leading icon on the right.
+
+### Focus
+
+- A press on the label, or anywhere in the field that is not another control, focuses the input.
+- A disabled field cannot be focused, and neither can an icon button in it. A read-only field can be focused.
+
+### Keyboard navigation
+
+| Keys           | Actions                                                              |
+| -------------- | -------------------------------------------------------------------- |
+| Tab            | Move the focus to the input, and then to an icon button in the field |
+| Space or Enter | Press the focused icon button                                        |
+
+### Labeling elements
+
+- The input is a text box named by the `label`, including the asterisk of a required field, as Material [advises](https://m3.material.io/components/text-fields/accessibility#101b7337-c788-41c8-8027-7884da77bc89). Without a `label`, set an `aria-label` or `aria-labelledby`.
+- The `description` describes the field. While the field is invalid, the error text describes it instead and is announced as an alert.
+- The character counter also describes the field, after the supporting text and before the elements of your own `aria-describedby`. A screen reader reads the `counterLabel` before its numbers: Character count by default.
+- Give an icon button in the field an `aria-label` that says what it does, and that follows its state. Material's example is Show password, and Hide password while the password is shown. An icon that is not a button, such as an error icon, needs an `aria-label` too, such as Error.
+- A prefix and a suffix are shown as written and do not describe the input. Where the symbol matters, such as € for euros, say it in the `label` or the `description` as well.
+
+> **Note:** A `description` added after the field first renders is shown, but does not describe the field until the error state next changes.
+
+## Props
+
+<PropsTable {...api} />

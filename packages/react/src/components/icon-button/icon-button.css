@@ -1,0 +1,16 @@
+/* React Aria's Button, or its ToggleButton given isSelectable: the container, with focus ring and
+ * 48dp target, holding the ripple and the icon. Its colors, size and shape are the M3 props', in
+ * icon-button.tsx. Pending, it keeps its colors and shows the progress cursor. */
+@utility icon-button-container {
+  @apply touch-target relative m-0 inline-flex shrink-0 touch-manipulation appearance-none items-center justify-center border-0 px-0 no-underline outline-none select-none;
+  @apply focus-ring button-pending not-disabled:cursor-pointer pending:cursor-progress;
+  @apply transition-shape-color;
+  /* Forced colors drop backgrounds, so the container gets a border of its own. */
+  @apply forced-colors:container-border;
+}
+
+/* The disabled colors, applied as disabled:icon-button-disabled. A selected toggle's colors sort
+ * after it, so a toggle names both (selected:disabled:icon-button-disabled). */
+@utility icon-button-disabled {
+  @apply bg-on-surface/disabled-container text-on-surface/disabled-content;
+}

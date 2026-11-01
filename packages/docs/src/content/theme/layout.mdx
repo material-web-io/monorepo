@@ -1,0 +1,106 @@
+import * as breakpoints from '../../examples/theme/breakpoints.tsx?example'
+
+Use Material's five [breakpoints](https://m3.material.io/foundations/layout/breakpoints/overview) as Tailwind [variants](https://tailwindcss.com/docs/responsive-design), such as `expanded-screen:`, to change a layout with the width of the window, and the stacking order classes for the surfaces that overlap. The theme also styles the scrollbar.
+
+## Breakpoints
+
+The theme's breakpoints follow Material's [breakpoints](https://m3.material.io/foundations/layout/breakpoints/overview), which it named window size classes before: the window widths at which a layout changes. They are min-width [breakpoints](https://tailwindcss.com/docs/responsive-design), next to Tailwind's own. Write the styles of a compact window with no prefix, and use a variant for each breakpoint from medium up. Resize the window to see them take effect.
+
+<Example {...breakpoints} />
+
+| Variant               | Breakpoint  | From   | Common devices                                                                     |
+| --------------------- | ----------- | ------ | ---------------------------------------------------------------------------------- |
+| none                  | Compact     | 0      | Phone in portrait                                                                  |
+| `medium-screen:`      | Medium      | 600dp  | Tablet in portrait, foldable in portrait (unfolded)                                |
+| `expanded-screen:`    | Expanded    | 840dp  | Phone in landscape, tablet in landscape, foldable in landscape (unfolded), desktop |
+| `large-screen:`       | Large       | 1200dp | Desktop                                                                            |
+| `extra-large-screen:` | Extra-large | 1600dp | Desktop, ultra-wide monitors                                                       |
+
+A breakpoint variant is one of Tailwind's [responsive variants](https://tailwindcss.com/docs/responsive-design), and is used like any other:
+
+- **Wider windows:** A variant applies from its width up: `expanded-screen:` also applies in a large window.
+- **Ranges:** Each has its [`max-` form](https://tailwindcss.com/docs/responsive-design#targeting-a-breakpoint-range), as Tailwind's breakpoints do: `max-medium-screen:` matches a compact window alone. Use both for a range, as in `medium-screen:max-large-screen:flex`.
+- **Names:** The variants end in `-screen`: `expanded:` without it matches an expanded element, not a window size.
+- **Tailwind's breakpoints:** Keep to one set of breakpoints on an element. Tailwind's own breakpoints override Material's whatever their sizes, so `md:` overrides `expanded-screen:` though it is the narrower.
+- **Your own CSS:** Use a breakpoint in a stylesheet with Tailwind's [`@variant`](https://tailwindcss.com/docs/functions-and-directives#variant-directive), as in `@variant expanded-screen { ... }`.
+- **Panes and navigation:** Material [moves a layout](https://m3.material.io/foundations/layout/breakpoints/overview#447916ac-1cf2-4cd4-b997-f639c881d27f) from one pane to two or three as the window widens, and swaps the [navigation bar](/components/navigation-bar) of a compact window for a [navigation rail](/components/navigation-rail) from medium up.
+
+## Stacking order
+
+Use these classes to stack the surfaces that overlap, lowest to highest, so that any two of them agree: a menu in a dialog, a snackbar over a sheet.
+
+| Class          | z-index | Surface                          |
+| -------------- | ------- | -------------------------------- |
+| `z-fab`        | 10      | A floating action button         |
+| `z-app-bar`    | 20      | An app bar                       |
+| `z-navigation` | 30      | A navigation bar or rail         |
+| `z-scrim`      | 40      | The scrim behind a modal surface |
+| `z-sheet`      | 50      | A sheet                          |
+| `z-dialog`     | 60      | A dialog                         |
+| `z-menu`       | 70      | A menu                           |
+| `z-snackbar`   | 80      | A snackbar                       |
+| `z-tooltip`    | 90      | A tooltip                        |
+
+Inside a component, under all of them, use three more classes for its parts:
+
+| Class          | z-index | Part                                                            |
+| -------------- | ------- | --------------------------------------------------------------- |
+| `z-behind`     | -1      | A part behind its content                                       |
+| `z-raised`     | 1       | A part raised above its siblings                                |
+| `z-focus-ring` | 5       | The focused element, so that nothing next to it covers its ring |
+
+A stacking class is one of Tailwind's [z-index utilities](https://tailwindcss.com/docs/z-index), and is used like any other:
+
+- **Components:** The library's surfaces, such as a `Dialog`, a `Menu` or a `Snackbar`, have their class already.
+- **Tailwind's z-index:** Tailwind's numeric classes are unchanged, and are on the same scale: `z-10` is level with `z-fab`.
+- **Parts of a component:** Add Tailwind's [`isolate`](https://tailwindcss.com/docs/isolation) to a component's root, so that the order of its parts stays inside it.
+- **Merged classes:** [tailwind-merge](https://github.com/dcastil/tailwind-merge) does not know the order, and keeps both of two stacking classes. To merge them, use the [`tv` or the `twMerge`](/get-started/styling#custom-components) that `@material-web/react` exports, where the later class replaces the earlier one.
+
+## Scrollbar
+
+The theme gives every scroll container and the page the Material scrollbar: a 4dp thumb in the outline color with round ends and no track. Firefox shows its own thin scrollbar in that color.
+
+Use `scrollbar-hidden` to hide a scrollbar without disabling the scrolling, for an overflow that should read as clipped content.
+
+```html
+<div class="scrollbar-hidden overflow-x-auto"></div>
+```
+
+The scrollbar is styled in Tailwind's [base layer](https://tailwindcss.com/docs/adding-custom-styles#adding-base-styles), so a scrollbar rule in your own CSS replaces it.
+
+## Custom layout
+
+The breakpoints and the stacking order are Tailwind [theme variables](https://tailwindcss.com/docs/theme). Set them in `@theme`, after the import:
+
+```css
+@import 'tailwindcss';
+@import '@material-web/tailwind';
+
+@theme {
+  --breakpoint-medium-screen: 640px;
+  --z-index-dialog: 100;
+}
+```
+
+| Theme variable                    | Default  | Components that use it, such as       |
+| --------------------------------- | -------- | ------------------------------------- |
+| `--breakpoint-medium-screen`      | `600px`  | Dialog                                |
+| `--breakpoint-expanded-screen`    | `840px`  | None                                  |
+| `--breakpoint-large-screen`       | `1200px` | None                                  |
+| `--breakpoint-extra-large-screen` | `1600px` | None                                  |
+| `--z-index-fab`                   | `10`     | FAB, FAB menu                         |
+| `--z-index-app-bar`               | `20`     | App bar                               |
+| `--z-index-navigation`            | `30`     | None                                  |
+| `--z-index-scrim`                 | `40`     | None                                  |
+| `--z-index-sheet`                 | `50`     | Bottom sheet                          |
+| `--z-index-dialog`                | `60`     | Dialog, modal sheets, search view     |
+| `--z-index-menu`                  | `70`     | Menu                                  |
+| `--z-index-snackbar`              | `80`     | Snackbar                              |
+| `--z-index-tooltip`               | `90`     | None                                  |
+| `--z-index-behind`                | `-1`     | Text field                            |
+| `--z-index-raised`                | `1`      | App bar, calendar, chip, list, slider |
+| `--z-index-focus-ring`            | `5`      | Every component with a focus ring     |
+
+- **Units:** Keep a breakpoint in `px`. Tailwind sorts the breakpoints of one unit together, so one in `rem` no longer comes in the order of its size.
+- **Breakpoint of your own:** Add a variable for a [breakpoint of your own](https://tailwindcss.com/docs/responsive-design#using-custom-breakpoints), as in `--breakpoint-tv: 1920px` for a `tv:` variant.
+- **Surface of your own:** Add a variable to place a surface in the order, as in `--z-index-banner: 25` for a `z-banner` class between the app bar and the navigation.

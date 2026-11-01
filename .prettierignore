@@ -1,0 +1,6 @@
+dist
+.react-router
+storybook-static
+coverage
+package-lock.json
+packages/tailwind/src/theme-default.css

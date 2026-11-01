@@ -1,0 +1,573 @@
+/* Time pickers (time-picker.tsx and its parts, time-picker-dialog.tsx): React Aria's TimeField, its
+ * segments as the spec's time selectors, the period selector and the dial, to the spec's measurements
+ * and, where they differ, the guideline videos', whose motion this is. Reduced motion skips it. */
+
+/* The hand's angle, clockwise from 12 o'clock, registered so that it turns on the default spatial
+ * spring; inherited by the hand and by the handle's cut of the numbers, which read it. */
+@property --time-picker-dial-angle {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: 0deg;
+}
+
+/* TimePicker, React Aria's TimeField: a column of the header and the content, 24dp in from its
+ * sides, as wide as its content; body-large on-surface on no background, which its dialog draws.
+ * The swap of the dial and the input follows the guidelines' toggle video: 700ms on the M3
+ * emphasized easing, the path itself rather than the cubic-bezier that stands in for it. */
+@utility time-picker {
+  --time-picker-swap-duration: var(--md-sys-motion-duration-extra-long1);
+  --time-picker-swap-easing: linear(
+    0,
+    0.005,
+    0.0207,
+    0.049,
+    0.0938,
+    0.1628,
+    0.274,
+    0.479,
+    0.6357,
+    0.7193,
+    0.7728,
+    0.8112,
+    0.8405,
+    0.8638,
+    0.8829,
+    0.8989,
+    0.9125,
+    0.9241,
+    0.9342,
+    0.9429,
+    0.9506,
+    0.9574,
+    0.9633,
+    0.9685,
+    0.9732,
+    0.9773,
+    0.9809,
+    0.984,
+    0.9868,
+    0.9893,
+    0.9914,
+    0.9932,
+    0.9948,
+    0.9961,
+    0.9972,
+    0.9981,
+    0.9988,
+    0.9994,
+    0.9997,
+    0.9999,
+    1
+  );
+  /* The hand's turn: the default spatial spring, as Compose's dial turns it. */
+  --time-picker-hand-duration: var(--md-sys-motion-spring-default-spatial-duration);
+  --time-picker-hand-easing: var(--md-sys-motion-spring-default-spatial-easing);
+  /* The labels' room under the boxes in input mode: their 7dp gap and two lines of body-small. */
+  --time-picker-labels-room: calc(7px + --spacing(8));
+  /* In a dialog too short for it, as a phone turned landscape is for the horizontal dial, it
+   * scrolls, the dialog's actions staying under it; never sideways, where the dial overflows its
+   * pane as it folds. */
+  @apply flex min-h-0 w-fit max-w-full flex-col overflow-x-hidden overflow-y-auto overscroll-contain px-space-300 text-start font-plain text-body-lg text-on-surface;
+  /* Its scrollbar (layout.css) stops short of the dialog's 28dp corners. */
+  &::-webkit-scrollbar-track {
+    margin-block: var(--radius-shape-xl);
+  }
+}
+
+/* TimePickerHeader: the caller's heading in the `title` slot, label-medium on-surface-variant, 24dp
+ * from the top and 20dp over the time, in both modes, as Compose's dialog lays it out. */
+@utility time-picker-header {
+  @apply shrink-0 pt-space-300 pb-space-250;
+  :where(& > * > [slot='title']) {
+    @apply m-0 text-label-md text-on-surface-variant;
+  }
+}
+/* The heading as the modes swap, as the toggle video fades them through: the one leaving fades out
+ * over a short-2, then the one coming, mounted once it has gone, fades in over a short-3. */
+@utility time-picker-header-title {
+  opacity: 1;
+  transition: opacity var(--md-sys-motion-duration-short3) linear;
+  @starting-style {
+    opacity: 0;
+  }
+}
+@utility time-picker-header-title-leaving {
+  opacity: 0;
+  transition: opacity var(--md-sys-motion-duration-short2) linear;
+}
+
+/* TimePickerContent: the time, the period selector and the dial, as the spec lays them out: the
+ * selector after the time and the dial under them, or, on a horizontal dial, the selector under
+ * the time and the two centered beside the dial, as Compose's row aligns them, with the dial's
+ * 24dp gap to the actions under the grid. The gaps are the parts' margins, so that a missing
+ * selector, on a 24-hour clock, leaves none. */
+@utility time-picker-content {
+  @apply grid justify-start;
+}
+@utility time-picker-content-vertical {
+  grid-template-areas:
+    'input period'
+    'dial dial';
+  grid-template-columns: auto auto;
+}
+/* A horizontal picker keeps this grid in input mode, so that the swap folds in place: the dial's
+ * column beside the time, the selector's row under it over the dial and its column after the
+ * minute in input mode, each sized in the stylesheet, the dial's gap to the actions, all swapping
+ * over the swap's time, as the dial pane and the time's boxes do. */
+@utility time-picker-content-horizontal {
+  --time-picker-period-column: 0px;
+  --time-picker-period-row: 0px;
+  @apply pb-space-300;
+  grid-template-areas:
+    '. . dial'
+    'input period dial'
+    'under under dial'
+    '. . dial';
+  grid-template-columns: auto var(--time-picker-period-column) auto;
+  grid-template-rows: 1fr auto var(--time-picker-period-row) 1fr;
+  transition-property: padding-bottom, grid-template-columns, grid-template-rows;
+  transition-duration: var(--time-picker-swap-duration);
+  transition-timing-function: var(--time-picker-swap-easing);
+}
+/* With a period selector, which a caller may leave out: its row over the dial, 38dp and its 16dp
+ * gap, and in input mode, where the dial's gap to the actions closes, its column after the minute,
+ * 52dp and its 12dp gap. */
+@utility time-picker-content-horizontal-under {
+  &:has(.time-picker-period) {
+    --time-picker-period-row: calc(--spacing(9.5) + var(--spacing-space-200));
+  }
+}
+@utility time-picker-content-horizontal-input {
+  @apply pb-0;
+  &:has(.time-picker-period) {
+    --time-picker-period-column: calc(--spacing(13) + var(--spacing-space-150));
+  }
+}
+/* A layout or a clock changed with the mode as it was: the parts take their places at once. */
+@utility time-picker-content-cut {
+  --time-picker-swap-duration: 0s;
+}
+
+/* TimePickerInput: the hour and the minute, React Aria's DateInput's segments, on the columns of
+ * the boxes they are, the separator between, and the labels under them in input mode. Left to
+ * right whatever the locale's direction, as Compose lays the hour and the minute out; over the
+ * period selector, which passes under it on a horizontal picker as the modes swap. */
+@utility time-picker-input {
+  grid-area: input;
+  direction: ltr;
+  @apply relative z-1 grid;
+  grid-template-columns: auto auto auto;
+}
+/* React Aria's DateInput, the group of the segments: its segments on the input's columns. */
+@utility time-picker-input-time {
+  display: contents;
+}
+/* The box of the hour or the minute, around React Aria's DateSegment over the dial and a text
+ * input in input mode: 96dp by 80dp with 8dp corners, display-large on surface-container-highest,
+ * primary-container while it is the selection, with its hover and pressed state layers, as
+ * Compose's time selector; its size and text swap with the modes over the swap's time, its colors
+ * on the effects spring and its outline in 100ms. */
+@utility time-picker-input-segment {
+  @apply relative box-border flex h-20 w-24 cursor-pointer items-center justify-center rounded-shape-sm bg-surface-container-highest text-display-lg text-on-surface tabular-nums select-none;
+  transition-property: width, height, font-size, background-color, color, box-shadow;
+  transition-duration:
+    var(--time-picker-swap-duration), var(--time-picker-swap-duration),
+    var(--time-picker-swap-duration), var(--md-sys-motion-spring-default-effects-duration),
+    var(--md-sys-motion-spring-default-effects-duration), var(--md-sys-motion-duration-short2);
+  transition-timing-function:
+    var(--time-picker-swap-easing), var(--time-picker-swap-easing), var(--time-picker-swap-easing),
+    var(--md-sys-motion-spring-default-effects-easing),
+    var(--md-sys-motion-spring-default-effects-easing), linear;
+  &:has([data-placeholder]) {
+    @apply text-on-surface-variant;
+  }
+  &:has([data-disabled], :disabled) {
+    @apply cursor-default text-on-surface/disabled-content forced-colors:text-gray-text;
+  }
+  @apply forced-colors:container-border;
+  /* The state layer, in its own color at the hover and pressed opacities, as Compose's ripple;
+   * none on a disabled box, nor on the text field being typed in. */
+  &::after {
+    content: '';
+    @apply pointer-events-none absolute inset-0 rounded-inherit bg-current opacity-0;
+    transition: opacity var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
+  }
+  @media (hover: hover) {
+    &:hover:not(:has([data-disabled], :disabled, input:focus))::after {
+      opacity: var(--md-sys-state-hover-state-layer-opacity);
+    }
+  }
+  &:active:not(:has([data-disabled], :disabled, input:focus))::after {
+    opacity: var(--md-sys-state-pressed-state-layer-opacity);
+  }
+}
+/* The segment in the box, React Aria's DateSegment, over the dial: the number, filling the box, with
+ * no caret, which it does not edit as text. */
+@utility time-picker-input-segment-text {
+  @apply flex size-full items-center justify-center caret-transparent outline-none;
+}
+/* The text input in the box, in input mode: the number as typed, in the box's font and color, its
+ * caret primary; the text selected as in any input. */
+@utility time-picker-input-field {
+  @apply m-0 size-full min-w-0 appearance-none rounded-inherit border-0 bg-transparent p-0 text-center caret-primary outline-none select-text;
+  font: inherit;
+  color: inherit;
+}
+/* Over the dial, the keyboard focus ring around it, React Aria's data-focus-visible on the segment:
+ * the segment is contenteditable, so a click would match the browser's :focus-visible as a text
+ * input's does. Compose's selector draws no focus of its own. */
+@utility time-picker-input-segment-picker {
+  @apply has-focus-visible:focus-indicator;
+}
+@utility time-picker-input-segment-selected {
+  @apply bg-primary-container text-on-primary-container;
+  &:has([data-placeholder]):not(:has([data-disabled], :disabled)) {
+    @apply text-on-primary-container;
+  }
+  @apply forced-colors:selected-fill;
+}
+/* In input mode, Compose's text field: 96dp by 72dp, the number display-medium; the selection is
+ * outlined 1dp inside its edge in outline, 2dp while its input is focused. */
+@utility time-picker-input-segment-input {
+  @apply h-18 cursor-text text-display-md;
+  &:has(:focus) {
+    @apply inset-ring-2 inset-ring-outline forced-colors:inset-ring-highlight-text;
+  }
+}
+@utility time-picker-input-segment-input-selected {
+  @apply inset-ring-1 inset-ring-outline forced-colors:inset-ring-highlight-text;
+}
+/* On a 24-hour vertical dial, with no period selector after it: 114dp wide. */
+@utility time-picker-input-segment-wide {
+  @apply w-28.5;
+}
+/* The separator, React Aria's literal between the hour and the minute: 24dp wide, or as wide as a
+ * word written there, as Canadian French's h or Dzongkha's, as tall as the boxes, display-large
+ * on-surface, lifted 4dp, as Compose's; the digits' size in input mode, swapped with the modes. */
+@utility time-picker-input-separator {
+  @apply flex min-w-6 -translate-y-space-50 items-center justify-center self-stretch text-display-lg whitespace-nowrap text-on-surface select-none;
+  transition-property: font-size;
+  transition-duration: var(--time-picker-swap-duration);
+  transition-timing-function: var(--time-picker-swap-easing);
+  &[data-disabled] {
+    @apply text-on-surface/disabled-content forced-colors:text-gray-text;
+  }
+}
+@utility time-picker-input-separator-input {
+  @apply text-display-md;
+}
+/* The direction marks around the time, the space before the day period and the day period itself,
+ * which the period selector shows, and any other words of the locale's pattern. */
+@utility time-picker-input-hidden {
+  display: none;
+}
+/* The labels under the boxes, body-small on-surface-variant 7dp under them, on the boxes' columns,
+ * in the two lines Compose keeps for them; folded away in picker mode over the swap's time, fading
+ * through with the swap: out over a short-2, in over the short-3 after it. */
+@utility time-picker-input-labels {
+  @apply col-span-full grid h-8 grid-cols-subgrid overflow-hidden text-body-sm text-on-surface-variant;
+  box-sizing: content-box;
+  padding-top: 7px;
+  opacity: 1;
+  transition:
+    height var(--time-picker-swap-duration) var(--time-picker-swap-easing),
+    padding-top var(--time-picker-swap-duration) var(--time-picker-swap-easing),
+    opacity var(--md-sys-motion-duration-short3) linear var(--md-sys-motion-duration-short2);
+  & > * {
+    @apply truncate;
+  }
+}
+@utility time-picker-input-labels-away {
+  @apply h-0 pt-0;
+  opacity: 0;
+  transition:
+    height var(--time-picker-swap-duration) var(--time-picker-swap-easing),
+    padding-top var(--time-picker-swap-duration) var(--time-picker-swap-easing),
+    opacity var(--md-sys-motion-duration-short2) linear;
+}
+
+/* TimePickerPeriodSelector, React Aria's RadioGroup: AM over PM in a 52dp box 12dp after the time,
+ * as tall as the boxes, or side by side in a 216dp by 38dp one 16dp under the time on a horizontal
+ * dial; outlined 1dp in outline with 8dp corners, sized and moved with the modes over the swap. */
+@utility time-picker-period {
+  /* Its options side by side, 1, or over and under, 0: turned at once, halfway through a swap. */
+  --time-picker-period-across: 0;
+  @apply relative box-border rounded-shape-sm border border-outline;
+  transition-property: width, height, margin, --time-picker-period-across;
+  transition-duration: var(--time-picker-swap-duration);
+  transition-timing-function: var(--time-picker-swap-easing);
+  transition-behavior: allow-discrete;
+  &[data-disabled] {
+    @apply border-on-surface/disabled-container forced-colors:border-gray-text;
+  }
+}
+@utility time-picker-period-vertical {
+  grid-area: period;
+  @apply ms-space-150 w-13 self-start;
+}
+@utility time-picker-period-vertical-picker {
+  @apply h-20;
+}
+@utility time-picker-period-vertical-input {
+  @apply h-18;
+}
+/* On a horizontal picker, one place in both modes, the time's row and the one under it, at their
+ * bottom and start: under the time over the dial; in input mode, which grows the selector's column,
+ * at the column's end, beside the boxes over the labels' room, so that it moves between the two. */
+@utility time-picker-period-horizontal {
+  grid-row: input-start / under-end;
+  grid-column: under;
+  @apply self-end justify-self-start;
+}
+@utility time-picker-period-horizontal-picker {
+  --time-picker-period-across: 1;
+  @apply h-9.5 w-54;
+}
+@utility time-picker-period-horizontal-input {
+  @apply h-18 w-13;
+  margin-inline-start: calc(100% - --spacing(13));
+  margin-bottom: var(--time-picker-labels-room);
+}
+/* An option, React Aria's RadioField: half the box, AM from its top start and PM from its bottom
+ * end, over and under or side by side; round at the box's corners, and parted from the other by
+ * the outline, faded as the box's is when disabled. */
+@utility time-picker-period-option {
+  @apply absolute flex border-outline;
+  width: calc(100% - 50% * var(--time-picker-period-across));
+  height: calc(50% + 50% * var(--time-picker-period-across));
+  &:first-child {
+    @apply start-0 top-0;
+    border-start-start-radius: var(--radius-shape-sm);
+    border-start-end-radius: calc(var(--radius-shape-sm) * (1 - var(--time-picker-period-across)));
+    border-end-start-radius: calc(var(--radius-shape-sm) * var(--time-picker-period-across));
+  }
+  &:last-child {
+    @apply end-0 bottom-0 border-0;
+    border-end-end-radius: var(--radius-shape-sm);
+    border-end-start-radius: calc(var(--radius-shape-sm) * (1 - var(--time-picker-period-across)));
+    border-start-end-radius: calc(var(--radius-shape-sm) * var(--time-picker-period-across));
+    border-top-width: calc(1px * (1 - var(--time-picker-period-across)));
+    border-inline-start-width: calc(1px * var(--time-picker-period-across));
+  }
+  .time-picker-period[data-disabled] > & {
+    @apply border-on-surface/disabled-container forced-colors:border-gray-text;
+  }
+}
+/* Its RadioButton, the label pressed, filling it: title-medium on-surface-variant, tertiary-container
+ * and on-tertiary-container selected, its state layer and ripple over it, cut to the option's
+ * corners; the keyboard focus ring 2dp outside it, as the spec's states draw it: round at the box's
+ * corners and square at the line between the two. */
+@utility time-picker-period-option-button {
+  @apply relative flex flex-1 cursor-pointer items-center justify-center rounded-inherit text-title-md text-on-surface-variant outline-none select-none;
+  @apply focus-visible:focus-indicator;
+  transition-property: background-color, color;
+  transition-duration: var(--md-sys-motion-spring-default-effects-duration);
+  transition-timing-function: var(--md-sys-motion-spring-default-effects-easing);
+  &[data-selected] {
+    @apply bg-tertiary-container text-on-tertiary-container;
+    @apply forced-colors:selected-fill;
+  }
+  &[data-disabled] {
+    @apply cursor-default text-on-surface/disabled-content forced-colors:text-gray-text;
+  }
+}
+
+/* TimePickerDial's room in the content: the dial 36dp under the time and 24dp over the actions on a
+ * vertical dial, 36dp beside the time on a horizontal one, centered under the time or at its top,
+ * as Compose lays it out; folded away in input mode as the toggle video folds it, over the swap's
+ * time, the dial scaled from the pane's start. */
+@utility time-picker-dial-pane {
+  grid-area: dial;
+  /* What overflows it, the hand's box turned with the time and the face as the pane folds, is ink,
+   * which scrolls nothing. */
+  @apply flex contain-layout;
+  transition-property: height, width, margin;
+  transition-duration: var(--time-picker-swap-duration);
+  transition-timing-function: var(--time-picker-swap-easing);
+}
+@utility time-picker-dial-pane-vertical {
+  @apply mt-space-450 mb-space-300 h-64 w-64 items-start justify-center justify-self-center;
+  :where(& > *) {
+    @apply origin-top;
+  }
+}
+@utility time-picker-dial-pane-horizontal {
+  @apply ms-space-450 h-64 w-64 items-center justify-start self-start;
+  :where(& > *) {
+    @apply origin-left rtl:origin-right;
+  }
+}
+/* Its width folds too: a 24-hour clock's time is narrower than the dial, and ends the content. */
+@utility time-picker-dial-pane-away-vertical {
+  @apply mt-0 mb-0 h-0 w-0;
+}
+/* Beside the time, it folds to the time's height in input mode, the 72dp boxes and the labels'
+ * room: so the dialog's height closes on the swap's curve, as its width does, not ahead of it. */
+@utility time-picker-dial-pane-away-horizontal {
+  @apply ms-0 w-0;
+  height: calc(--spacing(18) + var(--time-picker-labels-room));
+}
+
+/* The face: 256dp round, surface-container-highest, which takes a press or a drag anywhere on it;
+ * faded out in 100ms at its size, lifting 12dp, as its pane folds away, and grown from the pane's
+ * start as it comes back, as the toggle video draws it. Its hand turns on the default spatial
+ * spring, as Compose's. */
+@utility time-picker-dial {
+  --time-picker-dial-ring: 101px;
+  @apply relative size-64 shrink-0 cursor-pointer touch-none rounded-shape-full bg-surface-container-highest outline-none select-none;
+  @apply forced-colors:container-border;
+  &:has([data-disabled]) {
+    @apply cursor-default;
+  }
+  scale: 1;
+  opacity: 1;
+  /* Inherited, not visible, so that an ancestor hidden hides it with it. */
+  visibility: inherit;
+  translate: 0 0;
+  transition-property: scale, opacity, visibility, translate, --time-picker-dial-angle;
+  transition-duration:
+    var(--time-picker-swap-duration), var(--md-sys-motion-duration-short2), 0s, 0s,
+    var(--time-picker-hand-duration);
+  transition-timing-function:
+    var(--time-picker-swap-easing), linear, linear, linear, var(--time-picker-hand-easing);
+  &.time-picker-dial-snap {
+    transition-duration:
+      var(--time-picker-swap-duration), var(--md-sys-motion-duration-short2), 0s, 0s, 0s;
+  }
+}
+/* Folded away: faded out and lifted at its size, then shrunk out of sight; back in its place at
+ * once as it returns, under its fade. */
+@utility time-picker-dial-away {
+  @apply -translate-y-space-150;
+  scale: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition-duration:
+    var(--time-picker-swap-duration), var(--md-sys-motion-duration-short2), 0s,
+    var(--md-sys-motion-duration-short2), 0s;
+  transition-delay:
+    var(--md-sys-motion-duration-short2), 0s, var(--time-picker-swap-duration), 0s, 0s;
+}
+/* The hand on the inner ring: a 24-hour dial's afternoon hour. */
+@utility time-picker-dial-inner {
+  --time-picker-dial-ring: 69px;
+}
+/* The hand: the 2dp track from the center out to the 48dp handle on the ring, primary, turned to
+ * the angle; under the numbers, the one under the handle drawn over it in on-primary. */
+@utility time-picker-dial-hand {
+  @apply pointer-events-none absolute inset-0;
+  rotate: var(--time-picker-dial-angle);
+  &::before {
+    content: '';
+    position: absolute;
+    left: calc(50% - 1px);
+    top: calc(50% - var(--time-picker-dial-ring) + 24px);
+    width: 2px;
+    height: calc(var(--time-picker-dial-ring) - 24px);
+    @apply bg-primary forced-colors:selected-fill;
+  }
+  &::after {
+    content: '';
+    position: absolute;
+    left: calc(50% - 24px);
+    top: calc(50% - var(--time-picker-dial-ring) - 24px);
+    @apply size-12 rounded-shape-full bg-primary forced-colors:selected-fill;
+  }
+}
+/* The 8dp dot at the center, primary. */
+@utility time-picker-dial-center {
+  @apply pointer-events-none absolute top-1/2 left-1/2 size-2 -translate-1/2 rounded-shape-full bg-primary forced-colors:selected-fill;
+}
+/* A face of the dial, the hours' or the minutes': its numbers and the handle's cut of them, over
+ * the face, which takes the pointer for them; crossfaded with the other face as the selection
+ * changes, on the default effects spring, as Compose's Crossfade; hidden once it has faded. */
+@utility time-picker-dial-face {
+  @apply pointer-events-none absolute inset-0;
+  opacity: 1;
+  /* Inherited, as the dial's is. */
+  visibility: inherit;
+  transition-property: opacity, visibility;
+  transition-duration: var(--md-sys-motion-spring-default-effects-duration), 0s;
+  transition-timing-function: var(--md-sys-motion-spring-default-effects-easing), linear;
+}
+@utility time-picker-dial-face-away {
+  opacity: 0;
+  visibility: hidden;
+  transition-delay: 0s, var(--md-sys-motion-spring-default-effects-duration);
+}
+/* The numbers of a face, React Aria's ToggleButtonGroup, a radio group, on-surface; a stacking
+ * context, so that the focus ring's z-index raises a number over its neighbors alone, not over the
+ * handle's cut of the numbers, which would draw the number under the handle on-surface. */
+@utility time-picker-dial-numbers {
+  @apply pointer-events-none absolute inset-0 isolate text-on-surface;
+}
+/* A number: a 48dp target centered on its place on its ring, of twelve from 12 o'clock, body-large
+ * in the color of the group it is in, the numbers' or the handle's cut, ringed by the keyboard
+ * focus. */
+@utility time-picker-dial-number {
+  --time-picker-dial-number-ring: 101px;
+  --time-picker-dial-number-angle: calc(var(--time-picker-dial-index) * 30deg);
+  @apply absolute m-0 flex size-12 appearance-none items-center justify-center rounded-shape-full border-0 bg-transparent p-0 font-plain text-body-lg text-inherit outline-none;
+  left: calc(
+    50% + sin(var(--time-picker-dial-number-angle)) * var(--time-picker-dial-number-ring) - 24px
+  );
+  top: calc(
+    50% - cos(var(--time-picker-dial-number-angle)) * var(--time-picker-dial-number-ring) - 24px
+  );
+  @apply focus-visible:focus-indicator;
+  &[data-disabled] {
+    @apply text-on-surface/disabled-content forced-colors:text-gray-text;
+  }
+}
+@utility time-picker-dial-number-inner {
+  --time-picker-dial-number-ring: 69px;
+}
+/* The copy of the numbers, on-primary, cut to the handle's circle, which turns with the hand: the
+ * number under the handle, as Compose's blend modes draw it, passed over as the hand turns. In
+ * forced colors it is the handle itself, filled with the highlight. */
+@utility time-picker-dial-selected {
+  @apply pointer-events-none absolute inset-0 text-on-primary forced-colors:selected-fill;
+  clip-path: circle(
+    24px at calc(50% + sin(var(--time-picker-dial-angle)) * var(--time-picker-dial-ring))
+      calc(50% - cos(var(--time-picker-dial-angle)) * var(--time-picker-dial-ring))
+  );
+}
+
+/* TimePickerDialog's container: a basic dialog's (dialog.css), as wide as the picker in it: past a
+ * basic dialog's 560dp should the picker be, and past the layer's padding on a phone narrower than
+ * the 328dp dialog and its margins, as the date picker's is; nothing above or below what it holds,
+ * and its text body-large on-surface. */
+@utility time-picker-modal {
+  @apply dialog-modal-basic dialog-modal;
+  @apply max-w-none shrink-0 text-body-lg text-on-surface;
+
+  :where(&) > * {
+    padding-block: 0;
+  }
+}
+
+/* TimePickerDialog's actions, under the picker, 48dp tall and 24dp over the bottom, as Compose's
+ * dialog lays them out: the mode toggle at the start, centered in a 48dp slot 24dp in, and the
+ * buttons at the end, 8dp apart, 24dp in. */
+@utility time-picker-actions {
+  @apply flex min-h-12 shrink-0 items-center justify-end gap-space-100 px-space-300 pb-space-300;
+}
+@utility time-picker-actions-start {
+  @apply me-auto flex size-12 items-center justify-center;
+}
+
+/* TimePickerModeToggle's icons, the keyboard and the clock on one spot, swapped as the toggle video
+ * swaps them: the one leaving fades out over a short-2, then the one coming fades in over a short-3. */
+@utility time-picker-mode-toggle-icons {
+  @apply grid;
+  :where(& > *) {
+    grid-area: 1 / 1;
+    opacity: 1;
+    transition: opacity var(--md-sys-motion-duration-short3) linear
+      var(--md-sys-motion-duration-short2);
+  }
+}
+@utility time-picker-mode-toggle-icon-away {
+  opacity: 0;
+  transition: opacity var(--md-sys-motion-duration-short2) linear;
+}

@@ -1,0 +1,200 @@
+import checkboxApi from 'virtual:api/Checkbox'
+import { CheckboxGroupSlots } from '../../slot-pictures/checkbox.tsx'
+import checkboxGroupApi from 'virtual:api/CheckboxGroup'
+import * as basic from '../../examples/checkbox/basic.tsx?example'
+import * as controlled from '../../examples/checkbox/controlled.tsx?example'
+import * as custom from '../../examples/checkbox/custom.tsx?example'
+import * as disabled from '../../examples/checkbox/disabled.tsx?example'
+import * as error from '../../examples/checkbox/error.tsx?example'
+import * as group from '../../examples/checkbox/group.tsx?example'
+import * as groupControlled from '../../examples/checkbox/group-controlled.tsx?example'
+import * as indeterminate from '../../examples/checkbox/indeterminate.tsx?example'
+import * as label from '../../examples/checkbox/label.tsx?example'
+import * as list from '../../examples/checkbox/list.tsx?example'
+import * as renderProps from '../../examples/checkbox/render-props.tsx?example'
+import * as required from '../../examples/checkbox/required.tsx?example'
+
+Checkboxes let people select one or more items from a list, or turn an item on or off. Use them to:
+
+- Select one or more options from a list
+- Present a list that contains [sub-selections](#indeterminate)
+- Turn an item on or off in a desktop environment
+- [Group](#checkbox-group) similar options together
+
+Compared with the other selection controls:
+
+- **Checkbox or switch:** Use checkboxes in place of [switches](/components/switch) when several related options can be selected from a list. Checkboxes group similar items together and take up less space than switches.
+- **Checkbox or radio button:** Checkboxes are multi-select. To select a single option from a set, use [radio buttons](/components/radio).
+
+Use a `Checkbox` on its own, or several in a group, which is composed of these parts:
+
+| Part                             | Use                                                                                  |
+| -------------------------------- | ------------------------------------------------------------------------------------ |
+| `CheckboxGroup`                  | The group, which holds the other parts                                               |
+| `Label`                          | The group's name. Without one, name the group with an `aria-label`.                  |
+| `Checkbox`                       | A checkbox. In a group, an option, with its `value`.                                 |
+| `Text` with `slot="description"` | The group's description                                                              |
+| `FieldError`                     | The group's error, displayed once a form submission is blocked. See [Forms](#forms). |
+
+```tsx
+import { Checkbox, CheckboxGroup } from '@material-web/react'
+import { FieldError, Label, Text } from 'react-aria-components'
+```
+
+## Basic checkbox
+
+Use a `Checkbox` on its own, or put several in a [`CheckboxGroup`](#checkbox-group) to select from a list. Set `defaultSelected` on a checkbox that starts selected.
+
+<Example {...basic} />
+
+Set `isDisabled` to disable the checkbox: it cannot be selected or focused. Set `isReadOnly` to keep its selection as it is while it can still be focused.
+
+<Example {...disabled} />
+
+## Label
+
+Write the label as the checkbox's children. Pressing the label toggles the checkbox. With no label text, set an `aria-label`.
+
+<Example {...label} />
+
+The label takes the [type style](/theme/typography#type-scale) of the text around it. To set one, add its class to the checkbox or to an element around it, as in `text-body-lg`.
+
+## Checkbox group
+
+Put checkboxes in a `CheckboxGroup` and give each a `value`. The group's value is the list of the selected values, as with React Aria's [`CheckboxGroup`](https://react-aria.adobe.com/CheckboxGroup).
+
+The group has no layout of its own, so give it one, such as a column.
+
+<Example {...group} />
+
+Set the initial selection with `defaultValue`, or control it with `value` and `onChange`. In a group, a checkbox's own `isSelected` and `defaultSelected` do not change the group's value.
+
+<Example {...groupControlled} />
+
+The group's other props apply to every checkbox in it:
+
+- `isDisabled` and `isReadOnly` disable each checkbox or make it read-only.
+- `isInvalid` shows each checkbox in the error color.
+- `isRequired` requires at least one checkbox to be selected.
+- `name` submits each selected `value` under that name.
+
+## Slots
+
+<CheckboxGroupSlots showLegend />
+
+| Slot          | Child    | Use                                         |
+| ------------- | -------- | ------------------------------------------- |
+| `description` | A `Text` | Describes the group and each checkbox in it |
+
+## Controlled
+
+Control the selection with `isSelected` and `onChange`, which is called with the new selection. Without them, the checkbox keeps its own selection, starting from `defaultSelected`.
+
+<Example {...controlled} />
+
+## Indeterminate
+
+Set `isIndeterminate` to show a dash in place of the check. A press does not clear it, so clear it yourself in `onChange`.
+
+In this example, a parent checkbox is indeterminate while only some of its children are selected. Selecting the parent selects every child, and unselecting it unselects them all.
+
+<Example {...indeterminate} />
+
+> **Note:** `isIndeterminate` changes how the checkbox is shown and announced. In a [form](#forms), the checkbox is still submitted by its selection.
+
+## Validation
+
+Set `isInvalid` to mark the checkbox as invalid and show it in the error color. To show the error of a field that a form requires, see [Forms](#forms).
+
+<Example {...error} />
+
+## Forms
+
+Set a `name` to include a checkbox or a group in a form. It is submitted with the form and reset with it.
+
+| Field                           | Submits                                                                      |
+| ------------------------------- | ---------------------------------------------------------------------------- |
+| A `Checkbox` with a `name`      | Its `value` when selected, or `on` with no `value`. Nothing when unselected. |
+| A `CheckboxGroup` with a `name` | The `value` of each selected checkbox, under the group's `name`.             |
+
+Set `isRequired` to require a single checkbox to be selected, or a group to have at least one checkbox selected. A required field blocks its form from being submitted until then. Once a submission is blocked, each checkbox shows the error color, and a `FieldError` in the group is displayed, until one is selected. See React Aria's [Forms](https://react-aria.adobe.com/forms#validation) guide.
+
+<Example {...required} />
+
+> **Note:** A reset from code, with `form.reset()`, that unselects several checkboxes of a group unselects only the last of them. A reset button resets them all.
+
+## In a list
+
+In a selection [list](/components/list), put a `Checkbox` in an item's `selection`, `leading` or `trailing` slot to make it the item's selection checkbox. It needs no label.
+
+<Example {...list} />
+
+## Customization
+
+Pass classes in `className` to restyle one checkbox. They go on its outermost element, an inline flex box aligned to the middle of its line, as do `style` and `ref`. `inputRef` is the ref of its input. See [Styling](/get-started/styling) for the classes, the states and the theme.
+
+<Example {...custom} />
+
+- **Color:** `className` does not reach the box. To change its colors, set the color roles it uses. See [Theme](/get-started/styling#theme).
+- **States:** On a checkbox, the variants `selected:`, `indeterminate:`, `invalid:`, `disabled:`, `read-only:` and `required:` style those states. Hover, press and focus are reported on an element inside it, so use their `has-*` form, as in `has-hover:bg-surface-container`. See [States](/get-started/styling#variants).
+- **Functions:** `className` and `style` can be functions of `isSelected`, `isIndeterminate`, `isInvalid`, `isDisabled`, `isReadOnly` and `isRequired`. To read hover, press and focus, pass a function as [children](#children-as-a-function).
+- **Every checkbox:** To restyle all the checkboxes at once, change the [theme](/get-started/styling#theme).
+
+### Children as a function
+
+Pass a function as children to render the label from the checkbox's state: `isSelected`, `isIndeterminate`, `isHovered`, `isPressed`, `isFocused`, `isFocusVisible`, `isDisabled`, `isReadOnly`, `isInvalid` and `isRequired`. `isFocused` is any focus, and `isFocusVisible` is keyboard focus only. The state's type is exported as `CheckboxRenderProps`. See [Children as a function](/get-started/composition#children-as-a-function).
+
+<Example {...renderProps} />
+
+On a `CheckboxGroup`, `className`, `style` and `children` can be functions of `isDisabled`, `isReadOnly`, `isRequired`, `isInvalid` and `state`, typed as `CheckboxGroupRenderProps`.
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/checkbox/accessibility#0d67c489-7715-4b5b-87d8-54df9f75f954) what people should be able to do with assistive technology:
+
+- Navigate to a checkbox
+- Toggle the checkbox on and off
+- Get appropriate feedback based on input type documented under Interaction & style
+
+### Interaction and style
+
+- **States:** Hovering shows a state layer, and a press shows a ripple. Keyboard focus shows a [focus ring](/theme/accessibility#focus-ring), and a press with a mouse or touch does not.
+- **Touch target:** A checkbox has a [touch target](/theme/accessibility#touch-targets) of 48dp around its box. Pressing its label toggles it too.
+- **Color contrast:** In the light and dark schemes, at every contrast level, the box keeps 3:1 contrast with the surface, and the check with the box's fill. Keep that contrast when you change the [color roles](/theme/color#color-roles) it uses.
+- **Density:** Material [advises](https://m3.material.io/components/checkbox/accessibility#2363e0eb-1d7d-42dc-8c6c-09f7d1653a67) against density that brings a checkbox's target under 48dp. A checkbox does not follow the [density](/get-started/styling#density) classes: it keeps its size and its 48dp target in a denser layout.
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), the box changes color and draws its check instantly.
+- **Forced colors:** In [forced colors](/theme/accessibility#forced-colors), a selected or indeterminate box is filled with the system's highlight color, and a disabled checkbox and its label are grayed out.
+- **Indeterminate:** Material [describes](https://m3.material.io/components/checkbox/accessibility#6a2f55e5-2fa0-4204-b6d1-62362dda89c7) a parent checkbox that is indeterminate while only some of its children are selected, and that selects them all when it is selected. Set `isIndeterminate` and the children's selection yourself, as in the [Indeterminate](#indeterminate) example.
+
+### Focus
+
+- Each checkbox is a tab stop, in a group too.
+- A disabled checkbox cannot be focused, and Tab skips it. A read-only checkbox can still be focused.
+
+### Keyboard navigation
+
+| Keys  | Actions                                 |
+| ----- | --------------------------------------- |
+| Tab   | Move the focus to a checkbox            |
+| Space | Select or deselect the focused checkbox |
+
+- Enter does not toggle a checkbox.
+
+### Labeling elements
+
+- A checkbox has the checkbox role, and its label names it. Material [advises](https://m3.material.io/components/checkbox/accessibility#32031a1d-4850-4506-bd95-4ca731bef4fd) a name that is the same as the label text: write the label as the checkbox's children, which links the two. With no label, set an `aria-label`.
+- A group has the group role. Name it with a `Label` or an `aria-label`. A `Text` in its `description` slot describes the group and each checkbox in it.
+- An indeterminate checkbox is announced as partially checked.
+- `isInvalid`, `isReadOnly` and `isRequired` are reported to assistive technology.
+
+## Props
+
+### Checkbox
+
+<PropsTable {...checkboxApi} />
+
+### CheckboxGroup
+
+<PropsTable {...checkboxGroupApi} />

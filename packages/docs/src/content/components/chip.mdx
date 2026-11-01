@@ -1,0 +1,252 @@
+import chipApi from 'virtual:api/Chip'
+import { ChipSlots } from '../../slot-pictures/chip.tsx'
+import chipGroupApi from 'virtual:api/ChipGroup'
+import * as array from '../../examples/chip/array.tsx?example'
+import * as assist from '../../examples/chip/assist.tsx?example'
+import * as avatar from '../../examples/chip/avatar.tsx?example'
+import * as basic from '../../examples/chip/basic.tsx?example'
+import * as colors from '../../examples/chip/colors.tsx?example'
+import * as custom from '../../examples/chip/custom.tsx?example'
+import * as disabled from '../../examples/chip/disabled.tsx?example'
+import * as elevated from '../../examples/chip/elevated.tsx?example'
+import * as filter from '../../examples/chip/filter.tsx?example'
+import * as input from '../../examples/chip/input.tsx?example'
+import * as link from '../../examples/chip/link.tsx?example'
+import * as longLabel from '../../examples/chip/long-label.tsx?example'
+import * as selectableRemovable from '../../examples/chip/selectable-removable.tsx?example'
+import * as slots from '../../examples/chip/slots.tsx?example'
+import * as suggestion from '../../examples/chip/suggestion.tsx?example'
+import * as variants from '../../examples/chip/variants.tsx?example'
+
+Chips help people enter information, make selections, filter content, or trigger actions. They appear together as a group, in a row of options.
+
+For an action that stands alone, use a [button](/components/button) instead.
+
+Chips are written in a group, with these parts:
+
+| Part        | Use                                                                                                                              |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `ChipGroup` | The group, which lays out its chips in rows and sets whether they act, select or are removed. See [Chip actions](#chip-actions). |
+| `Chip`      | A chip, whose `variant` sets its type                                                                                            |
+
+```tsx
+import { Chip, ChipGroup, Icon, IconButton } from '@material-web/react'
+import { Text } from 'react-aria-components'
+```
+
+## Basic chip
+
+Put each `Chip` in a `ChipGroup`, and write the chip's label as its children. A `Chip` outside a `ChipGroup` throws an error. The group lays out its chips in rows that wrap onto the next line.
+
+<Example {...basic} />
+
+A chip is named by its `textValue`. A chip whose children are a plain string uses that string as its `textValue`. Any other chip requires a `textValue`: one whose children are a function, or hold an icon or a `Text` label.
+
+The `Chip` comes in four variants. Set `variant` to `assist`, `filter`, `input` or `suggestion`. It is required and has no default.
+
+<Example {...variants} />
+
+### Assist chip
+
+Assist chips represent smart or automated actions that can span multiple apps. Handle a press with `onAction` on the chip, or with `onAction` on the group, which is called with the `id` of the chip.
+
+<Example {...assist} />
+
+### Filter chip
+
+Filter chips represent filters for a collection. Set `selectionMode` on the group to `single` or `multiple`, and give each chip an `id`. Control the selection with `selectedKeys` and `onSelectionChange`, or set the initial selection with `defaultSelectedKeys`. See React Aria's [Selection](https://react-aria.adobe.com/selection) guide.
+
+A selected filter chip has no checkmark unless you add one: put an `Icon` in the `leading` slot while the chip `isSelected`, as in this example.
+
+<Example {...filter} />
+
+### Input chip
+
+Input chips represent discrete pieces of information entered by a person. Handle their removal with `onRemove` on the group. It is called with the `id`s of the chips to remove when a chip's remove button is pressed, or on Backspace or Delete on a chip.
+
+Add the remove button as an `IconButton` with `slot="remove"`. It is named by its `aria-label` and the chip's label. A `Button` from `react-aria-components` with `slot="remove"` is named Remove, in the current locale, unless you set an `aria-label`.
+
+<Example {...input} />
+
+In this example, a function renders the chips from the group's `items`, and `renderEmptyState` renders what the group shows after the last chip is removed. See [Chip array](#chip-array).
+
+### Suggestion chip
+
+Suggestion chips help narrow a person's intent by presenting dynamically generated suggestions, such as what to say or search next. Handle a press with `onAction`, as on an assist chip.
+
+<Example {...suggestion} />
+
+### Elevated chip
+
+Set `isElevated` to give a chip its own container with a shadow. Use it for a chip that needs more visual separation, such as on an image or a dynamic background. An input chip is always flat, and its types do not accept `isElevated`.
+
+<Example {...elevated} />
+
+## Slots
+
+<ChipSlots showLegend />
+
+| Slot       | Child                 | Use                                                                                         |
+| ---------- | --------------------- | ------------------------------------------------------------------------------------------- |
+| `leading`  | An `Icon` or an image | Before the label, on every chip. See [Avatars](#avatars) and [Icons](#icons).               |
+| `label`    | A `Text`              | The label, on every chip. See [Long labels](#long-labels).                                  |
+| `trailing` | An `Icon` or a button | After the label, on a filter chip. See [Trailing button](#trailing-button).                 |
+| `remove`   | A button              | The remove button, after the label, on an input chip. An input chip has no `trailing` slot. |
+
+Set `slot` on a child to place it in one of the chip's slots. A child is placed by its slot, in whatever order the children are written. See [Slots](/get-started/composition#slots).
+
+> **Note:** An `Icon` or a button with a slot that its chip does not have throws an `Invalid slot` error, and so does a button with no slot. Any other element with another slot is shown where it is written, and so is an `Icon` with no slot.
+
+### Avatars
+
+Put an image in a chip to show an avatar, in the `leading` slot or with no slot. It is shown round, at the start of the chip.
+
+<Example {...avatar} />
+
+### Icons
+
+Put an icon in the `leading` or `trailing` slot. An `Icon` is sized and colored for the chip, unless a class on the icon sets its own size or color. Any icon works in a slot.
+
+<Example {...slots} />
+
+### Trailing button
+
+A chip can hold a button after its label. On an input chip, it is the remove button, with `slot="remove"`. On a filter chip, it is any button with `slot="trailing"`: give it its own `aria-label` and `onPress`, as on the last chip of the example above. It is disabled with the chip. An assist or suggestion chip takes no button.
+
+## Chip array
+
+Write the chips as the group's children, or pass `items` with a function as children that returns a chip for each item, as with React Aria's [collections](https://react-aria.adobe.com/collections). The group also accepts `dependencies` for that function, and `renderEmptyState` for the content of an empty group.
+
+In this example, both groups render their chips from an array in state. Removing a chip takes it out of the first array, and pressing a suggestion adds it.
+
+<Example {...array} />
+
+A chip takes the `id` of its item unless you set one. For the `id`s, the text values and `dependencies`, see [Collections](/get-started/composition#collections). To keep the array in state with methods that add and remove items, use React Aria's [`useListData`](https://react-aria.adobe.com/useListData), as the [input chips](#input-chip) do.
+
+## Chip actions
+
+What the chips do is set on their group: the chips of a group act, select or are removed together.
+
+| Action         | Set on the `ChipGroup`                                       | Keyboard            | Example                     |
+| -------------- | ------------------------------------------------------------ | ------------------- | --------------------------- |
+| Act on a press | `onAction`, called with the `id` of the chip                 | Enter               | [Assist chip](#assist-chip) |
+| Select         | `selectionMode`, with `selectedKeys` and `onSelectionChange` | Space or Enter      | [Filter chip](#filter-chip) |
+| Remove         | `onRemove`, with a remove button in each chip                | Backspace or Delete | [Input chip](#input-chip)   |
+
+Only filter and input chips show selection.
+
+### Selectable and removable chips
+
+Set both `selectionMode` and `onRemove` on a group for chips that can be selected and removed. Backspace or Delete on a selected chip removes every selected chip.
+
+<Example {...selectableRemovable} />
+
+## Disabled
+
+Disable a chip with its own `isDisabled`, or with `disabledKeys` on the group. A disabled chip cannot be selected or removed, and a button in it is disabled too.
+
+<Example {...disabled} />
+
+## Color
+
+A variant sets the chip's colors. To use other [color roles](/theme/color#color-roles), pass their classes in `className`, with a [state variant](/get-started/styling#states) for the colors of a state. In this example, a selected chip takes the tertiary container colors in place of the secondary ones.
+
+<Example {...colors} />
+
+## Long labels
+
+The label of a chip is one line. Write it as the chip's text, or as a `Text` with `slot="label"`:
+
+- A `Text` label is cut short with an ellipsis in a chip too narrow for it. A chip is never wider than its group.
+- A `Text` label takes the free room of a wider chip, keeping what follows it at the end.
+- A label written as plain text is not cut short, and overflows a chip too narrow for it.
+
+<Example {...longLabel} />
+
+## Links
+
+Give a chip an `href` to make it a link, with `target` and `rel` as on an `<a>`. A press follows the link, and does not select the chip. The chip is not rendered as an `<a>` element.
+
+<Example {...link} />
+
+To send these links through a client-side router, wrap the app in `RouterProvider` from `react-aria-components`. See [Routing](/get-started/react-aria#routing).
+
+## Customization
+
+Pass classes in `className` to restyle one chip. A class of yours replaces the chip's own class for the same property. See [Styling](/get-started/styling) for the classes, the states and the theme.
+
+<Example {...custom} />
+
+- **Density:** Add `density-1`, `density-2` or `density-3` to the group, or to an element around it. Each step makes its chips 4dp shorter than their 32dp, and their targets stay 48dp. Set it on the group and not on one chip: the chips of a row are as tall as the tallest one. See [Density](/get-started/styling#density).
+- **States:** Style a state with its variant, such as `hover:`, `pressed:` or `selected:`. See [States](/get-started/styling#states).
+- **Every chip:** To restyle all the chips at once, change the [theme](/get-started/styling#theme).
+
+### Children as a function
+
+Pass a function as children to render a chip from its state: `isHovered`, `isPressed`, `isFocused`, `isFocusVisible`, `isSelected`, `isDisabled`, `allowsRemoving`, `selectionMode` and `selectionBehavior`. The function can fill the chip's slots too, as the checkmark of a filter chip does above. The function must be the only child. To return several children, wrap them in a fragment. See [Children as a function](/get-started/composition#children-as-a-function).
+
+> **Note:** `isHovered` is reported only for a chip that selects or acts. For a chip with a remove button, it is reported while the pointer is anywhere on the chip, including that button.
+
+`className` and `style` can be functions of the same state. The state's type is exported as `ChipRenderProps`. On a `ChipGroup` with `items`, the children are a function that returns a chip for each item.
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/chips/accessibility#c5cc4397-4781-4211-a878-b4125ab845dc) what people should be able to do with assistive technology:
+
+- Use a chip to perform an action
+- Navigate to a chip
+- Activate a chip
+
+### Interaction and style
+
+- **States:** A chip that selects or acts shows a state layer on hover, and a press shows a ripple. A chip that does neither shows no hover layer. Keyboard focus shows a [focus ring](/theme/accessibility#focus-ring), and a press with a mouse or touch does not. A remove button shows a focus ring of its own.
+- **Touch target:** Every chip has a [touch target](/theme/accessibility#touch-targets) of at least 48dp, and a remove button has a 48dp target of its own, above the chip's. A group keeps its chips 8dp apart, and its rows 16dp apart, where their targets meet.
+- **Color contrast:** A chip's label [needs](https://m3.material.io/components/chips/accessibility#dd20c9e1-6d1d-4319-95ec-5291fe91e2c2) 3:1 contrast with the background. Keep that contrast when you change its [colors](#color).
+- **Density:** Each [density](/get-started/styling#density) step makes a chip 4dp shorter, and its target stays 48dp. Material [advises](https://m3.material.io/components/chips/accessibility#83c35f63-de2d-494c-bb11-52465303ae87) applying density only when people choose it, such as with a denser layout setting.
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), the changes of color and shadow are instant.
+- **Forced colors:** In [forced colors](/theme/accessibility#forced-colors), every chip keeps an edge, and a selected filter or input chip is filled with the system's highlight color.
+- **Horizontal overflow:** A group wraps its chips onto as many rows as they need, so that every chip shows without scrolling, as Material [advises](https://m3.material.io/components/chips/accessibility#824f8be6-cc5a-4e7d-953f-1b6231eb19a8). To show one row at first, add a Show all filter chip that shows the rest, or a leading button that lists them in a [menu](/components/menu). Don't list chips that have a remove button in a menu.
+- **Interactivity:** Material [requires](https://m3.material.io/components/chips/accessibility#24803f58-d678-456b-a4bf-b56115deba46) a second cue that chips are interactive. Use one of these: a label before the group, such as Select type, which can name the group with `aria-labelledby`; page context, such as Filter results; an outline in the `outline` role for 3:1 contrast, with `inset-ring-outline` in a flat chip's `className`; or a label or leading icon that suggests an action, such as Turn on lights.
+
+### Focus
+
+- The group is one tab stop. Tab moves the focus to the chip that was focused last, and then to that chip's remove button.
+- When the focused chip is removed, the focus moves to the next chip, to the previous one if it was the last, or to the group if no chip is left.
+
+### Keyboard navigation
+
+| Keys                | Actions                                                                                        |
+| ------------------- | ---------------------------------------------------------------------------------------------- |
+| Tab                 | Move the focus into the group, to the chip focused last, and then to that chip's remove button |
+| Arrow keys          | Move the focus to the previous or next chip, wrapping at the ends                              |
+| Home                | Move the focus to the first chip                                                               |
+| End                 | Move the focus to the last chip                                                                |
+| Space or Enter      | Select the focused chip, or deselect a selected one, in a group that selects                   |
+| Escape              | Deselect every chip, in a group that selects                                                   |
+| Enter               | Act on the focused chip, in a group that acts                                                  |
+| Backspace or Delete | Remove the focused chip, or every selected chip if it is selected, in a group with `onRemove`  |
+
+- In a group that acts, Space does not act on the focused chip.
+- The direction of the Left and Right arrow keys follows the locale set with `I18nProvider`, not the page's `dir`.
+
+### Labeling elements
+
+- The group has the grid role, and each chip is a row in it. Name the group with an `aria-label` or an `aria-labelledby`.
+- A chip is named by its label text, as Material [advises](https://m3.material.io/components/chips/accessibility#fbf902bf-4a4a-456e-ae48-f5e8f6cd1786). Label additional actions, such as remove, separately, and hide images: an `Icon` in a chip is hidden from assistive technology, and an avatar needs an empty `alt`.
+- A chip whose children are not a plain string takes its name from `textValue`. See [Basic chip](#basic-chip).
+- Material [advises](https://m3.material.io/components/chips/accessibility#ac48adbb-8adc-4398-83d7-3a758e4e01c0) a remove button on every chip that can be removed. Its name is its `aria-label`, or Remove in the current locale, followed by the chip's label, such as Remove Ann. See [Input chip](#input-chip).
+- In a group that selects, a chip reports whether it is selected with `aria-selected`.
+- In a group with `onRemove`, a chip focused with the keyboard or a screen reader has a description that tells how to remove it with Delete, in the current locale.
+- While the focus is in the group, screen readers announce chips added to it.
+
+## Props
+
+### ChipGroup
+
+<PropsTable {...chipGroupApi} />
+
+### Chip
+
+<PropsTable {...chipApi} />

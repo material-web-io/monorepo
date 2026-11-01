@@ -1,0 +1,49 @@
+/* An icon: the symbol font (the theme's font-icon, --font-icon) in a square box as wide and as tall
+ * as its font size, at weight 400. The browser sets the opsz and wght axes from its font size and
+ * weight; its size, FILL and GRAD are read from icon-*, icon-filled and icon-grade-*. */
+@utility font-icon {
+  @apply inline-block shrink-0 overflow-hidden leading-none font-regular tracking-0 whitespace-nowrap normal-case not-italic select-none;
+  /* Ligature text only shapes into its glyph in a left-to-right run, whatever the layout's. */
+  @apply direction-ltr;
+  /* The nearest icon-* on it or what holds it, else the font size it inherits. */
+  font-size: var(--icon-size, inherit);
+  width: 1em;
+  height: 1em;
+  font-variation-settings:
+    'FILL' var(--icon-fill, 0),
+    'GRAD' var(--icon-grade, 0);
+}
+
+/* An icon's size in dp, any number (icon-24) or length (icon-[1.5rem]), on it or on what holds it,
+ * inherited as a font size is, and leaving the font size of the text alone. */
+@utility icon-* {
+  --icon-size: calc(--value(number) * 1rem / 16);
+  --icon-size: --value([length]);
+}
+
+/* The filled glyph (FILL axis), on an Icon or on what holds it, every Icon in it: selected states
+ * in M3 use the filled style. icon-outlined keeps an Icon outlined in what fills them. */
+@utility icon-filled {
+  --icon-fill: 1;
+}
+
+@utility icon-outlined {
+  --icon-fill: 0;
+}
+
+/* Grade (GRAD axis), on an Icon or on what holds it: -icon-grade-25 (low emphasis), 0 or
+ * icon-grade-200 (high emphasis). */
+@utility icon-grade-* {
+  --icon-grade: --value(integer);
+}
+
+@utility -icon-grade-* {
+  --icon-grade: calc(--value(integer) * -1);
+}
+
+/* Flips an Icon horizontally. As rtl:icon-mirrored, a glyph that implies a direction (arrow_back,
+ * chevron_right, undo, ...) flips in a right-to-left layout only; a symbol that keeps its meaning
+ * there (check, schedule, play_arrow, ...) goes without. */
+@utility icon-mirrored {
+  @apply -scale-x-100;
+}

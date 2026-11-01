@@ -1,0 +1,311 @@
+import listApi from 'virtual:api/List'
+import listItemApi from 'virtual:api/ListItem'
+import * as actions from '../../examples/list/actions.tsx?example'
+import * as align from '../../examples/list/align.tsx?example'
+import * as basic from '../../examples/list/basic.tsx?example'
+import * as betweenLists from '../../examples/list/between-lists.tsx?example'
+import * as controls from '../../examples/list/controls.tsx?example'
+import * as density from '../../examples/list/density.tsx?example'
+import * as disabled from '../../examples/list/disabled.tsx?example'
+import * as dividers from '../../examples/list/dividers.tsx?example'
+import * as dragAndDrop from '../../examples/list/drag-and-drop.tsx?example'
+import * as empty from '../../examples/list/empty.tsx?example'
+import * as gutterless from '../../examples/list/gutterless.tsx?example'
+import * as horizontal from '../../examples/list/horizontal.tsx?example'
+import * as leading from '../../examples/list/leading.tsx?example'
+import * as links from '../../examples/list/links.tsx?example'
+import * as multiSelect from '../../examples/list/multi-select.tsx?example'
+import * as nonInteractive from '../../examples/list/non-interactive.tsx?example'
+import * as segmented from '../../examples/list/segmented.tsx?example'
+import * as singleSelect from '../../examples/list/single-select.tsx?example'
+import * as standard from '../../examples/list/standard.tsx?example'
+import * as text from '../../examples/list/text.tsx?example'
+import * as trailing from '../../examples/list/trailing.tsx?example'
+import * as variants from '../../examples/list/variants.tsx?example'
+import { ListItemSlots } from '../../slot-pictures/list.tsx'
+
+Lists are continuous, vertical indexes of text and images. Use a list to help people find a specific item and act on it. To show content of several kinds about one subject, such as an image, text and actions, use a [card](/components/card) instead.
+
+A list is made of these parts:
+
+| Part             | Use                                                                                                         |
+| ---------------- | ----------------------------------------------------------------------------------------------------------- |
+| `List`           | The container of the items                                                                                  |
+| `ListItem`       | One item, with its parts in [slots](#slots)                                                                 |
+| `Text`           | From `react-aria-components`: the label, the supporting text, the overline and the trailing text of an item |
+| `useDragAndDrop` | The hook that lets people [drag](#drag-and-drop) the items                                                  |
+
+```tsx
+import { List, ListItem, useDragAndDrop } from '@material-web/react'
+import { Text } from 'react-aria-components'
+```
+
+## Basic list
+
+Put one `ListItem` per item in a `List`, and write the parts of an item as its children, each with its `slot`. Import `Text` from `react-aria-components`.
+
+<Example {...basic} />
+
+- **Ids:** Give each `ListItem` an `id`, which identifies it in the list's selection and actions.
+- **Text values:** Give each `ListItem` a `textValue` with the text of its label, which names the item. An item whose children are plain text uses them as its `textValue`. For any other item, `textValue` is required.
+- **Dynamic lists:** Write the items as the `children` of the list, or pass the list its `items` and a function that returns the `ListItem` of each one. Pass `dependencies` along with them when that function depends on other values. See [Collections](/get-started/composition#collections) and React Aria's [collections](https://react-aria.adobe.com/collections) guide.
+- **Outside a list:** A `ListItem` outside a `List` throws an error.
+
+A `List` takes the props of React Aria's [`GridList`](https://react-aria.adobe.com/GridList), and a `ListItem` those of its `GridListItem`. The Props tab lists them.
+
+> **Note:** `GridListSection` and `GridListLoadMoreItem` from `react-aria-components` are not styled.
+
+A list comes in two variants. Set `variant` to `standard` (the default) or `segmented`. The variant is a visual choice and does not change how a list behaves.
+
+<Example {...variants} />
+
+### Standard list
+
+A standard list shows its items one after another, with no gap between them.
+
+<Example {...standard} />
+
+### Segmented list
+
+A segmented list separates the items with a gap and rounds the corners at the two ends of the list. Use it for a contained list, where the gaps set the items apart as a group.
+
+<Example {...segmented} />
+
+## Slots
+
+<ListItemSlots showLegend />
+
+| Slot          | Child                                                                 | Use                                                                      |
+| ------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `leading`     | An `Icon`, a button, a `Checkbox` or an element of your own           | Before the text. See [Leading](#leading).                                |
+| `overline`    | A `Text`                                                              | The overline, over the label                                             |
+| `label`       | A `Text`                                                              | The label text                                                           |
+| `description` | A `Text`                                                              | The supporting text, under the label                                     |
+| `trailing`    | A `Text`, an `Icon`, a button, a `Checkbox` or an element of your own | At the end of the item, in the order written. See [Trailing](#trailing). |
+| `selection`   | A `Checkbox`                                                          | The item's selection checkbox                                            |
+
+Set `slot` on each part of an item to place it.
+
+- A button, including a selectable one, is disabled with the item. A button also takes the `drag` slot.
+- A `Checkbox` in the `leading` or `trailing` slot is the item's selection checkbox as well.
+- A part with a slot the item does not have throws an `Invalid slot` error.
+- An element of your own is placed by its `slot` attribute, which is not checked.
+- Give every part a slot. A part without one is placed wherever the item has room.
+
+See [Slots](/get-started/composition#slots).
+
+### Text
+
+Write an item's text in a `Text` for each part, and set its slot:
+
+- `label` is the label text.
+- `description` is the supporting text, under the label.
+- `overline` is the overline, over the label.
+- `trailing` is the trailing text, such as a count.
+
+For an item with a label alone, write plain text as its children: `<ListItem>Label text</ListItem>`.
+
+<Example {...text} />
+
+### Leading
+
+Put a part in the `leading` slot to show it before the text: an `Icon`, or an avatar, an image or a video thumbnail of your own. An `Icon` is sized by the item. Size an element of your own with classes: `size-10 rounded-full` for a 40dp round avatar, `size-14 rounded-shape-sm` for a 56dp image, and `h-14 w-25 rounded-shape-sm` for a 100 by 56dp video thumbnail.
+
+<Example {...leading} />
+
+### Trailing
+
+Put parts in the `trailing` slot to show them at the end of the item, in the order written: an `Icon`, trailing text, or icon buttons. A press on a button does not call the item's `onAction`.
+
+<Example {...trailing} />
+
+## Empty state
+
+Pass `renderEmptyState` a function that returns what the list shows while it has no items.
+
+<Example {...empty} />
+
+## Handling actions
+
+Set `onAction` on a `ListItem`, or on the `List`, to handle a click, a tap or Enter on an item. The list's `onAction` is called with the `id` of the item, and the item's own with no argument. A press on a button in the item does not call `onAction`.
+
+<Example {...actions} />
+
+In a list that also selects, a press either selects the item or acts on it. See React Aria's [Item actions](https://react-aria.adobe.com/selection#item-actions).
+
+## Selection
+
+Set `selectionMode` on the `List` to `single` or `multiple` to make its items selectable. Set the initial selection with `defaultSelectedKeys`, or control it with `selectedKeys` and `onSelectionChange`. The keys are the `id`s of the selected items. A selected item is highlighted, and its icons are filled.
+
+<Example {...singleSelect} />
+
+In a single-select list, a click on the selected item deselects it. Set `disallowEmptySelection` to prevent that.
+
+The list also takes `selectionBehavior`, `disabledKeys`, `disabledBehavior` and `escapeKeyBehavior`. See React Aria's [Selection](https://react-aria.adobe.com/selection) guide.
+
+## Non-interactive list
+
+A list with no selection mode and no actions is non-interactive: its items show no hover or pressed state. The keyboard still moves the focus through them.
+
+<Example {...nonInteractive} />
+
+## Drag and drop
+
+Call `useDragAndDrop` from `@material-web/react` and pass its `dragAndDropHooks` to the `List`. The hook takes the same options as React Aria's [`useDragAndDrop`](https://react-aria.adobe.com/dnd). To reorder a list, pass `getItems` and `onReorder`, as in the example below.
+
+Each item then shows a drag handle at its start. The handle is how the keyboard drags an item, and a pointer drags the item itself.
+
+<Example {...dragAndDrop} />
+
+- While an item is dragged, a placeholder shows where it would be dropped. In a keyboard drag, the arrow keys move the placeholder.
+- Pass `renderDragPreview` to the hook to replace the preview that the pointer drags.
+- Pass `renderDropIndicator` to the hook to replace the placeholder.
+
+### Between lists
+
+To move an item to another list, insert it in the `onInsert` of the list that receives it, and remove it in the `onDragEnd` of the list it leaves when the `dropOperation` is `'move'`. See React Aria's [drag and drop guide](https://react-aria.adobe.com/dnd).
+
+<Example {...betweenLists} />
+
+### React Aria's own hook
+
+The `useDragAndDrop` hook from `react-aria-components` works with a `List` as well. With it, the drop indicator is a line where the item would be dropped, the dragged item stays in its place, and the other items do not slide.
+
+## Disabled
+
+Set `isDisabled` on an item to disable it, or list its `id` in the `disabledKeys` of the list.
+
+<Example {...disabled} />
+
+## Dividers
+
+Set `hasDivider` to show a divider between the items. Limit dividers to uncontained lists.
+
+<Example {...dividers} />
+
+## Orientation
+
+Set `orientation="horizontal"` to lay the items out in a row. The up and down arrow keys still move between them.
+
+<Example {...horizontal} />
+
+## Align list items
+
+The parts of an item are centered vertically. In an item with three lines of text, or 88dp tall or more, they are aligned to its top. In this example, the avatar of the second item is at its top, as its supporting text wraps onto a third line.
+
+<Example {...align} />
+
+An item is at least 56, 72 or 88dp tall, for one, two or three lines of text. An overline or supporting text adds a line to the label, and so does a label or supporting text that wraps. An item also grows with a taller leading part.
+
+In a list that is given a height and scrolls, the items keep their heights.
+
+## Gutterless list
+
+An item has 16dp of padding at its sides. In a container that has its own padding, replace it with a padding class on each item, such as `px-0`.
+
+<Example {...gutterless} />
+
+## Links
+
+Give a `ListItem` an `href` to make it a link, such as `<ListItem href="/inbox">`. To send these links through a client-side router, wrap the app in `RouterProvider` from `react-aria-components`. See [Routing](/get-started/react-aria#routing).
+
+<Example {...links} />
+
+In a list with selection, how a press on a link behaves depends on the `selectionBehavior`. See React Aria's [Links](https://react-aria.adobe.com/GridList#links).
+
+## List controls
+
+### Checkbox
+
+Put a `Checkbox` in the `selection`, `leading` or `trailing` slot of an item to show and toggle the item's selection. It needs no label. In a list with no selection mode, the checkbox is disabled unless you set `isDisabled={false}` on it.
+
+<Example {...multiSelect} />
+
+### Switch
+
+A `Switch` or a `Radio` in a slot is not tied to the item's selection: give it its own name and state. A `Radio` still needs a `RadioGroup` around it.
+
+<Example {...controls} />
+
+## Customization
+
+Pass classes in `className` to restyle a `List` or a `ListItem`. A class of yours replaces the component's own class for the same property. See [Styling](/get-started/styling) for the classes, the states and the theme.
+
+- **Color:** An item has the surface color. On a container of another color, give it `bg-transparent`.
+- **States:** Style a state of an item with its variant, such as `hover:`, `pressed:` or `selected:`. See [States](/get-started/styling#states).
+- **Every list:** To restyle all the lists at once, change the [theme](/get-started/styling#theme).
+
+### Density
+
+Add `density-1`, `density-2` or `density-3` to a list, or to an element around it. Each [density](/get-started/styling#density) step takes 2dp off the top and bottom of an item, down to a height of 48dp.
+
+<Example {...density} />
+
+### State
+
+The `className`, `style` and `children` of a `ListItem` can be functions of its state: `isHovered`, `isPressed`, `isFocused`, `isFocusVisible`, `isFocusVisibleWithin`, `isSelected`, `isDisabled`, `selectionMode`, `selectionBehavior`, `allowsDragging`, `isDragging`, `isDropTarget`, `id` and `state`. A `render` function is given the item's ripple along with the children, so render the children it receives. See [Children as a function](/get-started/composition#children-as-a-function).
+
+To style by state in your own CSS, target the data attributes:
+
+- The list sets `data-focused`, `data-focus-visible`, `data-empty`, `data-layout` and `data-orientation`.
+- Each item sets `data-hovered`, `data-pressed`, `data-focused`, `data-focus-visible`, `data-focus-visible-within`, `data-selected`, `data-disabled`, `data-allows-dragging`, `data-dragging` and `data-drop-target`, and `data-selection-mode` in a list with selection.
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/lists/accessibility#538f23f7-689c-4516-bfc8-5f6933a43f5e) what people should be able to do with assistive technology:
+
+- Navigate to a list item
+- Select a list item
+
+### Interaction and style
+
+- **States:** An item that can be selected or has an action shows a state layer on hover and a ripple on a press. An item that does neither shows neither, as in a [non-interactive list](#non-interactive-list). Keyboard focus shows a [focus ring](/theme/accessibility#focus-ring) inside the item, and a press does not.
+- **Touch target:** Every item is at least 48dp tall, at every density, and each icon button or checkbox in it has a [touch target](/theme/accessibility#touch-targets) of its own. A press on an icon button does not press the item.
+- **Color contrast:** With the default colors, the text keeps 4.5:1 contrast and the icons 3:1, at rest and selected, in the light and dark schemes at every contrast level.
+- **Text size:** A label or supporting text that wraps adds a line, and the item grows with it. See [Align list items](#align-list-items).
+- **Density:** Each [density](#density) step takes 2dp off the top and bottom of an item, which stays at least 48dp tall.
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), the changes of shape and color are instant, and dragged items move to their new places at once.
+- **Forced colors:** In [forced colors](/theme/accessibility#forced-colors), a selected item is filled with the system's highlight color, a disabled item is drawn in the gray text color, and the items of a segmented list keep an edge.
+- **Selection:** A selected item is highlighted, and its icons are filled. Material [advises](https://m3.material.io/components/lists/accessibility#fb0cfdee-081e-492b-a9dc-7025826b97ff) a cue besides color, such as a checkbox or a leading icon: put a `Checkbox` in the item's `selection`, `leading` or `trailing` slot. See [Checkbox](#checkbox).
+
+### Focus
+
+- The list is one tab stop. Tab moves the focus to the item focused last. Before any item has been focused, it moves to the first selected item, as Material [advises](https://m3.material.io/components/lists/accessibility#3aa18ed3-e865-4012-9036-4072ccab1eca), or to the first item when none is selected; going backward, to the last selected item or the last item. The next Tab leaves the list.
+- In an `Autocomplete`, the list takes no virtual focus: Tab moves the focus from the bar to the list. See [Search](/components/search).
+
+### Keyboard navigation
+
+| Keys                | Actions                                                                         |
+| ------------------- | ------------------------------------------------------------------------------- |
+| Tab                 | Move the focus into the list, or out of it                                      |
+| Up or Down arrow    | Move the focus to the previous or next item                                     |
+| Left or Right arrow | Move the focus into the buttons and checkboxes of an item, and back to the item |
+| Home                | Move the focus to the first item                                                |
+| End                 | Move the focus to the last item                                                 |
+| Space               | Select the focused item                                                         |
+| Enter               | Call the action of the focused item                                             |
+| Escape              | Clear the selection                                                             |
+
+- The up and down arrow keys stop at the first and the last item. Typing finds an item by its `textValue`.
+- Set [`keyboardNavigationBehavior="tab"`](https://react-aria.adobe.com/GridList#keyboard-navigation) to move through the controls of an item with Tab instead.
+- The left and right arrow keys are reversed in a right-to-left locale, which is set with an `I18nProvider`, not with `dir`.
+- To drag an item with the keyboard, move the focus to its drag handle with the right arrow key and press Enter. The arrow keys then move the placeholder, Enter drops the item and Escape cancels. See React Aria's [drag and drop accessibility](https://react-aria.adobe.com/dnd#accessibility).
+
+### Labeling elements
+
+- The list is a grid, and each item a row. Name the list with `aria-label` or `aria-labelledby`. Material [advises](https://m3.material.io/components/lists/accessibility#09e32b7d-78a1-45c1-be12-4c6646cfe1d1) a name that describes the selection people can make, such as Select either bread, pita, or rice.
+- An item is named by its `textValue` followed by its supporting text. Material [advises](https://m3.material.io/components/lists/accessibility#31d7a5f8-2eac-47b5-889f-8a684c4e842f) a name that matches the label text and the supporting text, so give the item a `textValue` with the text of its label.
+- In a list with selection, an item reports whether it is selected with `aria-selected`, and a list with multiple selection is `aria-multiselectable`. A disabled item reports `aria-disabled`.
+- A `Checkbox` in the `selection`, `leading` or `trailing` slot needs no label: it is named after its item. Give each icon button in an item an `aria-label`. See [Icon button](/components/icon-button#labeling-elements).
+
+## Props
+
+### List
+
+<PropsTable {...listApi} />
+
+### ListItem
+
+<PropsTable {...listItemApi} />

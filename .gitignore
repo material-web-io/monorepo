@@ -1,0 +1,12 @@
+node_modules
+dist
+.react-router
+storybook-static
+coverage
+*.tsbuildinfo
+.DS_Store
+.env
+.env.*
+!.env.example
+*.log
+.vitest

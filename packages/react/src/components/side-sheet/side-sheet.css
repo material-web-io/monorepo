@@ -1,0 +1,200 @@
+/* Side sheets (side-sheet.tsx). --side-sheet-width is how wide a sheet is, the docked
+ * container's 256dp unless side-sheet-width-* sets another: registered as a length, and not
+ * inherited, so a sheet in a sheet goes by its own. */
+@property --side-sheet-width {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 256px;
+}
+
+/* Another width, up to the spec's 400dp: side-sheet-width-90, -space-900, -[22rem]. */
+@utility side-sheet-width-* {
+  --side-sheet-width: --value(--spacing-*, [length]);
+  --side-sheet-width: calc(var(--spacing) * --value(number));
+}
+
+/* Either container. --side-sheet-span is the width it has once shown, which the column in it
+ * (side-sheet-column) always has. The M3 emphasized easing as Android draws it, two cubics,
+ * here in 72 stops: the web token's single cubic has no slow start, which the videos show. */
+@utility side-sheet {
+  --side-sheet-span: min(var(--side-sheet-width), calc(var(--spacing) * 100));
+  --side-sheet-easing: linear(
+    0,
+    0.0008 1%,
+    0.0032 2%,
+    0.0072 3%,
+    0.013 4%,
+    0.0206 5%,
+    0.0302 6%,
+    0.042 7%,
+    0.0563 8%,
+    0.0733 9%,
+    0.0935 10%,
+    0.1174 11%,
+    0.146 12%,
+    0.1801 13%,
+    0.1998 13.5%,
+    0.2216 14%,
+    0.2459 14.5%,
+    0.2733 15%,
+    0.3045 15.5%,
+    0.3406 16%,
+    0.3836 16.5%,
+    0.4 16.6666%,
+    0.433 17%,
+    0.479 17.5%,
+    0.5198 18%,
+    0.5553 18.5%,
+    0.5859 19%,
+    0.6357 20%,
+    0.6745 21%,
+    0.7058 22%,
+    0.7317 23%,
+    0.7538 24%,
+    0.7728 25%,
+    0.7895 26%,
+    0.8044 27%,
+    0.8176 28%,
+    0.8296 29%,
+    0.8405 30%,
+    0.8504 31%,
+    0.8595 32%,
+    0.8679 33%,
+    0.8757 34%,
+    0.8829 35%,
+    0.8897 36%,
+    0.8959 37%,
+    0.9018 38%,
+    0.9073 39%,
+    0.9125 40%,
+    0.9241 42.5%,
+    0.9342 45%,
+    0.9429 47.5%,
+    0.9506 50%,
+    0.9574 52.5%,
+    0.9633 55%,
+    0.9685 57.5%,
+    0.9732 60%,
+    0.9773 62.5%,
+    0.9809 65%,
+    0.984 67.5%,
+    0.9868 70%,
+    0.9893 72.5%,
+    0.9914 75%,
+    0.9932 77.5%,
+    0.9948 80%,
+    0.9961 82.5%,
+    0.9972 85%,
+    0.9981 87.5%,
+    0.9988 90%,
+    0.9994 92.5%,
+    0.9997 95%,
+    0.9999 97.5%,
+    1
+  );
+  width: var(--side-sheet-span);
+}
+
+/* What a sheet holds: a column which scrolls as one, up and down only, unless something in it
+ * scrolls itself. A modal one's is React Aria's SheetContent, which takes the focus as the sheet
+ * opens and draws no ring for it. */
+@utility side-sheet-column {
+  @apply flex min-h-0 grow flex-col overflow-x-clip overflow-y-auto overscroll-contain outline-none;
+}
+
+/* The header: a row 24dp from the sheet's top, its headline 24dp in from the sides, or 12dp from
+ * an icon before or after it. Measured to the icons, 16dp in at the start and 24dp at the end: an
+ * IconButton's 40dp box is 8dp wider than its icon all around, and overhangs the line by 6dp. */
+@utility side-sheet-header {
+  @apply flex shrink-0 items-start pt-space-300 text-on-surface-variant;
+
+  &:has(> :first-child:not([slot='title'])) {
+    @apply ps-space-100;
+  }
+  &:has(> :last-child:not([slot='title'])) {
+    @apply pe-space-200;
+  }
+  & > :not([slot='title']) {
+    @apply -my-space-75 shrink-0;
+  }
+  & > :last-child:not([slot='title']) {
+    @apply ms-auto;
+  }
+  & > [slot='title'] {
+    @apply m-0 mx-space-50 min-w-0 grow text-title-lg text-on-surface-variant;
+
+    &:first-child {
+      @apply ms-space-300;
+    }
+    &:last-child {
+      @apply me-space-300;
+    }
+  }
+}
+
+/* Detached: 16dp from the window's edges, or the edges of the row it is in. */
+@utility side-sheet-detached {
+  --side-sheet-inset: var(--spacing-space-200);
+  margin: var(--side-sheet-inset);
+}
+
+/* A standard sheet takes its width from the row it is in as it is shown and gives it back as
+ * it is hidden (data-exiting), on the emphasized easing over 1000ms: guideline video 2. Its
+ * column fades in 300ms on, over 250ms, and out at once, over 150ms 100ms on. */
+@utility side-sheet-standard {
+  box-sizing: border-box;
+  flex-shrink: 0;
+  transition-property: width, margin-inline;
+  transition-duration: var(--md-sys-motion-duration-extra-long4);
+  transition-timing-function: var(--side-sheet-easing);
+
+  /* Its column is as wide as the sheet once shown, centered in it, so it comes into view as the
+   * sheet is revealed, at half the pace of its edge. */
+  & > * {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: calc((100% - var(--side-sheet-span)) / 2);
+    width: var(--side-sheet-span);
+    transition-property: opacity;
+    transition-duration: var(--md-sys-motion-duration-medium1);
+    transition-timing-function: linear;
+    transition-delay: var(--md-sys-motion-duration-medium2);
+  }
+  &:is([data-entering], [data-exiting]) {
+    width: 0;
+    margin-inline: 0;
+  }
+  &:is([data-entering], [data-exiting]) > * {
+    opacity: 0;
+    transition-duration: var(--md-sys-motion-duration-short3);
+    transition-delay: var(--md-sys-motion-duration-short2);
+  }
+  /* Focused itself, as React Aria's dialog is with nothing in it to focus, it draws no ring, as
+   * a modal one's column does not; its edge in forced colors still draws. */
+  &:where(:focus-visible) {
+    outline-style: none;
+  }
+}
+
+/* A modal sheet's container, React Aria's Sheet at the window's end, which a swipe scrolls it off:
+ * as tall as the window, no wider than it less its margins, its fill run on past the window's
+ * end by React Aria's padding (overscrollPadding), for the browser's bounce to show none of the
+ * page, which a content box keeps out of its width. Detached, it is 16dp in from that end,
+ * where React Aria's margin leaves it none. */
+@utility side-sheet-modal {
+  --side-sheet-span: min(
+    var(--side-sheet-width),
+    calc(var(--spacing) * 100),
+    calc(100dvw - 2 * var(--side-sheet-inset, 0px))
+  );
+  box-sizing: content-box;
+  inset-inline-end: var(--side-sheet-inset, 0px);
+}
+
+/* A modal sheet's scrim fades in as the sheet comes in, and out as it goes, which React Aria
+ * plays along the sheet's swipe (swipeAnimation). */
+@keyframes side-sheet-scrim {
+  from {
+    opacity: 0;
+  }
+}

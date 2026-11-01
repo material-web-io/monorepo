@@ -1,0 +1,235 @@
+import splitButtonApi from 'virtual:api/SplitButton'
+import leadingApi from 'virtual:api/SplitButtonLeading'
+import trailingApi from 'virtual:api/SplitButtonTrailing'
+import * as basic from '../../examples/split-button/basic.tsx?example'
+import * as colors from '../../examples/split-button/colors.tsx?example'
+import * as custom from '../../examples/split-button/custom.tsx?example'
+import * as disabled from '../../examples/split-button/disabled.tsx?example'
+import * as elevated from '../../examples/split-button/elevated.tsx?example'
+import * as expanded from '../../examples/split-button/expanded.tsx?example'
+import * as filled from '../../examples/split-button/filled.tsx?example'
+import * as icon from '../../examples/split-button/icon.tsx?example'
+import * as link from '../../examples/split-button/link.tsx?example'
+import * as loading from '../../examples/split-button/loading.tsx?example'
+import * as outlined from '../../examples/split-button/outlined.tsx?example'
+import * as press from '../../examples/split-button/press.tsx?example'
+import * as sizes from '../../examples/split-button/sizes.tsx?example'
+import * as tonal from '../../examples/split-button/tonal.tsx?example'
+import * as variants from '../../examples/split-button/variants.tsx?example'
+
+A split button is two buttons side by side: a leading button for an action, and a trailing button that opens a menu of options related to that action.
+
+Use one for an action that has a set of related options. For an action alone, use a [button](/components/button), and to group several related actions, a [button group](/components/button-group).
+
+A split button is composed of these parts:
+
+| Part                  | Use                                                                                                    |
+| --------------------- | ------------------------------------------------------------------------------------------------------ |
+| `SplitButtonLeading`  | The leading button, for the action                                                                     |
+| `SplitButtonTrailing` | The trailing button, for the menu icon. Wrap it in a `MenuTrigger` to open a [menu](/components/menu). |
+
+```tsx
+import {
+  Menu,
+  MenuItem,
+  MenuPopover,
+  SplitButton,
+  SplitButtonLeading,
+  SplitButtonTrailing,
+} from '@material-web/react'
+import { MenuTrigger } from 'react-aria-components'
+```
+
+## Basic split button
+
+Put a `SplitButtonLeading` and then a `SplitButtonTrailing` in a `SplitButton`.
+
+<Example {...basic} />
+
+Set `variant` and `size` on the `SplitButton`. Each button takes its own props, such as `onPress` and `isDisabled`.
+
+The `SplitButton` comes in four variants. Set `variant` on the `SplitButton` to `elevated`, `filled` (the default), `tonal` or `outlined`. They are the same as a [button](/components/button#basic-button)'s, without `text`.
+
+<Example {...variants} />
+
+Disable each button with its own `isDisabled`. A disabled button cannot be pressed or focused.
+
+<Example {...disabled} />
+
+### Elevated split button
+
+An elevated split button is a tonal one with a shadow. To avoid overusing shadows, use it only when the button needs visual separation from a visually prominent background.
+
+<Example {...elevated} />
+
+### Filled split button
+
+A filled split button has the most visual impact of the four. Use it for an important, final action that completes a flow.
+
+<Example {...filled} />
+
+### Tonal split button
+
+A tonal split button suits a lower-priority action that needs slightly more emphasis than an outline gives.
+
+<Example {...tonal} />
+
+### Outlined split button
+
+An outlined split button is for medium-emphasis actions: ones that are important, but are not the primary action in a product.
+
+<Example {...outlined} />
+
+## Icons
+
+Write an icon as a child of the leading button, before or after its label. An [`Icon`](/components/icon) is sized to the button. Any icon works: `Icon`, an icon from an SVG library, or your own component. Give an icon that is not an `Icon` the size listed under [Sizes](#sizes). See [Composition](/get-started/composition#icons).
+
+The leading button can hold an icon alone. It then has no visible text, so set an `aria-label`.
+
+<Example {...icon} />
+
+The trailing button has its own icon and takes no children.
+
+## Trailing button
+
+In a `MenuTrigger`, the trailing button gets its `onPress`, `aria-haspopup`, `aria-expanded` and `aria-controls` from the trigger. While the menu is open, its icon turns 180° and its inner corner becomes round.
+
+To open anything other than a menu, set those four props yourself. `aria-expanded` is what turns the icon and rounds the inner corner.
+
+<Example {...expanded} />
+
+## Handling presses
+
+Handle a press on the leading button with its `onPress`. In a `MenuTrigger`, a press on the trailing button opens the menu: handle a press on an item with `onAction` on the `Menu`, which is called with the item's `id`.
+
+<Example {...press} />
+
+Each button takes the same press events as a `Button`. See [Handling presses](/components/button#handling-presses).
+
+## Loading
+
+Set `isPending` on the `SplitButtonLeading` while its action is in progress, as on a [button](/components/button#loading). A pending leading button shows a [loading indicator](/components/loading-indicator) in place of its label and icon, sized to the button. It keeps its size and colors, so the layout around it does not shift.
+
+<Example {...loading} />
+
+- **Presses:** A pending leading button ignores presses and shows no hover. As a submit button, it does not submit its form, and as a [link](#links), it does not navigate. The trailing button still opens the menu.
+- **Focus:** It keeps the focus, so a keyboard user stays on it while the action runs.
+- **Children:** Its children are hidden while it is pending. See [Pending content](#pending-content).
+
+## Color
+
+A variant sets the colors of both buttons. To use other [color roles](/theme/color#color-roles), pass their classes in the `className` of each button: a container color, and the on-color of that container for the label and the icons.
+
+<Example {...colors} />
+
+## Sizes
+
+For larger or smaller split buttons, set `size` on the `SplitButton` to `xs`, `s` (the default), `m`, `l` or `xl`.
+
+| Size | Height | Leading icon | Trailing button |
+| ---- | ------ | ------------ | --------------- |
+| `xs` | 32dp   | 20dp         | 48dp wide       |
+| `s`  | 40dp   | 20dp         | 48dp wide       |
+| `m`  | 56dp   | 24dp         | 56dp wide       |
+| `l`  | 96dp   | 32dp         | 96dp wide       |
+| `xl` | 136dp  | 40dp         | 136dp wide      |
+
+<Example {...sizes} />
+
+The leading button is as tall as a `Button` of the same size, with its label in the same type style. For `xs` and `s`, the trailing button is at least 48dp wide, wider than it is tall.
+
+## Rendering non-native buttons
+
+Set `elementType` on the `SplitButtonLeading` to render it as an element other than a `<button>`. The element gets the `button` role and a tab stop, as on a [button](/components/button#rendering-non-native-buttons).
+
+### Links
+
+Set `elementType="a"` on the `SplitButtonLeading` to render it as a link, with `href`, `target` and `rel`. The browser follows it as a native link, without a client-side router. To follow it through a router, see [Third-party routing library](/components/button#third-party-routing-library).
+
+<Example {...link} />
+
+> **Note:** The trailing button cannot be a link. `elementType="a"` on a `SplitButtonTrailing` is a type error.
+
+## Customization
+
+Pass classes in `className` to restyle one split button: on the `SplitButton` for the element around the two buttons, and on each button for the button itself. A class of yours replaces the component's own class for the same property. See [Styling](/get-started/styling) for the classes, the states and the theme.
+
+<Example {...custom} />
+
+- **Density:** Add `density-1`, `density-2` or `density-3` to the `SplitButton`, or to an element around it. Each step makes both buttons 4dp shorter. See [Density](/get-started/styling#density).
+- **States:** Style a state of either button with its variant, such as `hover:` or `pressed:`. In your own CSS, select the same states on either button by their data attributes: `data-hovered`, `data-pressed`, `data-focused`, `data-focus-visible` and `data-disabled`. See [States](/get-started/styling#states).
+- **Functions:** Pass a function as the children of a `SplitButtonLeading` to render them from the button's state: `isHovered`, `isPressed`, `isFocused`, `isFocusVisible`, `isDisabled` and `isPending`. The `className` and `style` of either button can be functions of the same state. See [Children as a function](/get-started/composition#children-as-a-function).
+- **Every split button:** To restyle all the split buttons at once, change the [theme](/get-started/styling#theme).
+
+## Limitations
+
+### Link role
+
+A leading button rendered as an `<a>` keeps the `button` role, so assistive technology announces it as a button and not as a link. A disabled one has no `href`.
+
+### Disabled buttons
+
+A disabled button cannot be focused and reports no hover, so it shows no [tooltip](/components/tooltip#opening-and-closing).
+
+### Pending content
+
+A pending leading button shows only its loading indicator. Children written for the pending state, such as a Sending… label, are hidden too. For a button that shows other content while pending, build a [complex button](/components/button#complex-button).
+
+## Accessibility
+
+### Use cases
+
+Material [lists](https://m3.material.io/components/split-button/accessibility#f0827eec-556d-4307-a263-7b481bcc6de4) what people should be able to do with assistive technology:
+
+- Navigate to each button and interact with them
+- Navigate to any element opened by the trailing button
+- Understand the current selection state of the button
+
+### Interaction and style
+
+- **States:** Each button shows a state layer on hover and a ripple on a press, and its inner corner grows rounder on hover, keyboard focus and press. Keyboard focus shows a [focus ring](/theme/accessibility#focus-ring), and a press with a mouse or touch does not. While the menu is open, the trailing button turns its icon and becomes round, and keeps its colors.
+- **Touch target:** Both buttons of every size have a [touch target](/theme/accessibility#touch-targets) of at least 48dp, as Material [advises](https://m3.material.io/components/split-button/accessibility#866012e6-331f-4e46-943a-7fa4f1ea60a7). For `xs` and `s`, the target reaches above and below the button, and both buttons are at least 48dp wide, so that their targets do not overlap.
+- **Color contrast:** Every variant keeps the leading button's label at 4.5:1 contrast or more with its container, and the trailing button's icon at 3:1 or more, in the light and dark schemes at every contrast level. Keep that contrast when you change their [colors](#color).
+- **Motion:** With [reduced motion](/theme/accessibility#reduced-motion), the changes of shape and color, and the turn of the icon, are instant.
+- **Forced colors:** In [forced colors](/theme/accessibility#forced-colors), both buttons keep an edge.
+- **Right to left:** The split button is mirrored in a right-to-left layout, with the leading button on the right.
+
+### Focus
+
+- The split button is not a tab stop. Tab moves the focus to the leading button and then to the trailing button, as Material [advises](https://m3.material.io/components/split-button/accessibility#4a9a0d91-2c3f-4989-ab95-1993aba28f1c), in a right-to-left layout too.
+- A disabled button cannot be focused, and Tab skips it.
+- In a `MenuTrigger`, the menu takes the focus as it opens, and gives it back to the trailing button as it closes.
+- A pending leading button keeps the focus, so a keyboard user stays on it while the action runs.
+
+### Keyboard navigation
+
+| Keys             | Actions                                                                     |
+| ---------------- | --------------------------------------------------------------------------- |
+| Tab              | Move the focus to the leading button, and then to the trailing button       |
+| Space or Enter   | Press the focused button, or open the menu from the trailing button         |
+| Up or Down arrow | Open the menu from the trailing button, with the last or first item focused |
+
+- In the open menu, the keys are those of a [menu](/components/menu#keyboard-navigation).
+
+### Labeling elements
+
+- The label names the leading button, as it names a [button](/components/button#labeling-elements). With an icon alone, set an `aria-label`: an `Icon` is hidden from assistive technology, so it does not name the button.
+- The trailing button has no visible text, so an `aria-label` or an `aria-labelledby` is required. Material [advises](https://m3.material.io/components/split-button/accessibility#ced3a789-c9cc-468d-8648-f15dc3ad7b72) one that says it holds more options related to the leading button's action, such as More watch options next to Watch later.
+- `aria-expanded` on the trailing button tells assistive technology whether the menu is open. `MenuTrigger` sets it, with `aria-haspopup`. For anything other than a menu, set them yourself: see [Trailing button](#trailing-button).
+- In a `MenuTrigger`, the menu is named by the trailing button. Label its items as on a [menu](/components/menu#labeling-elements).
+- A pending leading button reports that it is unavailable with `aria-disabled`. Its loading indicator is hidden from assistive technology, so its label still names it.
+- When a focused leading button becomes pending, or stops being pending, screen readers announce it.
+
+## Props
+
+### SplitButton
+
+<PropsTable {...splitButtonApi} />
+
+### SplitButtonLeading
+
+<PropsTable {...leadingApi} />
+
+### SplitButtonTrailing
+
+<PropsTable {...trailingApi} />

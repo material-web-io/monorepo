@@ -1,0 +1,192 @@
+/* Bottom sheets (bottom-sheet.tsx). How far short of the top a sheet's full height is, when
+ * bottom-sheet-top-* sets it: not inherited, so a sheet in a sheet goes by its own, and unset
+ * by default. */
+@property --bottom-sheet-top {
+  syntax: '*';
+  inherits: false;
+}
+
+/* How far a drag of its handle pulls a sheet past its full height, up, or its lowest place,
+ * down (bottom-sheet-drag-handle.tsx): a length, to spring back from, and not inherited, so a
+ * sheet in a sheet stays where it is. */
+@property --bottom-sheet-pull {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+/* How far short of the top a sheet's full height is, in place of 72dp and 56dp: under an app's
+ * own top bar, say (bottom-sheet-top-29, -space-900, -[116px]). */
+@utility bottom-sheet-top-* {
+  --bottom-sheet-top: --value(--spacing-*, [length]);
+  --bottom-sheet-top: calc(var(--spacing) * --value(number));
+}
+
+/* A standard sheet's layer, as React Aria's is a modal one's: over the window, which shows
+ * through it. It scrolls the sheet, a swipe or the wheel on it, snapping it to where it rests,
+ * or not at all while it comes and goes (bottom-sheet.tsx). */
+@utility bottom-sheet-layer {
+  @apply pointer-events-none fixed inset-0 z-sheet snap-y snap-mandatory overflow-y-auto overscroll-y-contain;
+  scrollbar-width: none;
+
+  &:is([data-entering], [data-exiting]) {
+    scroll-snap-type: none;
+  }
+}
+
+/* What is above a standard sheet in its layer: as tall, so the sheet rests below it hidden,
+ * scrolled to its start, or less tall by its peek where it cannot be hidden (bottom-sheet.tsx). */
+@utility bottom-sheet-above {
+  @apply h-full snap-start;
+}
+
+/* A standard sheet's container, in its layer below what is above it: across it up to 640dp
+ * and 72dp short of its top, or 56dp from the top and sides where that is wider than 640dp. The
+ * layer snaps to its end, at its full height. */
+@utility bottom-sheet {
+  /* As set, or a step at 640dp, of the width it is positioned in (a percentage) and of its
+   * container's or, with none, the window's (cqw), which a height can be worked out from. */
+  --bottom-sheet-margin: var(
+    --bottom-sheet-top,
+    clamp(
+      var(--spacing-space-700),
+      var(--spacing-space-900) - (100cqw - 640px) * 100000,
+      var(--spacing-space-900)
+    )
+  );
+  @apply pointer-events-auto relative mx-auto box-border snap-end;
+  width: calc(100% - 2 * clamp(0px, (100% - 640px) * 100000, var(--spacing-space-700)));
+  max-height: calc(100% - var(--bottom-sheet-margin));
+  /* Its fill goes on below it, for the browser's bounce at its full height to show no gap under
+   * it, as React Aria's overscroll padding does: an image, which adds nothing to what scrolls. */
+  border-image: linear-gradient(
+      to top,
+      var(--md-sys-color-surface-container-low) 100vh,
+      transparent 0
+    )
+    fill 0 / 0 / 0 0 100vh;
+
+  /* Focused itself, as React Aria's dialog is with nothing in it to focus, it draws no ring, as a
+   * modal one's dialog does not; its edge and full-screen fill still draw. */
+  &:where(:focus-visible) {
+    outline-style: none;
+  }
+
+  /* Forced colors drop its fill and shadow: a system-color edge inside it, the canvas below. */
+  @media (forced-colors: active) {
+    border-image-source: linear-gradient(to top, Canvas 100vh, transparent 0);
+    outline: 1px solid CanvasText;
+    outline-offset: -1px;
+  }
+}
+
+/* What a standard sheet holds, its drag handle and what is under it. On iOS it scrolls across by
+ * a pixel, a scroller of its own handing the finger up and down to the layer, which iOS's WebKit
+ * would not scroll for it (WebKit bug 183870); its detents stay out of it, to snap the layer. */
+@utility bottom-sheet-content {
+  @apply flex min-h-0 grow flex-col;
+
+  @supports (-webkit-touch-callout: none) {
+    @apply relative;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    overscroll-behavior-x: none;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    &::after {
+      @apply pointer-events-none absolute top-0 left-0 h-px;
+      width: calc(100% + 1px);
+      content: '';
+    }
+  }
+}
+
+/* What marks where a standard sheet rests partially expanded, over all of it: a detent for each
+ * of its snapPoints, the peek it sets as --bottom-sheet-peek (bottom-sheet.tsx). */
+@utility bottom-sheet-detents {
+  @apply pointer-events-none absolute inset-0;
+}
+
+/* A detent: the layer snaps to its end, its peek down from the sheet's top, a percentage being
+ * of the sheet's height, or the sheet's own end when it is no taller than that. */
+@utility bottom-sheet-detent {
+  @apply absolute inset-x-0 top-0 snap-end;
+  height: min(var(--bottom-sheet-peek), 100%);
+}
+
+/* A modal sheet's container, React Aria's Sheet, at the bottom of the window, which a swipe
+ * scrolls it onto and off: across it up to 640dp, and 72dp short of its top, or 56dp from the
+ * top and sides in a window wider than 640dp. */
+@utility bottom-sheet-modal {
+  --bottom-sheet-margin: var(
+    --bottom-sheet-top,
+    clamp(
+      var(--spacing-space-700),
+      var(--spacing-space-900) - (100dvw - 640px) * 100000,
+      var(--spacing-space-900)
+    )
+  );
+  /* Its fill goes on below the window by React Aria's padding (overscrollPadding), for the
+   * browser's bounce to show no gap under it: a content box keeps that out of its height. */
+  box-sizing: content-box;
+  width: calc(100% - 2 * clamp(0px, (100% - 640px) * 100000, var(--spacing-space-700)));
+  max-height: calc(100% - var(--bottom-sheet-margin));
+
+  /* Forced colors drop its fill and shadow: a system-color edge, inside it at the window's. */
+  @media (forced-colors: active) {
+    outline: 1px solid CanvasText;
+    outline-offset: -1px;
+  }
+}
+
+/* A modal sheet's scrim fades in as the sheet comes up to where it opens, and out as it goes,
+ * which React Aria plays along the sheet's swipe (swipeAnimation). */
+@keyframes bottom-sheet-scrim {
+  from {
+    opacity: 0;
+  }
+}
+
+/* A standard sheet full-screen at its full height (bottom-sheet.tsx `fullScreen`): always that
+ * tall, and while it is full-screen (data-full-screen) surface, its fill run up to the window's
+ * top by an outline as wide as the window, which covers its round corners as well. */
+@utility bottom-sheet-full-screen {
+  min-height: calc(100% - var(--bottom-sheet-margin));
+  outline: 100vmax solid transparent;
+  /* Guideline video 1's order on springs: its color fast either way, the fill over its top on
+   * default effects as it leaves and slow effects, the slowest, as it comes back. */
+  --bottom-sheet-fill-duration: var(--md-sys-motion-spring-default-effects-duration);
+  --bottom-sheet-fill-easing: var(--md-sys-motion-spring-default-effects-easing);
+  transition-property: background-color, outline-color;
+  transition-duration:
+    var(--md-sys-motion-spring-fast-effects-duration), var(--bottom-sheet-fill-duration);
+  transition-timing-function:
+    var(--md-sys-motion-spring-fast-effects-easing), var(--bottom-sheet-fill-easing);
+
+  &[data-full-screen]:not([data-entering], [data-exiting]) {
+    --bottom-sheet-fill-duration: var(--md-sys-motion-spring-slow-effects-duration);
+    --bottom-sheet-fill-easing: var(--md-sys-motion-spring-slow-effects-easing);
+    outline-color: var(--md-sys-color-surface);
+    background-color: var(--md-sys-color-surface);
+  }
+  /* Forced colors would draw the transparent outline: the sheet's edge, and the canvas while
+   * full-screen. */
+  @media (forced-colors: active) {
+    outline: 1px solid CanvasText;
+    outline-offset: -1px;
+    &[data-full-screen]:not([data-entering], [data-exiting]) {
+      outline: 100vmax solid Canvas;
+      outline-offset: 0;
+    }
+  }
+}
+
+/* The drag handle's focus ring (bottom-sheet-drag-handle.tsx), around its bar and not its
+ * 48dp target: the indicator's thickness and outer offset, in secondary. */
+@utility bottom-sheet-drag-handle-focus {
+  outline: var(--md-sys-state-focus-indicator-thickness) solid var(--md-sys-color-secondary);
+  outline-offset: var(--md-sys-state-focus-indicator-outer-offset);
+}
