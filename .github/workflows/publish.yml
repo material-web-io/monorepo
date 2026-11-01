@@ -1,0 +1,47 @@
+name: Publish
+
+# Publishes both libraries to npm when a v<version> tag is pushed, as `npm run release` makes.
+# npm trusts this workflow by its filename (trusted publishing), so it needs no token, and
+# each package's prepublishOnly runs the checks and its build first.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+  id-token: write # Lets npm verify that this workflow is the one publishing.
+
+concurrency: publish
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          cache: npm
+      - run: npm ci
+      # The checks in prepublishOnly include the browser tests.
+      - run: npx playwright install --with-deps chromium
+      - name: Check the tag against the package versions
+        id: version
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          for p in tailwind react; do
+            actual="$(node -p "require('./packages/$p/package.json').version")"
+            if [ "$actual" != "$version" ]; then
+              echo "::error::packages/$p is at $actual, but the tag is $GITHUB_REF_NAME"
+              exit 1
+            fi
+          done
+          # A prerelease, such as 0.2.0-beta.1, is published under next, not latest.
+          case "$version" in
+            *-*) echo "dist-tag=next" >> "$GITHUB_OUTPUT" ;;
+            *) echo "dist-tag=latest" >> "$GITHUB_OUTPUT" ;;
+          esac
+      # The theme first: the components depend on it at exactly this version.
+      - run: npm publish --workspace @material-web/tailwind --tag ${{ steps.version.outputs.dist-tag }}
+      - run: npm publish --workspace @material-web/react --tag ${{ steps.version.outputs.dist-tag }}
