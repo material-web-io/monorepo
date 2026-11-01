@@ -1,8 +1,9 @@
 name: Publish
 
-# Publishes both libraries to npm when a v<version> tag is pushed, as `npm run release` makes.
-# npm trusts this workflow by its filename (trusted publishing), so it needs no token, and
-# each package's prepublishOnly runs the checks and its build first.
+# Publishes both libraries to npm when a v<version> tag is pushed, as `npm run release` makes,
+# then creates the tag's GitHub release. npm trusts this workflow by its filename (trusted
+# publishing), so it needs no token, and each package's prepublishOnly runs the checks and its
+# build first.
 on:
   push:
     tags: ['v*']
@@ -16,6 +17,8 @@ concurrency: publish
 jobs:
   publish:
     runs-on: ubuntu-latest
+    outputs:
+      dist-tag: ${{ steps.version.outputs.dist-tag }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -45,3 +48,28 @@ jobs:
       # The theme first: the components depend on it at exactly this version.
       - run: npm publish --workspace @material-web/tailwind --tag ${{ steps.version.outputs.dist-tag }}
       - run: npm publish --workspace @material-web/react --tag ${{ steps.version.outputs.dist-tag }}
+
+  release:
+    # A job of its own, so that the token that can write to the repository never runs the
+    # install, the tests or the build. It runs only once both packages are published.
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DIST_TAG: ${{ needs.publish.outputs.dist-tag }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          # Links to the packages on npm, above the notes GitHub writes from the commits and
+          # pull requests since the last release.
+          notes="Published to npm under \`$DIST_TAG\`:
+
+          - [@material-web/tailwind@$version](https://www.npmjs.com/package/@material-web/tailwind/v/$version)
+          - [@material-web/react@$version](https://www.npmjs.com/package/@material-web/react/v/$version)"
+          prerelease=()
+          if [ "$DIST_TAG" = next ]; then prerelease=(--prerelease); fi
+          gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --verify-tag \
+            --generate-notes --notes "$notes" "${prerelease[@]}"
