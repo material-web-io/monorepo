@@ -13,14 +13,14 @@
   ],
   "license": "MIT",
   "author": "Yunfan Yang",
-  "homepage": "https://github.com/material3-web/monorepo/tree/main/packages/react#readme",
+  "homepage": "https://github.com/material-web-io/monorepo/tree/main/packages/react#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/material3-web/monorepo.git",
+    "url": "git+https://github.com/material-web-io/monorepo.git",
     "directory": "packages/react"
   },
   "bugs": {
-    "url": "https://github.com/material3-web/monorepo/issues"
+    "url": "https://github.com/material-web-io/monorepo/issues"
   },
   "type": "module",
   "sideEffects": [

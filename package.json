@@ -1,12 +1,12 @@
 {
-  "name": "material3-web-monorepo",
+  "name": "material-web-io-monorepo",
   "private": true,
   "description": "Material 3 for Tailwind CSS and React: the workspace of @material-web/tailwind and @material-web/react.",
   "license": "MIT",
   "author": "Yunfan Yang",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/material3-web/monorepo.git"
+    "url": "git+https://github.com/material-web-io/monorepo.git"
   },
   "type": "module",
   "workspaces": [

@@ -1,6 +1,6 @@
 # @material-web/react
 
-Accessible [Material 3](https://m3.material.io) components for React, styled with [Tailwind CSS](https://tailwindcss.com) v4. The components take the props, parts and providers of [React Aria Components](https://react-aria.adobe.com/), and come with the [`@material-web/tailwind`](https://github.com/material3-web/monorepo/tree/main/packages/tailwind#readme) theme.
+Accessible [Material 3](https://m3.material.io) components for React, styled with [Tailwind CSS](https://tailwindcss.com) v4. The components take the props, parts and providers of [React Aria Components](https://react-aria.adobe.com/), and come with the [`@material-web/tailwind`](https://github.com/material-web-io/monorepo/tree/main/packages/tailwind#readme) theme.
 
 > **Beta.** This library is in beta. Its API may change between releases until the first stable version.
 
@@ -153,7 +153,7 @@ A component sizes the `Icon` it holds. Any other icon works as a child too, such
 
 ## Theming
 
-The colors, typefaces, shapes and motion come from the theme. Set `data-theme="dark"` or `data-contrast="high"` on the root element or on any part of the page, and generate the colors of your own seed color. See the [theme's readme](https://github.com/material3-web/monorepo/tree/main/packages/tailwind#theming).
+The colors, typefaces, shapes and motion come from the theme. Set `data-theme="dark"` or `data-contrast="high"` on the root element or on any part of the page, and generate the colors of your own seed color. See the [theme's readme](https://github.com/material-web-io/monorepo/tree/main/packages/tailwind#theming).
 
 ## License
 

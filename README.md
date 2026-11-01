@@ -6,7 +6,7 @@
 
 Two libraries that bring [Material Design 3](https://m3.material.io) to [React](https://react.dev) and [Tailwind CSS](https://tailwindcss.com).
 
-[Documentation](https://material3-web.github.io/monorepo/) · [Installation](#installation) · [React components](packages/react#readme) · [Tailwind theme](packages/tailwind#readme) · [Development](#development)
+[Documentation](https://material-web-io.github.io/monorepo/) · [Installation](#installation) · [React components](packages/react#readme) · [Tailwind theme](packages/tailwind#readme) · [Development](#development)
 
 </div>
 

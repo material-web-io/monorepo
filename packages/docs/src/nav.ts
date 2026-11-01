@@ -36,7 +36,7 @@ export const site = {
   title: 'Material 3 for React & Tailwind',
   shortTitle: 'Material 3',
   description: 'Two libraries that bring Material Design 3 to React and Tailwind CSS.',
-  repository: 'https://github.com/material3-web/monorepo',
+  repository: 'https://github.com/material-web-io/monorepo',
   /** The version of both libraries, which are released together. */
   version,
 }

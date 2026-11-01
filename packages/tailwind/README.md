@@ -2,7 +2,7 @@
 
 The [Material 3](https://m3.material.io) design tokens for [Tailwind CSS](https://tailwindcss.com) v4, as Tailwind classes and CSS custom properties. CSS only, with no JavaScript and no dependencies.
 
-Use it with your own markup or components, in React or any other framework. For Material 3 components for React, use [`@material-web/react`](https://github.com/material3-web/monorepo/tree/main/packages/react#readme), which installs this theme.
+Use it with your own markup or components, in React or any other framework. For Material 3 components for React, use [`@material-web/react`](https://github.com/material-web-io/monorepo/tree/main/packages/react#readme), which installs this theme.
 
 > **Beta.** This library is in beta. Its API may change between releases until the first stable version.
 
