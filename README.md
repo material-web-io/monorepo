@@ -6,7 +6,7 @@
 
 Two libraries that bring [Material Design 3](https://m3.material.io) to [React](https://react.dev) and [Tailwind CSS](https://tailwindcss.com).
 
-[Installation](#installation) · [React components](packages/react#readme) · [Tailwind theme](packages/tailwind#readme) · [Development](#development)
+[Documentation](https://material3-web.github.io/monorepo/) · [Installation](#installation) · [React components](packages/react#readme) · [Tailwind theme](packages/tailwind#readme) · [Development](#development)
 
 </div>
 
@@ -111,11 +111,11 @@ npm run build                    # both libraries and the documentation site
 npm run tokens:generate          # regenerate packages/tailwind/src/theme-default.css
 ```
 
-| Folder              | Contents                                                                                                                                                                                                                                                                                                     |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `packages/tailwind` | `@material-web/tailwind`. `src/` is published as written, with no build. `src/theme-default.css` is generated: change `scripts/generate-tokens.mjs` and run `npm run tokens:generate`, never edit the file. The generator is also the package's `material3-theme` command, bundled into `dist/`.             |
-| `packages/react`    | `@material-web/react`. `src/components/` holds a folder per component, with its CSS and tests. `src/tailwind.css` is the package's stylesheet, published with its imports inlined. `src/lib/` holds the shared `tv` and `twMerge`, and the helpers the components share around React Aria. Built to `dist/`. |
-| `packages/docs`     | The documentation site, a private package: React Router, Vite and MDX, prerendered to static HTML in `dist/client`. `src/nav.ts` is the site map, `src/content/` holds the pages and `src/examples/` the examples they run. Set `DOCS_BASE` to serve the site under a path other than `/`.                   |
+| Folder              | Contents                                                                                                                                                                                                                                                                                                                                                             |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/tailwind` | `@material-web/tailwind`. `src/` is published as written, with no build. `src/theme-default.css` is generated: change `scripts/generate-tokens.mjs` and run `npm run tokens:generate`, never edit the file. The generator is also the package's `material3-theme` command, bundled into `dist/`.                                                                     |
+| `packages/react`    | `@material-web/react`. `src/components/` holds a folder per component, with its CSS and tests. `src/tailwind.css` is the package's stylesheet, published with its imports inlined. `src/lib/` holds the shared `tv` and `twMerge`, and the helpers the components share around React Aria. Built to `dist/`.                                                         |
+| `packages/docs`     | The documentation site, a private package: React Router, Vite and MDX, prerendered to static HTML in `dist/client`. `src/nav.ts` is the site map, `src/content/` holds the pages and `src/examples/` the examples they run. Set `DOCS_BASE` to serve the site under a path other than `/`. `.github/workflows/docs.yml` deploys it to GitHub Pages for each release. |
 
 - **Releases:** The two libraries share one version, and `@material-web/react` depends on `@material-web/tailwind` at exactly that version. `npm run release -- 0.2.0` sets that version in every workspace, then commits and tags `v0.2.0`. Pushing the tag with `git push --follow-tags` runs the [publish workflow](.github/workflows/publish.yml), which publishes both packages to npm through [trusted publishing](https://docs.npmjs.com/trusted-publishers), with no token, then creates the tag's GitHub release with generated notes. A prerelease, such as `0.2.0-beta.1`, is published under the `next` tag and marked as a prerelease on GitHub. Each package runs the checks and its build before it is published.
 - **TypeScript:** Pinned to 6.0, since typescript-eslint and Storybook's docgen do not support 7.x yet.

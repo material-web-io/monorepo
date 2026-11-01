@@ -1,0 +1,71 @@
+name: Docs
+
+# Deploys the documentation site to GitHub Pages for each release, built from the release's
+# tag, so that the site documents what is on npm. It runs once the publish workflow has
+# published the release, or by hand for a release tag. The repository's Pages source must be
+# GitHub Actions (Settings → Pages → Build and deployment).
+#
+# It follows the publish workflow rather than the push of the tag: a run that follows another
+# runs on main, the only branch the github-pages environment deploys from, and it starts only
+# once both packages are on npm.
+on:
+  workflow_run:
+    workflows: [Publish]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: The release tag to deploy the docs of, such as v0.1.1-beta.0
+        required: true
+
+permissions:
+  contents: read
+
+# One deployment at a time. A newer run waits for the one in progress rather than cancelling
+# it, so a deployment is never cut off halfway.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    # A release that failed to publish is not on npm, so there is nothing to document.
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read # Lets configure-pages read the site's base path.
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # The commit of the tag that was published, or the tag given by hand, which must be one.
+          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', inputs.tag) || github.event.workflow_run.head_sha }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - id: pages
+        uses: actions/configure-pages@v6
+      - run: npm ci
+      # The site is served under /<repository>/, or at / with a custom domain: base_path is
+      # "/monorepo" or "".
+      - run: npm run build --workspace @material-web/docs
+        env:
+          DOCS_BASE: ${{ steps.pages.outputs.base_path }}/
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: packages/docs/dist/client
+
+  deploy:
+    # A job of its own, so that the token that can deploy never runs the install or the build.
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write # Lets Pages verify that the artifact comes from this workflow.
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
