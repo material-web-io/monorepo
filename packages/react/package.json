@@ -1,6 +1,6 @@
 {
   "name": "@material-web/react",
-  "version": "0.1.0",
+  "version": "0.1.1-beta.0",
   "description": "Material 3 components for React, built with Tailwind CSS and React Aria.",
   "keywords": [
     "material-design",
@@ -52,7 +52,7 @@
   },
   "dependencies": {
     "@internationalized/date": "^3.12.4",
-    "@material-web/tailwind": "0.1.0",
+    "@material-web/tailwind": "0.1.1-beta.0",
     "@react-aria/live-announcer": "^3.5.1",
     "react-aria": "^3.53.1",
     "react-aria-components": "^1.22.1",

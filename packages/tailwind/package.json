@@ -1,6 +1,6 @@
 {
   "name": "@material-web/tailwind",
-  "version": "0.1.0",
+  "version": "0.1.1-beta.0",
   "description": "Material 3 for Tailwind CSS v4: the design tokens as CSS custom properties and Tailwind utilities.",
   "keywords": [
     "material-design",
